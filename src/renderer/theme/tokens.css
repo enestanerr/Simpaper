@@ -1,0 +1,241 @@
+/*
+ * Varak design tokens. Identity: ink (#1D2B53) chrome with gold (#C9A227) highlights; each module
+ * has its own accent (brand colours are injected from src/shared/brand.ts by theme.ts, the values
+ * below are fallbacks). Theme selection: <html data-theme="light|dark">; forced colours override all.
+ */
+:root {
+  --c-ink: #1d2b53;
+  --c-ink-2: #273867;
+  --c-ink-3: #34477d;
+  --c-gold: #c9a227;
+  --c-gold-light: #e6c65a;
+  --c-writer: #3b5bdb;
+  --c-calc: #12876f;
+  --c-impress: #d5582a;
+  --c-pdf: #c0303f;
+
+  --font-ui: 'Segoe UI Variable Text', 'Segoe UI Variable', 'Segoe UI', system-ui, -apple-system, 'Noto Sans', 'Liberation Sans', sans-serif;
+  --font-display: 'Segoe UI Variable Display', 'Segoe UI Variable', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'Cascadia Mono', Consolas, 'Liberation Mono', monospace;
+  --fs-xs: 10px;
+  --fs-s: 11px;
+  --fs: 12px;
+  --fs-m: 13px;
+  --fs-l: 15px;
+  --fs-xl: 20px;
+  --fs-xxl: 28px;
+
+  --radius-s: 3px;
+  --radius-m: 6px;
+  --radius-l: 10px;
+
+  --titlebar-h: 40px;
+  --caption-reserve: 140px;
+  --doctabs-h: 30px;
+  --ribbon-tabs-h: 30px;
+  --ribbon-body-h: 94px;
+  --statusbar-h: 26px;
+  --toolstrip-h: 30px;
+
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+  --dur-fast: 90ms;
+  --dur: 160ms;
+
+}
+
+:root,
+:root[data-theme='light'] {
+  color-scheme: light;
+  /* Title bar = WINDOW_CHROME (caption buttons are painted by Windows in the same colours). */
+  --bg-titlebar: var(--chrome-bg-light, #f5f5f5);
+  --fg-titlebar: var(--chrome-fg-light, #1d2b53);
+  --fg-titlebar-muted: #5a6073;
+  --bg-titlebar-hover: rgba(29, 43, 83, 0.08);
+  --bg-titlebar-pressed: rgba(29, 43, 83, 0.15);
+  --bg-doctabs: var(--bg-titlebar);
+  --bg-doctab-hover: rgba(29, 43, 83, 0.06);
+  --bg-app: #f3f1ec;
+  --bg-ribbon: #fbfaf7;
+  --bg-ribbon-tabs: #fbfaf7;
+  --bg-doctab-active: #fbfaf7;
+  --fg-doctab-active: #1b1f2a;
+  --border-ribbon: #dcd8ce;
+  --bg-surface: #ffffff;
+  --bg-surface-2: #f7f5f0;
+  --bg-surface-3: #efece5;
+  --bg-workspace: #e4e1d9;
+  --bg-statusbar: #f0ede6;
+  --fg: #1b1f2a;
+  --fg-muted: #5a6073;
+  --fg-subtle: #767c8e;
+  --fg-disabled: #a3a6b0;
+  --border: #d6d2c8;
+  --border-strong: #b9b4a8;
+  --bg-hover: rgba(29, 43, 83, 0.07);
+  --bg-pressed: rgba(29, 43, 83, 0.13);
+  --bg-checked: rgba(29, 43, 83, 0.1);
+  --border-checked: rgba(29, 43, 83, 0.35);
+  --bg-input: #ffffff;
+  --border-input: #b9b4a8;
+  --shadow-popup: 0 8px 28px rgba(20, 24, 40, 0.18), 0 1px 3px rgba(20, 24, 40, 0.12);
+  --shadow-dialog: 0 18px 60px rgba(20, 24, 40, 0.28), 0 2px 6px rgba(20, 24, 40, 0.14);
+  --scrim: rgba(18, 22, 36, 0.36);
+  --focus: var(--c-ink);
+  --focus-halo: rgba(201, 162, 39, 0.55);
+  --link: #2c4bb8;
+  --danger: #b3261e;
+  --danger-bg: #fcebea;
+  --danger-border: #eeb4af;
+  --warning: #8a5a00;
+  --warning-bg: #fff5d6;
+  --warning-border: #ecd48b;
+  --info: #1d4f91;
+  --info-bg: #eaf1fb;
+  --info-border: #b8cdee;
+  --success: #1e6b3a;
+  --success-bg: #e7f5ec;
+  --keytip-bg: #1d2b53;
+  --keytip-fg: #fbe9a8;
+  --accent-contrast: #ffffff;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg-titlebar: var(--chrome-bg-dark, #202020);
+  --fg-titlebar: var(--chrome-fg-dark, #f3f3f3);
+  --fg-titlebar-muted: #a9abb5;
+  --bg-titlebar-hover: rgba(255, 255, 255, 0.08);
+  --bg-titlebar-pressed: rgba(255, 255, 255, 0.15);
+  --bg-doctabs: var(--bg-titlebar);
+  --bg-doctab-hover: rgba(255, 255, 255, 0.06);
+  --bg-app: #16171c;
+  --bg-ribbon: #202229;
+  --bg-ribbon-tabs: #202229;
+  --bg-doctab-active: #202229;
+  --fg-doctab-active: #eceae4;
+  --border-ribbon: #33363f;
+  --bg-surface: #25272f;
+  --bg-surface-2: #2b2e37;
+  --bg-surface-3: #32353f;
+  --bg-workspace: #121318;
+  --bg-statusbar: #1b1c22;
+  --fg: #eceae4;
+  --fg-muted: #b3b5bf;
+  --fg-subtle: #9496a2;
+  --fg-disabled: #6b6e7a;
+  --border: #3a3d48;
+  --border-strong: #52566a;
+  --bg-hover: rgba(255, 255, 255, 0.07);
+  --bg-pressed: rgba(255, 255, 255, 0.13);
+  --bg-checked: rgba(230, 198, 90, 0.16);
+  --border-checked: rgba(230, 198, 90, 0.5);
+  --bg-input: #1b1c22;
+  --border-input: #52566a;
+  --shadow-popup: 0 8px 28px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-dialog: 0 18px 60px rgba(0, 0, 0, 0.6), 0 2px 6px rgba(0, 0, 0, 0.4);
+  --scrim: rgba(0, 0, 0, 0.5);
+  --focus: var(--c-gold-light);
+  --focus-halo: rgba(230, 198, 90, 0.35);
+  --link: #9db4ff;
+  --danger: #ffb4ab;
+  --danger-bg: #3b1d1c;
+  --danger-border: #6e2f2b;
+  --warning: #f2cf6d;
+  --warning-bg: #3a3017;
+  --warning-border: #6b5a22;
+  --info: #a9c7ff;
+  --info-bg: #1b2a44;
+  --info-border: #2f4a78;
+  --success: #93d8a8;
+  --success-bg: #173222;
+  --keytip-bg: #f4d77a;
+  --keytip-fg: #1d2b53;
+  --accent-contrast: #ffffff;
+}
+
+/* Module accents: the app root carries data-module of the active document. */
+[data-module] {
+  --accent: var(--c-ink);
+}
+[data-module='writer'] {
+  --accent: var(--c-writer);
+}
+[data-module='calc'] {
+  --accent: var(--c-calc);
+}
+[data-module='impress'] {
+  --accent: var(--c-impress);
+}
+[data-module='pdf'] {
+  --accent: var(--c-pdf);
+}
+:root {
+  --accent-text: color-mix(in oklab, var(--accent) 88%, black);
+  --accent-soft: color-mix(in oklab, var(--accent) 12%, transparent);
+  --accent-softer: color-mix(in oklab, var(--accent) 6%, transparent);
+}
+:root[data-theme='dark'] {
+  --accent-text: color-mix(in oklab, var(--accent) 55%, white);
+  --accent-soft: color-mix(in oklab, var(--accent) 24%, transparent);
+  --accent-softer: color-mix(in oklab, var(--accent) 12%, transparent);
+}
+
+/* Contextual tab colours. */
+:root {
+  --ctx-table: #7a5cc9;
+  --ctx-picture: #b0561d;
+  --ctx-drawing: #1f7f98;
+  --ctx-chart: #2f8a3d;
+}
+
+@media (forced-colors: active) {
+  :root,
+  :root[data-theme='light'],
+  :root[data-theme='dark'] {
+    --bg-titlebar: Canvas;
+    --fg-titlebar: CanvasText;
+    --fg-titlebar-muted: CanvasText;
+    --bg-titlebar-hover: Highlight;
+    --bg-titlebar-pressed: Highlight;
+    --bg-doctabs: Canvas;
+    --bg-doctab-hover: Highlight;
+    --bg-doctab-active: Canvas;
+    --fg-doctab-active: CanvasText;
+    --bg-app: Canvas;
+    --bg-ribbon: Canvas;
+    --bg-ribbon-tabs: Canvas;
+    --border-ribbon: CanvasText;
+    --bg-surface: Canvas;
+    --bg-surface-2: Canvas;
+    --bg-surface-3: Canvas;
+    --bg-workspace: Canvas;
+    --bg-statusbar: Canvas;
+    --fg: CanvasText;
+    --fg-muted: CanvasText;
+    --fg-subtle: CanvasText;
+    --fg-disabled: GrayText;
+    --border: CanvasText;
+    --border-strong: CanvasText;
+    --bg-hover: Highlight;
+    --bg-pressed: Highlight;
+    --bg-checked: Highlight;
+    --border-checked: CanvasText;
+    --bg-input: Field;
+    --border-input: CanvasText;
+    --focus: Highlight;
+    --link: LinkText;
+    --danger: CanvasText;
+    --danger-bg: Canvas;
+    --warning: CanvasText;
+    --warning-bg: Canvas;
+    --info: CanvasText;
+    --info-bg: Canvas;
+    --keytip-bg: CanvasText;
+    --keytip-fg: Canvas;
+    --accent: Highlight;
+    --accent-text: CanvasText;
+    --accent-soft: Canvas;
+    --accent-softer: Canvas;
+    --accent-contrast: HighlightText;
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "version": "26.8.0.3",
+  "msiUrl": "https://downloadarchive.documentfoundation.org/libreoffice/old/26.8.0.3/win/x86_64/LibreOffice_26.8.0.3_Win_x86-64.msi",
+  "fallbackUrl": "https://download.documentfoundation.org/libreoffice/stable/26.8.0/win/x86_64/LibreOffice_26.8.0_Win_x86-64.msi",
+  "sha256": "4aa6c6e1895f4055104effcb556bd3362d20c6ad707c149543304f395ef9db95",
+  "sizeBytes": 374906880,
+  "gpgFingerprint": "C2839ECAD9408FBE9531C3E9F434A1EFAFEEAEA3",
+  "sourceUrl": "https://download.documentfoundation.org/libreoffice/src/26.8.0/"
+}

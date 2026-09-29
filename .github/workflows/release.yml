@@ -1,0 +1,128 @@
+# Release build (docs/PACKAGING.md#release-workflow, docs/adr/0008-packaging.md).
+# Builds the per-user NSIS installer and the ZIP from a v* tag and uploads them to a DRAFT GitHub release for
+# manual review. Nothing is published automatically.
+# Code signing is NOT configured: the installer, the ZIP and Varak.exe are unsigned (planned: SignPath Foundation,
+# see docs/PACKAGING.md#signing-plan). The LibreOffice files inside keep The Document Foundation's signatures.
+# No caches are used: every release downloads the engine and verifies its SHA-256 digest and OpenPGP signature.
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing tag to build, for example v0.1.0
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  windows:
+    name: Windows installer and ZIP (unsigned)
+    runs-on: windows-latest
+    timeout-minutes: 120
+    permissions:
+      contents: write # create the draft release and upload its files
+    env:
+      RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+    steps:
+      - name: Check out the tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Check that the tag matches package.json
+        shell: pwsh
+        run: |
+          $version = (Get-Content -Raw package.json | ConvertFrom-Json).version
+          if ($env:RELEASE_TAG -cne "v$version") {
+            throw "Tag '$env:RELEASE_TAG' does not match the version in package.json ($version)."
+          }
+          Write-Host "Building Varak $version"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Fetch and verify the engine (signature required)
+        shell: pwsh
+        run: powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/engine/fetch-engine.ps1 -RequireSignature -RemoveMsiAfterExtract
+
+      - name: Prepare the engine and smoke-test it headlessly
+        run: npm run engine:prepare -- --verify
+
+      - name: Check that THIRD_PARTY_NOTICES.md is up to date
+        shell: pwsh
+        run: |
+          npm run notices
+          if ($LASTEXITCODE -ne 0) { throw 'npm run notices failed.' }
+          git diff --exit-code -- THIRD_PARTY_NOTICES.md
+          if ($LASTEXITCODE -ne 0) { throw 'THIRD_PARTY_NOTICES.md is outdated: run "npm run notices" and commit the result.' }
+
+      - name: Build the installer and the ZIP (unsigned)
+        run: npm run dist:win -- --publish never
+
+      - name: Write checksums and release notes
+        shell: pwsh
+        run: |
+          $version = $env:RELEASE_TAG.Substring(1)
+          $files = @("Varak-Setup-$version-x64.exe", "Varak-$version-x64.zip")
+          $lines = foreach ($name in $files) {
+            $path = Join-Path release $name
+            if (-not (Test-Path -LiteralPath $path)) { throw "Missing build output: $path" }
+            '{0}  {1}' -f (Get-FileHash -Algorithm SHA256 -LiteralPath $path).Hash.ToLowerInvariant(), $name
+          }
+          [IO.File]::WriteAllText((Join-Path release 'SHA256SUMS.txt'), (($lines -join "`n") + "`n"))
+
+          $lock = Get-Content -Raw scripts/engine/engine.lock.json | ConvertFrom-Json
+          $sums = $lines -join "`n"
+          $notes = @"
+          <!-- Maintainers: add the CHANGELOG section of this version before publishing. -->
+          > [!WARNING]
+          > Varak is in early development. Do not use it for important documents yet; see the
+          > [known limitations](https://github.com/${env:GITHUB_REPOSITORY}/blob/$env:RELEASE_TAG/docs/KNOWN_LIMITATIONS.md).
+
+          | File | Content |
+          |---|---|
+          | ``Varak-Setup-$version-x64.exe`` | Installer for the current user (no administrator rights needed) |
+          | ``Varak-$version-x64.zip`` | The same application for portable use: unzip and run ``Varak.exe`` |
+          | ``SHA256SUMS.txt`` | SHA-256 checksums of both files |
+
+          **Not code-signed yet:** Windows SmartScreen shows a warning when the installer or the app is started for the
+          first time. Compare the checksum of your download with ``SHA256SUMS.txt``.
+
+          **Engine:** LibreOffice $($lock.version), unmodified (installer SHA-256 ``$($lock.sha256)``, OpenPGP signature
+          verified in this build). Source code of the engine: $($lock.sourceUrl)
+
+          Built by GitHub Actions from commit ``$env:GITHUB_SHA``.
+
+          ``````text
+          $sums
+          ``````
+          "@
+          [IO.File]::WriteAllText((Join-Path $env:RUNNER_TEMP 'release-notes.md'), $notes)
+
+      - name: Upload to a draft release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: Varak ${{ env.RELEASE_TAG }}
+          body_path: ${{ runner.temp }}/release-notes.md
+          draft: true
+          prerelease: ${{ contains(env.RELEASE_TAG, '-') }}
+          fail_on_unmatched_files: true
+          files: |
+            release/Varak-Setup-*-x64.exe
+            release/Varak-*-x64.zip
+            release/SHA256SUMS.txt

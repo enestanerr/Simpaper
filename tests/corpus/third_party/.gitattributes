@@ -1,0 +1,7 @@
+# The vendored samples and licence files are verified by SHA-256 (scripts/corpus/third-party.mjs):
+# store and check them out byte for byte, whatever the repository-wide text settings are.
+* -text
+# Written by scripts/corpus/third-party.mjs --docs with LF line endings.
+*.md text eol=lf
+*.json text eol=lf
+.gitattributes text eol=lf

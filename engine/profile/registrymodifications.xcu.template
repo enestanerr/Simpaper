@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Varak engine profile template (MPL-2.0). Rendered by src/main/engine/profiles.ts into
+  <profile slot>/user/registrymodifications.xcu before every engine start.
+  Placeholders (double braces): UI_LOCALE (tr | en-US), LOCALE and DOCUMENT_LOCALE (BCP 47, e.g. tr-TR),
+  APPEARANCE (0 system, 1 light, 2 dark), ACCELERATORS (items generated from accelerators.json).
+  Keys and defaults were checked against LibreOffice 26.8.0.3 (share/registry/main.xcd); see docs/dev/engine.md.
+-->
+<oor:items xmlns:oor="http://openoffice.org/2001/registry" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<!-- Language: UI language, locale setting (decimal separator, date input), default document language -->
+<item oor:path="/org.openoffice.Setup/L10N"><prop oor:name="ooLocale" oor:op="fuse"><value>{{UI_LOCALE}}</value></prop></item>
+<item oor:path="/org.openoffice.Office.Linguistic/General"><prop oor:name="UILocale" oor:op="fuse"><value>{{UI_LOCALE}}</value></prop></item>
+<item oor:path="/org.openoffice.Setup/L10N"><prop oor:name="ooSetupSystemLocale" oor:op="fuse"><value>{{LOCALE}}</value></prop></item>
+<item oor:path="/org.openoffice.Office.Linguistic/General"><prop oor:name="DefaultLocale" oor:op="fuse"><value>{{DOCUMENT_LOCALE}}</value></prop></item>
+<!-- Appearance follows the Varak theme -->
+<item oor:path="/org.openoffice.Office.Common/Appearance"><prop oor:name="ApplicationAppearance" oor:op="fuse"><value>{{APPEARANCE}}</value></prop></item>
+<!-- The bundled engine is updated with Varak, never by itself. Job arguments are an extensible group:
+     without oor:type configmgr rejects the item and ignores every item after it. -->
+<item oor:path="/org.openoffice.Office.Jobs/Jobs/org.openoffice.Office.Jobs:Job['UpdateCheck']/Arguments"><prop oor:name="AutoCheckEnabled" oor:op="fuse" oor:type="xs:boolean"><value>false</value></prop></item>
+<item oor:path="/org.openoffice.Office.Update/Update"><prop oor:name="Enabled" oor:op="fuse"><value>false</value></prop></item>
+<!-- No LibreOffice dialogs at start-up or after a crash: Varak handles recovery itself -->
+<item oor:path="/org.openoffice.Office.Common/Misc"><prop oor:name="CrashReport" oor:op="fuse"><value>false</value></prop></item>
+<item oor:path="/org.openoffice.Office.Common/Misc"><prop oor:name="OfferSafeMode" oor:op="fuse"><value>false</value></prop></item>
+<item oor:path="/org.openoffice.Office.Common/Misc"><prop oor:name="ShowTipOfTheDay" oor:op="fuse"><value>false</value></prop></item>
+<item oor:path="/org.openoffice.Office.Common/Misc"><prop oor:name="FirstRun" oor:op="fuse"><value>false</value></prop></item>
+<item oor:path="/org.openoffice.Office.Common/Misc"><prop oor:name="ShowDonation" oor:op="fuse"><value>false</value></prop></item>
+<item oor:path="/org.openoffice.Setup/Product"><prop oor:name="WhatsNew" oor:op="fuse"><value>false</value></prop></item>
+<item oor:path="/org.openoffice.Setup/Product"><prop oor:name="WhatsNewDialog" oor:op="fuse"><value>false</value></prop></item>
+<!-- Infobars inside the document window: Varak's shell shows read-only/macro/signature state itself -->
+<item oor:path="/org.openoffice.Office.UI.Infobar/Enabled"><prop oor:name="WhatsNew" oor:op="fuse"><value>false</value></prop></item>
+<item oor:path="/org.openoffice.Office.UI.Infobar/Enabled"><prop oor:name="Donate" oor:op="fuse"><value>false</value></prop></item>
+<item oor:path="/org.openoffice.Office.UI.Infobar/Enabled"><prop oor:name="GetInvolved" oor:op="fuse"><value>false</value></prop></item>
+<item oor:path="/org.openoffice.Office.UI.Infobar/Enabled"><prop oor:name="HyphenationMissing" oor:op="fuse"><value>false</value></prop></item>
+<item oor:path="/org.openoffice.Office.UI.Infobar/Enabled"><prop oor:name="MacrosDisabled" oor:op="fuse"><value>false</value></prop></item>
+<item oor:path="/org.openoffice.Office.UI.Infobar/Enabled"><prop oor:name="Readonly" oor:op="fuse"><value>false</value></prop></item>
+<item oor:path="/org.openoffice.Office.UI.Infobar/Enabled"><prop oor:name="Signature" oor:op="fuse"><value>false</value></prop></item>
+<item oor:path="/org.openoffice.Office.UI.Infobar/Enabled"><prop oor:name="WarnGenericVCL" oor:op="fuse"><value>false</value></prop></item>
+<!-- Macros are never executed; VBA code is loaded and saved back but not executable -->
+<item oor:path="/org.openoffice.Office.Common/Security/Scripting"><prop oor:name="DisableMacrosExecution" oor:op="fuse"><value>true</value></prop></item>
+<item oor:path="/org.openoffice.Office.Common/Security/Scripting"><prop oor:name="MacroSecurityLevel" oor:op="fuse"><value>3</value></prop></item>
+<item oor:path="/org.openoffice.Office.Writer/Filter/Import/VBA"><prop oor:name="Load" oor:op="fuse"><value>true</value></prop></item>
+<item oor:path="/org.openoffice.Office.Writer/Filter/Import/VBA"><prop oor:name="Executable" oor:op="fuse"><value>false</value></prop></item>
+<item oor:path="/org.openoffice.Office.Writer/Filter/Import/VBA"><prop oor:name="Save" oor:op="fuse"><value>true</value></prop></item>
+<item oor:path="/org.openoffice.Office.Calc/Filter/Import/VBA"><prop oor:name="Load" oor:op="fuse"><value>true</value></prop></item>
+<item oor:path="/org.openoffice.Office.Calc/Filter/Import/VBA"><prop oor:name="Executable" oor:op="fuse"><value>false</value></prop></item>
+<item oor:path="/org.openoffice.Office.Calc/Filter/Import/VBA"><prop oor:name="Save" oor:op="fuse"><value>true</value></prop></item>
+<item oor:path="/org.openoffice.Office.Impress/Filter/Import/VBA"><prop oor:name="Load" oor:op="fuse"><value>true</value></prop></item>
+<item oor:path="/org.openoffice.Office.Impress/Filter/Import/VBA"><prop oor:name="Save" oor:op="fuse"><value>true</value></prop></item>
+<!-- Saving goes through Varak's safe-save pipeline: no keep-format dialog, no backups, no lock files -->
+<item oor:path="/org.openoffice.Office.Common/Save/Document"><prop oor:name="WarnAlienFormat" oor:op="fuse"><value>false</value></prop></item>
+<item oor:path="/org.openoffice.Office.Common/Save/Document"><prop oor:name="CreateBackup" oor:op="fuse"><value>false</value></prop></item>
+<item oor:path="/org.openoffice.Office.Common/Misc"><prop oor:name="UseLocking" oor:op="fuse"><value>false</value></prop></item>
+<item oor:path="/org.openoffice.Office.Common/Misc"><prop oor:name="UseSystemFileDialog" oor:op="fuse"><value>true</value></prop></item>
+<!-- AutoRecovery is Varak's (autosave snapshots + crash recovery) -->
+<item oor:path="/org.openoffice.Office.Recovery/RecoveryInfo"><prop oor:name="Enabled" oor:op="fuse"><value>false</value></prop></item>
+<item oor:path="/org.openoffice.Office.Recovery/AutoSave"><prop oor:name="Enabled" oor:op="fuse"><value>false</value></prop></item>
+<item oor:path="/org.openoffice.Office.Recovery/AutoSave"><prop oor:name="UserAutoSaveEnabled" oor:op="fuse"><value>false</value></prop></item>
+<!-- Privacy: the engine keeps no list of opened files and no thumbnails of their content -->
+<item oor:path="/org.openoffice.Office.Common/History"><prop oor:name="PickListSize" oor:op="fuse"><value>0</value></prop></item>
+<item oor:path="/org.openoffice.Office.Common/History"><prop oor:name="RecentDocsThumbnail" oor:op="fuse"><value>false</value></prop></item>
+<!-- Stability over speed: no OpenCL formula offloading (GPU driver dependent) -->
+<item oor:path="/org.openoffice.Office.Common/Misc"><prop oor:name="UseOpenCL" oor:op="fuse"><value>false</value></prop></item>
+<!-- Default save formats (only used by LibreOffice's own paths; Varak always names the filter) -->
+<item oor:path="/org.openoffice.Setup/Office/Factories/org.openoffice.Setup:Factory['com.sun.star.text.TextDocument']"><prop oor:name="ooSetupFactoryDefaultFilter" oor:op="fuse"><value>MS Word 2007 XML</value></prop></item>
+<item oor:path="/org.openoffice.Setup/Office/Factories/org.openoffice.Setup:Factory['com.sun.star.sheet.SpreadsheetDocument']"><prop oor:name="ooSetupFactoryDefaultFilter" oor:op="fuse"><value>Calc MS Excel 2007 XML</value></prop></item>
+<item oor:path="/org.openoffice.Setup/Office/Factories/org.openoffice.Setup:Factory['com.sun.star.presentation.PresentationDocument']"><prop oor:name="ooSetupFactoryDefaultFilter" oor:op="fuse"><value>Impress MS PowerPoint 2007 XML</value></prop></item>
+<!-- Calc: always recalculate on load, so cached results of unsupported formulas are never shown as fresh -->
+<item oor:path="/org.openoffice.Office.Calc/Formula/Load"><prop oor:name="OOXMLRecalcMode" oor:op="fuse"><value>0</value></prop></item>
+<item oor:path="/org.openoffice.Office.Calc/Formula/Load"><prop oor:name="ODFRecalcMode" oor:op="fuse"><value>0</value></prop></item>
+<!-- Office-like keyboard shortcuts (engine/profile/ACCELERATORS.md) -->
+{{ACCELERATORS}}
+</oor:items>

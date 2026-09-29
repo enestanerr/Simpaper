@@ -1,0 +1,82 @@
+{
+  "generic": "Beklenmeyen bir hata oluştu.",
+  "open": {
+    "notFound": "Dosya bulunamadı. Taşınmış, yeniden adlandırılmış veya silinmiş olabilir.",
+    "unsupported": "Bu dosya türü desteklenmiyor.",
+    "failed": "Dosya açılamadı. Dosya bozuk olabilir veya desteklenmeyen içerik taşıyor olabilir.",
+    "cancelled": "Açma işlemi iptal edildi.",
+    "accessDenied": "Bu dosyayı okuma izniniz yok.",
+    "locked": "Dosya başka bir program tarafından kilitlenmiş. Diğer programı kapatıp yeniden deneyin.",
+    "irm": "Bu dosya Bilgi Hakları Yönetimi (IRM) ile korunuyor ve açılamıyor.",
+    "encryptedPpt": "Parola korumalı PowerPoint 97-2003 sunuları açılamaz. Sunuyu PowerPoint'te parolasız ya da PPTX olarak kaydedip yeniden deneyin."
+  },
+  "create": {
+    "failed": "Yeni belge oluşturulamadı.",
+    "pdfUnsupported": "Boş bir PDF oluşturulamaz. Bir PDF dosyası açın ya da bir belgeyi PDF olarak dışa aktarın."
+  },
+  "save": {
+    "failed": "Dosya kaydedilemedi. Özgün dosyanız değiştirilmedi.",
+    "accessDenied": "Bu konuma kaydetme izniniz yok ya da dosya salt okunur. Başka bir konuma kaydetmeyi deneyin. Özgün dosyanız değiştirilmedi.",
+    "locked": "Dosya başka bir program tarafından kullanılıyor. Diğer programı kapatıp yeniden deneyin. Özgün dosyanız değiştirilmedi.",
+    "diskFull": "Diskte yeterli boş alan yok. Yer açıp yeniden deneyin. Özgün dosyanız değiştirilmedi.",
+    "pathTooLong": "Dosya yolu çok uzun. Daha kısa bir ad ya da klasör seçin.",
+    "folderMissing": "Hedef klasör bulunamadı.",
+    "verifyFailed": "Kaydedilen dosya doğrulamayı geçemediği için özgün dosyanın üzerine yazılmadı. Başka bir biçimde ya da konumda kaydetmeyi deneyin.",
+    "engineFailed": "Belge motoru dosyayı yazamadı. Özgün dosyanız değiştirilmedi.",
+    "formatNotWritable": "Bu biçimde kaydedilemez. Başka bir biçim seçin.",
+    "wrongKind": "Bu belge seçilen dosya türünde kaydedilemez.",
+    "usePdfExport": "PDF oluşturmak için \"PDF olarak dışa aktar\" komutunu kullanın.",
+    "targetOpen": "Bu dosya Varak'ta başka bir sekmede açık. Önce o sekmeyi kapatın ya da farklı bir ad seçin.",
+    "notFound": "Belge artık açık değil.",
+    "notReady": "Belge henüz hazır değil. Birkaç saniye sonra yeniden deneyin."
+  },
+  "export": {
+    "failed": "PDF dışa aktarılamadı.",
+    "notSupported": "Bu belge PDF olarak dışa aktarılamaz."
+  },
+  "print": {
+    "failed": "Yazdırma başlatılamadı."
+  },
+  "engine": {
+    "unavailable": "Belge motoru bulunamadı ya da başlatılamadı. Belgeler, hesap tabloları ve sunular açılamaz; PDF dosyaları kullanılmaya devam edebilir.",
+    "crashed": "Belge motoru beklenmedik biçimde kapandı.",
+    "restored": "Belge, en son otomatik kurtarma kopyasından geri yüklendi. Bu kopyadan sonra yaptığınız değişiklikleri kontrol edin.",
+    "restoredFromSaved": "Belge son kaydedilen hâlinden yeniden açıldı; kaydedilmemiş değişiklikler kurtarılamadı.",
+    "restarted": "Belge motoru yeniden başlatıldı ve belge yeniden açıldı.",
+    "restartLimit": "Belge motoru bu belgede art arda kapandı; otomatik yeniden başlatma durduruldu. Motoru elle yeniden başlatabilir ya da belgeyi kapatıp kurtarma listesinden geri yükleyebilirsiniz.",
+    "restoreUnavailable": "Belge motoru kapandı ve bu belge için kurtarma kopyası yok. Belgeyi kapatın.",
+    "restoreFailed": "Belge motoru kapandıktan sonra belge yeniden açılamadı.",
+    "timeout": "Belge motoru zamanında yanıt vermedi.",
+    "busy": "Belge motoru meşgul. Açık bir iletişim kutusu varsa kapatıp yeniden deneyin.",
+    "notResponding": "Belge motoru yanıt vermiyor. Uzun bir işlem sürüyor olabilir; biraz bekleyin. Yanıt gelmezse belge motorunu yeniden başlatabilir ya da belgeyi kapatıp kurtarma listesinden geri yükleyebilirsiniz.",
+    "responding": "Belge motoru yeniden yanıt veriyor.",
+    "restartNotNeeded": "Belge motoru çalışıyor; yeniden başlatmaya gerek yok."
+  },
+  "command": {
+    "unavailable": "Bu komut Varak'ta kullanılamaz.",
+    "macrosDisabled": "Güvenliğiniz için makrolar Varak'ta hiçbir zaman çalıştırılmaz.",
+    "notAllowed": "Bu komuta izin verilmiyor.",
+    "remoteUnsupported": "Uzak dosyalar desteklenmiyor. Dosyayı bilgisayarınıza kaydedip açın."
+  },
+  "recovery": {
+    "available": "Beklenmedik biçimde kapanan bir oturumdan kurtarılabilecek belgeler var.",
+    "notFound": "Kurtarma kopyası bulunamadı.",
+    "restoreFailed": "Kurtarma kopyası açılamadı."
+  },
+  "settings": {
+    "invalid": "Ayar değeri geçersiz."
+  },
+  "pdf": {
+    "unavailable": "PDF hizmeti kullanılamıyor."
+  },
+  "ipc": {
+    "invalidRequest": "Geçersiz istek.",
+    "unknownChannel": "Bilinmeyen istek.",
+    "untrustedSender": "İstek reddedildi.",
+    "unknownDocument": "Belge bulunamadı."
+  },
+  "notice": {
+    "macrosDisabled": "Bu belge makro içeriyor. Makrolar çalıştırılmaz; makro destekli bir biçimde kaydederseniz korunur.",
+    "readOnly": "Dosya salt okunur. Değişikliklerinizi kaydetmek için \"Farklı Kaydet\" komutunu kullanın."
+  }
+}

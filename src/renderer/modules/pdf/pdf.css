@@ -1,0 +1,469 @@
+/* PDF module (workspace, thumbnails, find bar, status bar, ribbon custom controls, dialogs). Uses the shell tokens. */
+
+.vpdf {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background: var(--bg-workspace);
+  color: var(--fg);
+}
+.vpdf[hidden] {
+  display: none;
+}
+
+.vpdf__body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.vpdf__stage {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* pdf.js requires an absolutely positioned scroll container. */
+.vpdf__container {
+  position: absolute;
+  inset: 0;
+  overflow: auto;
+  user-select: text;
+  background: var(--bg-workspace);
+  outline: none;
+}
+.vpdf__container:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--focus);
+}
+.vpdf__container .pdfViewer {
+  padding: 12px 0 24px;
+}
+.vpdf__stage--placing .vpdf__container,
+.vpdf__stage--placing .vpdf__container .page,
+.vpdf__stage--placing .vpdf__container .textLayer span {
+  cursor: crosshair;
+}
+.vpdf__container.varak-pdf-fields-plain .annotationLayer {
+  --annotation-unfocused-field-background: none;
+  --annotation-unfocused-field-filter: none;
+}
+/* pdf.js' alt-text button needs the full viewer's dialog, which the components build lacks. */
+.vpdf__container .editToolbar .altText {
+  display: none !important;
+}
+
+.vpdf__hint {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--c-ink);
+  color: #fff;
+  font-size: var(--fs-m);
+  box-shadow: var(--shadow-popup);
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* ---------------------------------------------------------------- thumbnails */
+.vpdf-thumbs {
+  display: flex;
+  flex-direction: column;
+  width: 168px;
+  flex: none;
+  border-right: 1px solid var(--border);
+  background: var(--bg-surface-2);
+}
+.vpdf-thumbs__list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 8px;
+  outline: none;
+}
+.vpdf-thumbs__hint {
+  margin: 0;
+  padding: 6px 10px;
+  border-top: 1px solid var(--border);
+  color: var(--fg-muted);
+  font-size: var(--fs-s);
+}
+.vpdf-thumb {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 8px;
+  padding: 6px 4px 4px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-m);
+  cursor: default;
+}
+.vpdf-thumb:hover {
+  background: var(--bg-hover);
+}
+.vpdf-thumb--selected {
+  background: var(--bg-checked);
+  border-color: var(--border-checked);
+}
+.vpdf-thumb:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 1px;
+}
+.vpdf-thumb--drop-before::before,
+.vpdf-thumb--drop-after::after {
+  content: '';
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--c-pdf);
+}
+.vpdf-thumb--drop-before::before {
+  top: -6px;
+}
+.vpdf-thumb--drop-after::after {
+  bottom: -6px;
+}
+.vpdf-thumb__frame {
+  min-width: 116px;
+  min-height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+.vpdf-thumb__canvas {
+  display: block;
+}
+.vpdf-thumb__label {
+  font-size: var(--fs-s);
+  color: var(--fg-muted);
+}
+.vpdf-thumb--current .vpdf-thumb__label {
+  color: var(--fg);
+  font-weight: 600;
+}
+.vpdf-thumb--current .vpdf-thumb__frame {
+  outline: 2px solid var(--c-pdf);
+  outline-offset: 1px;
+}
+
+/* ---------------------------------------------------------------- find bar */
+.vpdf-find {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-surface);
+}
+.vpdf-find__input {
+  width: 260px;
+}
+.vpdf-find__status {
+  min-width: 120px;
+  color: var(--fg-muted);
+  font-variant-numeric: tabular-nums;
+}
+.vpdf-find__close {
+  margin-left: auto;
+}
+.vpdf-iconbtn {
+  width: 30px;
+  padding: 0;
+}
+
+/* ---------------------------------------------------------------- notices, busy, state */
+.vpdf-notices {
+  position: absolute;
+  top: 10px;
+  right: 18px;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: min(520px, calc(100% - 36px));
+}
+.vpdf-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--info-border);
+  border-radius: var(--radius-m);
+  background: var(--info-bg);
+  color: var(--info);
+  box-shadow: var(--shadow-popup);
+  font-size: var(--fs-m);
+}
+.vpdf-notice--error {
+  border-color: var(--danger-border);
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+.vpdf-notice__icon {
+  flex: none;
+  margin-top: 1px;
+}
+.vpdf-notice__text {
+  flex: 1;
+  overflow-wrap: anywhere;
+  color: var(--fg);
+}
+.vpdf-notice__close {
+  flex: none;
+  display: inline-flex;
+  padding: 2px;
+  border-radius: var(--radius-s);
+  color: var(--fg-muted);
+}
+.vpdf-notice__close:hover {
+  background: var(--bg-hover);
+}
+
+.vpdf-busy {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px 6px;
+  background: linear-gradient(var(--bg-surface), transparent);
+  font-size: var(--fs-m);
+}
+.vpdf-busy__track {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  overflow: hidden;
+  background: color-mix(in oklab, var(--c-pdf) 18%, transparent);
+}
+.vpdf-busy__bar {
+  height: 100%;
+  background: var(--c-pdf);
+  transition: width var(--dur) var(--ease);
+}
+.vpdf-busy__bar--indeterminate {
+  width: 30%;
+  animation: vpdf-indeterminate 1.1s var(--ease) infinite;
+}
+.vpdf-busy__text {
+  margin-top: 8px;
+  color: var(--fg-muted);
+}
+@keyframes vpdf-indeterminate {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(340%);
+  }
+}
+
+.vpdf-state {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--fg-muted);
+  background: var(--bg-workspace);
+  font-size: var(--fs-l);
+}
+.vpdf-state--error p {
+  max-width: 480px;
+  text-align: center;
+  color: var(--fg);
+}
+
+/* ---------------------------------------------------------------- status bar */
+.vpdf-status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  min-width: 0;
+  font-size: var(--fs-s);
+}
+.vpdf-status__item {
+  padding: 0 8px;
+  white-space: nowrap;
+}
+.vpdf-status__button {
+  height: 22px;
+  padding: 0 8px;
+  border-radius: var(--radius-s);
+  font-variant-numeric: tabular-nums;
+}
+.vpdf-status__button:hover:not(:disabled) {
+  background: var(--bg-hover);
+}
+.vpdf-status__button:disabled {
+  color: var(--fg-disabled);
+}
+.vpdf-status__tool {
+  color: var(--c-pdf);
+  font-weight: 600;
+}
+.vpdf-status__spacer {
+  flex: 1;
+}
+.vpdf-status__zoom {
+  display: inline-flex;
+  align-items: center;
+}
+.vpdf-status__icon {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 4px;
+}
+.vpdf-status__value {
+  min-width: 52px;
+}
+
+/* ---------------------------------------------------------------- ribbon custom controls */
+.vpdf-rc {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  font-size: var(--fs);
+  white-space: nowrap;
+}
+.vpdf-rc__label {
+  color: var(--fg-muted);
+}
+.vpdf-rc__input,
+.vpdf-rc__select {
+  height: 22px;
+  border: 1px solid var(--border-input);
+  border-radius: var(--radius-s);
+  background: var(--bg-input);
+  color: var(--fg);
+  font: inherit;
+}
+.vpdf-rc__input {
+  width: 44px;
+  padding: 0 4px;
+  text-align: right;
+}
+.vpdf-rc__select {
+  padding: 0 2px;
+  max-width: 120px;
+}
+.vpdf-rc__select--narrow {
+  max-width: 76px;
+}
+.vpdf-rc__input:focus-visible,
+.vpdf-rc__select:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -1px;
+}
+.vpdf-rc__input:disabled,
+.vpdf-rc__select:disabled {
+  color: var(--fg-disabled);
+}
+.vpdf-rc__suffix {
+  color: var(--fg-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------------- dialogs */
+.vpdf-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 320px;
+}
+.vpdf-form p {
+  margin: 0;
+}
+.vpdf-form__textarea {
+  height: auto;
+  min-height: 84px;
+  padding: 6px 8px;
+  resize: vertical;
+  font: inherit;
+  user-select: text;
+}
+.vpdf-form__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.vpdf-form__hint {
+  color: var(--fg-muted);
+  font-size: var(--fs-s);
+}
+.vpdf-form__error {
+  color: var(--danger);
+}
+.vpdf-form__url {
+  width: 100%;
+  font-family: var(--font-mono);
+}
+.vpdf-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.vpdf-swatches legend {
+  margin-bottom: 6px;
+  padding: 0;
+}
+.vpdf-swatch {
+  position: relative;
+  display: inline-flex;
+}
+.vpdf-swatch input {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+.vpdf-swatch__chip {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--bg-surface);
+  box-shadow: 0 0 0 1px var(--border-strong);
+}
+.vpdf-swatch input:checked + .vpdf-swatch__chip {
+  box-shadow: 0 0 0 2px var(--focus);
+}
+.vpdf-swatch input:focus-visible + .vpdf-swatch__chip {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+@media (forced-colors: active) {
+  .vpdf-thumb--selected {
+    border-color: Highlight;
+  }
+  .vpdf-thumb--drop-before::before,
+  .vpdf-thumb--drop-after::after,
+  .vpdf-busy__bar {
+    background: Highlight;
+  }
+}

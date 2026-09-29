@@ -1,0 +1,35 @@
+* text=auto eol=lf
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.nsh text eol=crlf
+
+# Binary test documents
+*.docx binary
+*.docm binary
+*.dotx binary
+*.dotm binary
+*.xlsx binary
+*.xlsm binary
+*.xlsb binary
+*.xltx binary
+*.xltm binary
+*.pptx binary
+*.pptm binary
+*.ppsx binary
+*.ppsm binary
+*.potx binary
+*.potm binary
+*.doc binary
+*.xls binary
+*.ppt binary
+*.pps binary
+*.odt binary
+*.ods binary
+*.odp binary
+*.pdf binary
+*.bin binary
+*.dmp binary
+*.png binary
+*.ico binary
+*.ttf binary

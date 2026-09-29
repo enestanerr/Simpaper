@@ -1,0 +1,133 @@
+# electron-builder configuration for Windows (docs/PACKAGING.md, docs/adr/0008-packaging.md).
+# Identity values mirror src/shared/brand.ts (BRAND.appId, BRAND.productName, BRAND.vendor).
+# Prerequisites: npm run build, npm run engine:fetch, npm run engine:prepare (creates vendor/engine-dist).
+# Code signing is not configured yet (planned: SignPath Foundation), so the output is unsigned.
+
+appId: org.varakoffice.varak
+productName: Varak
+copyright: Copyright © 2026 Varak contributors
+# Used by the ZIP target (Varak-<version>-x64.zip); the installer has its own name below.
+artifactName: ${productName}-${version}-${arch}.${ext}
+
+directories:
+  output: release
+  buildResources: build
+
+# Only the compiled app is packaged; production dependencies are added by electron-builder.
+files:
+  - out/**/*
+  - package.json
+  - "!**/*.{ts,tsx,map}"
+  - "!src/**"
+  - "!tests/**"
+  - "!scripts/**"
+  - "!docs/**"
+  - "!engine/**"
+  - "!vendor/**"
+  - "!test-output/**"
+  - "!release/**"
+  - "!**/node_modules/**/{README,CHANGELOG,HISTORY}*.md"
+  - "!**/node_modules/**/{test,tests,__tests__,example,examples}/**"
+  # Renderer-only packages are bundled into out/renderer by Vite; the main process never imports them.
+  - "!**/node_modules/@tabler/**"
+  - "!**/node_modules/react-dom/**"
+  # Optional dependency of pdfjs-dist for rendering in Node; the main process does not render PDFs.
+  - "!**/node_modules/@napi-rs/**"
+
+asar: true
+asarUnpack:
+  # koffi (Win32 bindings of src/main/platform, src/main/files and src/main/compat) loads its Node-API binary
+  # from the platform package @koromix/koffi-win32-x64; native modules cannot be loaded from inside app.asar.
+  # Both packages are unpacked completely, as required by docs/dev/platform.md (integration checklist, item 10).
+  # Only the win32-x64 binary is installed on Windows, so no other platform binary ends up in the package.
+  - node_modules/koffi/**
+  - node_modules/@koromix/koffi-win32-x64/**
+
+# koffi ships prebuilt Node-API binaries (ABI-stable), so no rebuild against Electron is needed.
+npmRebuild: false
+
+# Chromium UI locales shipped with Electron (the app itself has Turkish and English).
+electronLanguages:
+  - en-US
+  - tr
+
+# Layout under <install dir>/resources, as expected by src/main/engine/locate.ts:
+#   engine/program/soffice.exe + python.exe   LibreOffice program directory
+#   engine/share/fonts/truetype/               engine fonts (also used by the PDF service for inserted text)
+#   bridge/varak_bridge/__init__.py            UNO bridge package (PYTHONPATH = resources/bridge)
+#   profile/registrymodifications.xcu.template engine profile template (+ accelerators.json)
+# pdf.js (worker, CMaps, standard fonts, WASM) is bundled into out/renderer by Vite and needs no entry here.
+extraResources:
+  # Unmodified LibreOffice, pruned to the shipped UI languages (scripts/engine/prepare-engine.mjs).
+  - from: vendor/engine-dist
+    to: engine
+    filter:
+      - "**/*"
+  # UNO bridge (runs on the engine's bundled Python); tests and bytecode caches are not shipped.
+  - from: engine/bridge
+    to: bridge
+    filter:
+      - "**/*"
+      - "!**/tests{,/**}"
+      - "!**/test{,/**}"
+      - "!**/test_*.py"
+      - "!**/*_test.py"
+      - "!**/conftest.py"
+      - "!**/__pycache__{,/**}"
+      - "!**/*.{pyc,pyo}"
+  # Template for the engine user profiles (macros disabled, updaters and first-start dialogs off).
+  - from: engine/profile
+    to: profile
+    filter:
+      - "**/*"
+
+# Varak's license and the third-party notices next to Varak.exe (docs/adr/0006-license.md: every release ships
+# them). electron-builder adds Electron's LICENSE.electron.txt and LICENSES.chromium.html itself; the engine's
+# own license files are part of resources/engine.
+extraFiles:
+  - from: LICENSE
+    to: LICENSE.txt
+  - from: THIRD_PARTY_NOTICES.md
+    to: THIRD_PARTY_NOTICES.md
+
+win:
+  icon: build/icon.ico
+  # electron-builder never signs anything (icon and version metadata of Varak.exe are still written).
+  # Reason: with a certificate configured it would pass every .exe copied from extraResources to signtool,
+  # i.e. re-sign the engine's executables that The Document Foundation already signed (a dir build on
+  # 2026-09-29 queued 44 of them), and the shipped engine would no longer be byte-identical to the MSI.
+  # Signing is planned as a separate CI step (SignPath) limited to Varak's own files; see docs/PACKAGING.md.
+  signExecutable: false
+  target:
+    - target: nsis
+      arch:
+        - x64
+    - target: zip
+      arch:
+        - x64
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowElevation: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Varak
+  uninstallDisplayName: ${productName} ${version}
+  multiLanguageInstaller: true
+  installerLanguages:
+    - en_US
+    - tr_TR
+  deleteAppDataOnUninstall: false
+  artifactName: ${productName}-Setup-${version}-${arch}.${ext}
+
+compression: normal
+
+electronFuses:
+  runAsNode: false
+  enableCookieEncryption: true
+  enableNodeOptionsEnvironmentVariable: false
+  enableNodeCliInspectArguments: false
+  enableEmbeddedAsarIntegrityValidation: true
+  onlyLoadAppFromAsar: true

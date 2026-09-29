@@ -1,0 +1,59 @@
+/* ------------------------------------------------------------------ Calc formula bar */
+.calc-fbar {
+  height: var(--toolstrip-h);
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  background: var(--bg-ribbon);
+  border-bottom: 1px solid var(--border-ribbon);
+}
+.calc-fbar__name,
+.calc-fbar__input {
+  height: 24px;
+  border: 1px solid var(--border-input);
+  border-radius: var(--radius-s);
+  background: var(--bg-input);
+  color: var(--fg);
+  padding: 0 6px;
+  font-size: var(--fs-m);
+}
+.calc-fbar__name {
+  width: 120px;
+  flex: none;
+}
+.calc-fbar__input {
+  flex: 1;
+  min-width: 0;
+}
+.calc-fbar__name:focus-visible,
+.calc-fbar__input:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -1px;
+  box-shadow: none;
+}
+.calc-fbar__buttons {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  padding: 0 2px;
+  border-right: 1px solid var(--border);
+  margin-right: 2px;
+}
+.calc-fbar__btn {
+  width: 26px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-s);
+  color: var(--fg-muted);
+}
+.calc-fbar__btn:hover:not(:disabled) {
+  background: var(--bg-hover);
+  color: var(--fg);
+}
+.calc-fbar input:disabled {
+  opacity: 0.6;
+}

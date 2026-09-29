@@ -1,0 +1,184 @@
+<p align="center">
+  <img src="resources/brand/logo.svg" width="112" height="112" alt="Varak logosu: kenarı yaldızlı bir kâğıt yaprağı ve bir altın varak">
+</p>
+
+<h1 align="center">Varak</h1>
+
+<p align="center">
+  Windows için tanıdık bir şeride sahip, özgür ve açık kaynaklı ofis paketi: belgeler, hesap tabloları, sunular ve
+  PDF. Kendini kanıtlamış LibreOffice motoru üzerine kurulu. Dosyalarınız bilgisayarınızda kalır; hesap gerekmez,
+  telemetri yoktur.
+</p>
+
+<p align="center"><a href="README.md">English</a> · <a href="docs/ARCHITECTURE.md">Mimari</a> ·
+<a href="docs/COMPATIBILITY.md">Uyumluluk</a> · <a href="docs/KNOWN_LIMITATIONS.md">Bilinen sınırlamalar</a> ·
+<a href="CONTRIBUTING.md">Katkıda bulunma</a></p>
+
+> [!WARNING]
+> **Durum: erken geliştirme aşaması (v0.1 kilometre taşı üzerinde çalışılıyor).** Varak henüz günlük kullanıma hazır
+> değildir ve yayımlanmış bir sürümü yoktur. Önemli belgeleriniz için kullanmayın. İlerleme
+> [docs/STATUS.md](docs/STATUS.md) ve [docs/ROADMAP.md](docs/ROADMAP.md) dosyalarında izlenir.
+
+Ayrıntılı proje belgeleri (mimari, uyumluluk tablosu, testler, paketleme) şimdilik yalnızca İngilizcedir.
+
+## Neden Varak?
+
+Aşağıdakiler ilk sürümün hedefleridir; her birinin ne kadarının hazır olduğunu
+[Bugün neler çalışıyor?](#bugün-neler-çalışıyor) bölümü anlatır.
+
+- **Office kullananlara tanıdık.** Giriş, Ekle, Düzen, Gözden Geçir ve Görünüm sekmeleriyle Office tarzı bir şerit,
+  Hızlı Erişim Araç Çubuğu, Dosya menüsü, belge sekmeleri ve klavyeyle erişim: Word, Excel ve PowerPoint'i bilenler
+  yollarını hemen bulabilsin diye tasarlandı.
+- **Kendini kanıtlamış, değiştirilmemiş bir motor.** Belgeler, hesap tabloları ve sunular **LibreOffice 26.8** ile
+  açılır, düzenlenir, yeniden hesaplanır ve kaydedilir. Motor, The Document Foundation'ın yayımladığı haliyle, hiç
+  değiştirilmeden pakete eklenir. Varak dosya biçimi desteğini yeniden icat etmez; motorun çevresine arayüzü kurar.
+- **Dosyalarınız bilgisayarınızda kalır.** Varak çevrimdışı çalışır; hesap, abonelik ya da bulut gerektirmez,
+  **telemetri göndermez** ve günlük (log) dosyalarına asla belge içeriği yazmaz.
+- **Verilerinize özen gösterir.** Kaydetme güvenli bir süreçten geçer (geçici dosya → doğrulama → tek adımda
+  değiştirme). İçerik kaybettirecek bir biçimde kaydetmeden *önce* Varak sizi uyarır ve bir kopya kaydetmeyi önerir;
+  otomatik kaydedilen anlık görüntüler bir çökmeden sonra kurtarmayı mümkün kılar. Makrolar asla çalıştırılmaz.
+- **Tek uygulamada dört modül:** Belge (DOCX), Hesap Tablosu (XLSX), Sunu (PPTX) ve PDF; ayrıca DOC, XLS, PPT, ODF,
+  RTF, CSV ve daha fazlası.
+- **Türkçe ve İngilizce** arayüz; Türkçeye uygun metin işleme (İ/ı, sıralama, sayı biçimleri, `;` ayırıcılı CSV).
+- Mozilla Public License 2.0 ile **özgür ve açık kaynak**. **Önce Windows:** Windows 10 ve 11 (x64).
+
+## Bugün neler çalışıyor?
+
+Varak ilk kurulabilir sürümüne doğru geliştiriliyor. 2026-09-29 itibarıyla dürüst bir özet: "Birim testlerinden
+geçti" ifadesi, uygulama çalıştırılmadan yürütülen otomatik testleri; "gerçek motorla test edildi" ifadesi, pencere
+göstermeden LibreOffice'i süren otomatik testleri kasteder. Aşağıdakilerin hiçbiri henüz çalışan uygulamada bir kişi
+tarafından denenmedi. Test sayıları: 643 birim testi, 107 motor entegrasyon testi, 65 köprü testi
+([docs/STATUS.md](docs/STATUS.md)).
+
+| Alan | Durum |
+|---|---|
+| Araştırma ve mimari | **Tamamlandı:** motor, uygulama kabuğu, PDF altyapısı, dosya biçimleri, Office arayüz eşlemesi ve test belgeleri kaynaklarıyla araştırıldı; kararlar [ADR](docs/adr/README.md) olarak kaydedildi |
+| Motor | **Tamamlandı:** LibreOffice 26.8.0.3 sabitlendi ve doğrulandı (SHA-256 + OpenPGP imzası); motoru indiren, doğrulayan, açan ve paketlemeye hazırlayan betikler var; pencere açmadan (headless) çalışan bir duman testi, Türkçe metni motorla gelen yazı tipleriyle PDF'ye ve DOCX'e dönüştürüyor |
+| LibreOffice düzenleme görünümünün Varak penceresine yerleştirilmesi | **Uygulandı ve ekranda kullanıldı (%100 ölçekte):** LibreOffice görünümü, Varak penceresindeki katmanlı bir kapsayıcının alt penceresi olarak; menüler belgenin üzerine açıldığında belgenin durağan bir görüntüsü, süreç koruması ve donma algılama. Paketlenmiş uygulamada gerçek fare ve klavyeyle yapılan otomatik GUI denemeleri geçti: yerleşim ve pencere taşıma, Türkçe yazma, şerit komutları, belgenin üzerine açılan menüler, kaydetme, Calc formülleri, slayt paneliyle Impress, PDF'ler, temalar ([GUI denemesi](docs/testing/GUI_SPIKE.md)). LibreOffice'in kendi iletişim kutuları belgenin üzerinde, klavye odağıyla açılıyor. Sahipli bindirme penceresi seçeneği bu bilgisayarda LibreOffice'i dondurdu ve yalnızca geliştirme içindir. Ölçekli ekranlar henüz denetlenmedi. |
+| Belge yaşam döngüsü (aç → düzenle → kaydet) | **Uygulandı ve gerçek motorla test edildi** (`tests/engine/documents-*`): açma, düzenleme, tam güvenli kaydetme hattından geçerek kaydetme, yeniden açma, "kopya olarak kaydet" seçenekli kayıp riski istemi, PDF'e dışa aktarma, otomatik kaydetme anlık görüntüsü ve geri yükleme, motor süreci sonlandırıldıktan sonra geri yükleme. Gerçek uygulama, gizli bir pencereyle çalışan otomatik açılış testinde Writer, Calc ve Impress belgelerini oluşturup sorgulayıp kapatıyor (paketlenmiş sürüm dahil). LibreOffice'in Türkçe Windows'ta başlangıçta takılmasına yol açan bir hata bulundu ve çevresinden dolaşıldı ([ayrıntılar](docs/dev/engine.md)). |
+| Güvenli kaydetme, kayıp riski uyarıları, otomatik kaydetme ve çökme kurtarma | **Uygulandı ve birim testlerinden geçti:** hata enjeksiyonuyla güvenli kaydetme (`tests/unit/main/safeWrite.test.ts`), bir biçimin kaybedeceği içeriğin algılanması (`compat.test.ts`), "kopya olarak kaydet" seçenekli kaydetme riski istemleri (`documentService.test.ts`), otomatik kaydetme anlık görüntüleri ve geri yükleme (`recovery.test.ts`) |
+| Şerit, Dosya menüsü, sekmeler, durum çubuğu, tuş ipuçları, Türkçe/İngilizce arayüz, temalar | **Uygulandı, birim testlerinden geçti ve ekranda kullanıldı:** dört modül için bağlamsal sekmeleri, uyarlanır yerleşimi ve tuş ipuçları olan Office tarzı şeritler, Hızlı Erişim Araç Çubuğu, Dosya menüsü, belge sekmeleri, yakınlaştırmalı durum çubukları, istemler, Türkçe ve İngilizce (her anahtar iki dilde), açık/koyu/yüksek karşıtlık temaları (`tests/unit/renderer`). Tuş ipuçları da ekranda denetlendi. |
+| Belge, Hesap Tablosu ve Sunu modülleri | **Uygulandı; temel akışlar ekranda kullanıldı:** Writer'da yazma ve kaydetme, Calc'te Türkçe söz dizimiyle formül, Impress'te slayt paneliyle yeni slayt. 202 Writer, 225 Calc ve 164 Impress komutunun her biri LibreOffice 26.8 komut kaydında denetlendi ve pencere açmadan çalışan motorda gönderilebildiği doğrulandı; Calc formül çubuğu ve seçim istatistikleri; slayt komutları ve slayt gösterisi |
+| Motorda dosya biçimi gidiş-dönüşleri | **Otomatik testlerden geçiyor** (`tests/engine`): Türkçe içerikli üretilmiş DOCX, XLSX ve PPTX dosyaları ile lisansı temiz örnek dosyalar, pencere açmadan çalışan LibreOffice ile açılıp kaydediliyor; sonuç, LibreOffice kullanmayan okuyucularla ve sayfa sayfa görsel karşılaştırmayla denetleniyor. ODF, CSV, TXT, RTF, eski Office ve şablon biçimlerine dönüştürmeler de test ediliyor. Bu testler motoru doğrudan kullanır, henüz Varak uygulaması üzerinden değil; bulguları [uyumluluk tablosunda](docs/COMPATIBILITY.md#test-status) listelenir. |
+| PDF modülü | **Uygulandı, birim testlerinden geçti; görüntüleyici ekranda kullanıldı** (Türkçe metinli bir metin PDF'i ve bir form PDF'i): küçük resimlerle görüntüleme, Türkçeye uygun arama (İ/ı), vurgulama, metin kutusu, çizim, resim ve yorumlar, form doldurma, sayfaları döndürme, silme, taşıma, ekleme ve çoğaltma, PDF birleştirme ve sayfa çıkarma, metin ve resim ekleme, yazdırma ve doğrulamalı kaydetme (`tests/unit/pdf`). Vurgulama, metin kutusu notu ve kaydetme ekranda da denetlendi (kaydedilen dosya bağımsız olarak geri okundu); diğer araçlar yalnızca birim testleriyle. |
+| Yükleyici, CI, depo belgeleri | **Yükleyici ve ZIP üretiliyor** (`npm run dist:win`: 331 MB yükleyici, 436 MB ZIP); paketlenmiş uygulama üç ofis modülü için gizli pencereli açılış testinden geçti. Yükleyici geliştirme bilgisayarında kurulup kullanıldı (kullanıcı başına, yönetici izni olmadan); henüz temiz bir makinede çalıştırılmadı ve genel bir sürüm yok. CI iş akışları, topluluk dosyaları ve belgeler hazır; CI henüz GitHub'da çalışmadı. |
+
+Hiçbir şey Microsoft Office'te doğrulanmadı; bkz. [docs/TESTING.md](docs/TESTING.md).
+
+## Planlananlar
+
+- **v0.1 — ilk kurulabilir sürüm:** DOCX, XLSX ve PPTX dosyalarını şeritle açma, düzenleme ve kaydetme; PDF
+  görüntüleme, açıklama ekleme, form doldurma ve sayfa işlemleri; PDF olarak dışa aktarma; güvenli kaydetme, kayıp
+  uyarıları ve çökme kurtarma; Türkçe ve İngilizce arayüz, açık ve koyu tema, şeride klavyeyle erişim; kullanıcı
+  başına yükleyici ve ZIP.
+- **v0.2 — derinlik ve doğruluk:** bul ve değiştir, baskı önizleme, stil galerisi, yorumlar ve değişiklik izleme
+  arayüzü; Calc'ta sıralama, filtreleme, bölmeleri dondurma, koşullu biçimlendirme ve grafikler;
+  Impress'te düzenler ve geçişler; daha fazla PDF açıklama türü; yüksek DPI doğrulaması; görsel regresyon testleri.
+- **v0.3 — biçim kapsamı ve sağlamlık:** tüm eski ve ODF biçimleri için doğrulanmış uyumluluk tablosu, CSV içe
+  aktarma iletişim kutusu, parola işlemleri, büyük dosyalarda performans, dosya ilişkilendirmeleri, otomatik
+  güncelleme ve imzalı sürümler.
+- **Daha sonra:** özet tablolar ve gelişmiş grafikler, PDF'deki mevcut metni düzeltme, karartma (redaksiyon), taranmış
+  PDF'ler için OCR, erişilebilirlik denetimi, Linux ve macOS için ön çalışma.
+
+Ayrıntılar ve kabul ölçütleri: [docs/ROADMAP.md](docs/ROADMAP.md).
+
+## Ekran görüntüleri
+
+Paketlenmiş uygulamanın gerçek ekran görüntüleri (Windows 11, %100 ölçek); [docs/DEMO.md](docs/DEMO.md) dosyasındaki
+kurallara göre `scripts/gui/screenshots.mjs` ile alındı, taslak görsel ya da rötuş yok. Tüm görüntüler ve ayrıntıları
+[docs/screenshots/](docs/screenshots/README.md) klasöründe.
+
+![Varak'ın belge modülünde Türkçe metinli bir DOCX](docs/screenshots/writer-home-tr.png)
+
+| Hesap Tablosu | Sunu |
+|---|---|
+| ![Formül çubuğunda DÜŞEYARA formülü olan Bütçe.xlsx](docs/screenshots/calc-formulas-tr.png) | ![Slayt paneliyle bir PPTX](docs/screenshots/impress-slides-tr.png) |
+| **PDF** | **Kayıp uyarısı** |
+| ![Vurgu ve metin kutusu notu eklenmiş bir PDF](docs/screenshots/pdf-annotate-tr.png) | ![İçerik kaybettirebilecek bir biçimde kaydetmeden önce çıkan uyarı](docs/screenshots/loss-warning-tr.png) |
+
+Aynı ekranların İngilizce arayüzlü hâlleri [İngilizce README](README.md#screenshots) dosyasında.
+
+## Kurulum
+
+Henüz yayımlanmış bir sürüm yok. v0.1 yayımlandığında GitHub'daki
+[sürümler (Releases)](https://github.com/varak-office/varak/releases) sayfasında şunlar olacak:
+
+- **`Varak-Setup-<sürüm>-x64.exe`**: yönetici hakları gerektirmeyen, yalnızca geçerli kullanıcı için kurulum yapan bir
+  yükleyici;
+- **`Varak-<sürüm>-x64.zip`**: aynı uygulamanın taşınabilir kullanım için ZIP hali (ZIP'i açıp `Varak.exe` dosyasını
+  çalıştırın).
+
+Gereksinimler: Windows 10 veya 11, 64 bit, yaklaşık 1,5 GB boş disk alanı. İlk sürümler kod imzalı olmayacak; bu yüzden
+Windows SmartScreen bir uyarı gösterecek. SignPath Foundation aracılığıyla imzalama planlanıyor
+([docs/PACKAGING.md](docs/PACKAGING.md#signing-plan)).
+
+## Kaynaktan derleme
+
+Gereksinimler: Windows 10/11 x64, [Node.js](https://nodejs.org/) 22.13 veya üstü,
+[Git for Windows](https://gitforwindows.org/) (içindeki `gpg`, motor indirmesini doğrular) ve yaklaşık 6 GB boş disk
+alanı (yükleyici derlenmeyecekse yaklaşık 3,5 GB).
+
+```powershell
+git clone https://github.com/varak-office/varak.git
+cd varak
+npm ci                                  # bağımlılıkları kur
+npm run engine:fetch                    # LibreOffice 26.8.0.3'ü indir, doğrula ve vendor/ altına aç
+npm run engine:prepare -- --verify      # paketlenecek motor klasörünü oluştur ve pencere açmadan dene
+npm run dist:win -- --publish never     # yükleyiciyi ve ZIP'i release/ klasörüne derle
+```
+
+Ayrıntılar, boyutlar ve sürüm süreci için: [docs/PACKAGING.md](docs/PACKAGING.md).
+
+## Geliştirmeye hızlı başlangıç
+
+```powershell
+npm ci                 # bağımlılıklar
+npm run engine:fetch   # geliştirme ve motor testleri için motor (bir kez; yaklaşık 0,4 GB indirme)
+npm test               # birim testleri
+npm run test:engine    # pencere açmadan LibreOffice ile gidiş-dönüş testleri
+npm run dev            # uygulamayı anında yeniden yüklemeyle başlatır (pencere açar)
+```
+
+Ayrıca işe yarar: `npm run lint`, `npm run typecheck`, `npm run build`. Katkıda bulunmak isteyenler önce
+[CONTRIBUTING.md](CONTRIBUTING.md) dosyasını okumalı; orada VS Code'daki bir tuzak (`ELECTRON_RUN_AS_NODE`) ve hangi
+testlerin pencere açabileceği de anlatılıyor.
+
+## Belgeler
+
+| Belge | İçerik |
+|---|---|
+| [Mimari](docs/ARCHITECTURE.md) | Parçaların nasıl bir araya geldiği ve nedenleri |
+| [Karar kayıtları](docs/adr/README.md) | Motor, kabuk, belge yüzeyi, PDF altyapısı, veri bütünlüğü, lisans, ad, paketleme |
+| [Uyumluluk tablosu](docs/COMPATIBILITY.md) | Biçim biçim neyin açıldığı, düzenlendiği, kaydedildiği ve neyin kaybolabileceği |
+| [Bilinen sınırlamalar](docs/KNOWN_LIMITATIONS.md) | Neyin çalışmadığı veya henüz doğrulanmadığı |
+| [Testler](docs/TESTING.md) | Test katmanları, komutlar ve testlerin neyi kanıtlayabildiği |
+| [Elle test rehberi](docs/TEST_REHBERI.md) | Uygulamayı kurup modül modül adım adım deneme listesi ve beklenen sonuçlar |
+| [Paketleme](docs/PACKAGING.md) | Tekrarlanabilir derlemeler, motor kilit dosyası, imzalama planı |
+| [Yol haritası](docs/ROADMAP.md) ve [durum](docs/STATUS.md) | Kilometre taşları ve güncel ilerleme |
+| [Değişiklik günlüğü](CHANGELOG.md) | Sürümlere göre önemli değişiklikler |
+| [Araştırma](docs/research/README.md) | Kararların arkasındaki kaynaklı araştırma (2026-09-28) |
+
+## Katkıda bulunma
+
+Katkılarınızı bekliyoruz: kod, çeviri, lisansı temiz test dosyaları, hata bildirimleri ve belgeler. Lütfen
+[CONTRIBUTING.md](CONTRIBUTING.md) dosyasını okuyun ve [Davranış Kuralları](CODE_OF_CONDUCT.md)'na uyun. Hata
+bildirimlerini ve katkıları Türkçe de yazabilirsiniz. Hata kayıtlarına asla gizli belge eklemeyin.
+
+## Güvenlik ve gizlilik
+
+Güvenlik açıklarını herkese açık kayıtlarda değil, [SECURITY.md](SECURITY.md) dosyasında anlatıldığı gibi gizli olarak
+bildirin. Varak'ta telemetri ve çevrimiçi özellik yoktur; çalışırken hiçbir şey indirmez ve belge makrolarını ya da PDF
+JavaScript'ini asla çalıştırmaz.
+
+## Lisans
+
+Varak, [Mozilla Public License 2.0](LICENSE) ile lisanslanmıştır. Başka lisanslara tabi üçüncü taraf yazılımlar da
+içerir; bunların başında, lisans dosyalarıyla birlikte dağıtılan değiştirilmemiş LibreOffice motoru gelir. Tam liste
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) dosyasındadır.
+
+## Ticari markalar
+
+LibreOffice, The Document Foundation'ın tescilli ticari markasıdır. Microsoft, Word, Excel ve PowerPoint, Microsoft
+şirketler grubunun ticari markalarıdır. Varak bağımsız bir projedir; The Document Foundation veya Microsoft ile bağlantılı
+değildir, onlar tarafından onaylanmamış ve desteklenmemektedir. "Varak" bir çalışma adıdır; bkz.
+[ADR 0007](docs/adr/0007-product-name.md).

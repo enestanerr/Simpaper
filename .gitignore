@@ -1,0 +1,35 @@
+# Dependencies and build output
+node_modules/
+out/
+dist/
+release/
+coverage/
+*.tsbuildinfo
+
+# Bundled engine (fetched by scripts/engine/fetch-engine.ps1, never committed)
+vendor/
+
+# Test artefacts
+test-output/
+tests/corpus/generated/
+playwright-report/
+test-results/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+
+# Office lock files
+~$*
+.~lock.*#

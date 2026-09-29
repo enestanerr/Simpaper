@@ -1,0 +1,82 @@
+{
+  "generic": "An unexpected error occurred.",
+  "open": {
+    "notFound": "The file was not found. It may have been moved, renamed or deleted.",
+    "unsupported": "This file type is not supported.",
+    "failed": "The file could not be opened. It may be damaged or contain unsupported content.",
+    "cancelled": "Opening was cancelled.",
+    "accessDenied": "You do not have permission to read this file.",
+    "locked": "The file is locked by another program. Close the other program and try again.",
+    "irm": "This file is protected with Information Rights Management (IRM) and cannot be opened.",
+    "encryptedPpt": "Password-protected PowerPoint 97-2003 presentations cannot be opened. Save the presentation without a password or as PPTX in PowerPoint and try again."
+  },
+  "create": {
+    "failed": "The new document could not be created.",
+    "pdfUnsupported": "A blank PDF cannot be created. Open a PDF file or export a document as PDF."
+  },
+  "save": {
+    "failed": "The file could not be saved. Your original file was not changed.",
+    "accessDenied": "You do not have permission to save here, or the file is read-only. Try saving to another location. Your original file was not changed.",
+    "locked": "The file is in use by another program. Close the other program and try again. Your original file was not changed.",
+    "diskFull": "There is not enough free disk space. Free up space and try again. Your original file was not changed.",
+    "pathTooLong": "The file path is too long. Choose a shorter name or folder.",
+    "folderMissing": "The target folder was not found.",
+    "verifyFailed": "The saved file failed verification, so your original file was not overwritten. Try saving in another format or location.",
+    "engineFailed": "The document engine could not write the file. Your original file was not changed.",
+    "formatNotWritable": "This format cannot be saved. Choose another format.",
+    "wrongKind": "This document cannot be saved as the selected file type.",
+    "usePdfExport": "Use \"Export as PDF\" to create a PDF.",
+    "targetOpen": "This file is open in another Varak tab. Close that tab first or choose a different name.",
+    "notFound": "The document is no longer open.",
+    "notReady": "The document is not ready yet. Try again in a few seconds."
+  },
+  "export": {
+    "failed": "The PDF could not be exported.",
+    "notSupported": "This document cannot be exported as PDF."
+  },
+  "print": {
+    "failed": "Printing could not be started."
+  },
+  "engine": {
+    "unavailable": "The document engine was not found or could not start. Documents, spreadsheets and presentations cannot be opened; PDF files can still be used.",
+    "crashed": "The document engine closed unexpectedly.",
+    "restored": "The document was restored from the latest automatic recovery copy. Check the changes you made after that copy.",
+    "restoredFromSaved": "The document was reopened from its last saved state; unsaved changes could not be recovered.",
+    "restarted": "The document engine was restarted and the document was reopened.",
+    "restartLimit": "The document engine closed repeatedly with this document, so automatic restarts were stopped. You can restart the engine manually, or close the document and restore it from the recovery list.",
+    "restoreUnavailable": "The document engine closed and there is no recovery copy of this document. Close the document.",
+    "restoreFailed": "The document could not be reopened after the document engine closed.",
+    "timeout": "The document engine did not respond in time.",
+    "busy": "The document engine is busy. If a dialog is open, close it and try again.",
+    "notResponding": "The document engine is not responding. A long operation may be running; please wait. If it does not recover, restart the document engine, or close the document and restore it from the recovery list.",
+    "responding": "The document engine is responding again.",
+    "restartNotNeeded": "The document engine is running; it does not need to be restarted."
+  },
+  "command": {
+    "unavailable": "This command is not available in Varak.",
+    "macrosDisabled": "For your security, Varak never runs macros.",
+    "notAllowed": "This command is not allowed.",
+    "remoteUnsupported": "Remote files are not supported. Save the file to your computer and open it."
+  },
+  "recovery": {
+    "available": "Documents from a session that closed unexpectedly can be recovered.",
+    "notFound": "The recovery copy was not found.",
+    "restoreFailed": "The recovery copy could not be opened."
+  },
+  "settings": {
+    "invalid": "The setting value is not valid."
+  },
+  "pdf": {
+    "unavailable": "The PDF service is not available."
+  },
+  "ipc": {
+    "invalidRequest": "Invalid request.",
+    "unknownChannel": "Unknown request.",
+    "untrustedSender": "The request was rejected.",
+    "unknownDocument": "The document was not found."
+  },
+  "notice": {
+    "macrosDisabled": "This document contains macros. Macros are not run; they are kept if you save in a macro-enabled format.",
+    "readOnly": "The file is read-only. Use \"Save As\" to save your changes."
+  }
+}

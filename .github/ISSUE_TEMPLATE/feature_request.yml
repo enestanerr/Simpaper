@@ -1,0 +1,64 @@
+name: Feature request · Özellik isteği
+description: Suggest an improvement or a new feature. · Bir iyileştirme veya yeni bir özellik önerin.
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for the suggestion. You can write in English or Turkish.
+        *İngilizce veya Türkçe yazabilirsiniz.*
+
+        Please look at the [roadmap](https://github.com/varak-office/varak/blob/main/docs/ROADMAP.md) and the
+        [known limitations](https://github.com/varak-office/varak/blob/main/docs/KNOWN_LIMITATIONS.md) first; many
+        features are already planned for a later version. Open questions and ideas that are not yet concrete fit
+        better into [Discussions](https://github.com/varak-office/varak/discussions).
+  - type: dropdown
+    id: module
+    attributes:
+      label: Module
+      options:
+        - Documents
+        - Spreadsheets
+        - Presentations
+        - PDF
+        - Application (ribbon, File menu, tabs, settings)
+        - Installation and updates
+        - Documentation or translations
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would it solve?
+      description: Describe the task you want to do and what makes it hard today.
+      placeholder: When I prepare invoices, I have to …
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: How should it work?
+      description: |
+        Describe the behaviour you would like. If Microsoft Office or another application does it in a way you know,
+        name the command and where it is (for example "Word: Layout → Breaks → Next Page").
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives or workarounds
+      description: What do you do today instead?
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Screenshots, sketches or sample files. Never attach confidential or personal documents.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I searched the existing issues and the roadmap.
+          required: true

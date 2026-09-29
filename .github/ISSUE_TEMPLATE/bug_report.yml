@@ -1,0 +1,135 @@
+name: Bug report · Hata bildirimi
+description: Something in Varak does not work as expected. · Varak'ta bir şey beklendiği gibi çalışmıyor.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to report a problem. You can write in English or Turkish.
+        *İngilizce veya Türkçe yazabilirsiniz.*
+
+        > [!CAUTION]
+        > **Issues are public.** Never attach confidential, personal or business documents, not even "anonymised"
+        > ones. If a file is needed, create a new file that shows the problem, or describe its content.
+        > **Security problems** (for example a document that makes Varak run code or read other files) must be
+        > reported privately, see [SECURITY.md](https://github.com/varak-office/varak/blob/main/SECURITY.md).
+
+        Please check [known limitations](https://github.com/varak-office/varak/blob/main/docs/KNOWN_LIMITATIONS.md)
+        and the [compatibility matrix](https://github.com/varak-office/varak/blob/main/docs/COMPATIBILITY.md) first:
+        some losses are expected in certain formats.
+  - type: input
+    id: version
+    attributes:
+      label: Varak version
+      description: File → About shows the version. For a build from source, also give the commit (`git rev-parse --short HEAD`).
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Windows version
+      description: Run `winver` or open Settings → System → About. For display problems, add the scaling of each monitor.
+      placeholder: "Windows 11 24H2 (build 26100), 150 % scaling"
+    validations:
+      required: true
+  - type: dropdown
+    id: module
+    attributes:
+      label: Module
+      options:
+        - Documents
+        - Spreadsheets
+        - Presentations
+        - PDF
+        - Application (ribbon, File menu, tabs, settings, recovery)
+        - Installer or ZIP
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: format
+    attributes:
+      label: File format
+      description: Format of the file you were working with (select all that apply).
+      multiple: true
+      options:
+        - DOCX
+        - DOC
+        - DOCM, DOTX or DOTM
+        - RTF or TXT
+        - ODT
+        - XLSX
+        - XLS
+        - XLSM, XLSB, XLTX or XLTM
+        - CSV or TSV
+        - ODS
+        - PPTX
+        - PPT
+        - PPTM, PPSX, PPSM, POTX, POTM or PPS
+        - ODP
+        - PDF
+        - New document (not saved yet)
+        - Not related to a file
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: The exact steps, starting from opening Varak.
+      placeholder: |
+        1. Open a DOCX file with a table
+        2. Select the table and click Layout → Delete rows
+        3. Save with Ctrl+S
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+      description: |
+        What happened instead? Copy error messages exactly. Screenshots help; make sure they show no personal data
+        (file names, user name, other windows).
+    validations:
+      required: true
+  - type: dropdown
+    id: sample
+    attributes:
+      label: Can the file that shows the problem be shared?
+      options:
+        - Yes, I created a new file that shows the problem and attached it below
+        - Yes, the file contains nothing confidential or personal, I may share it publicly, and I attached it below
+        - No, the file is confidential (I described its content instead)
+        - Not needed, the problem does not depend on a file
+    validations:
+      required: true
+  - type: textarea
+    id: attachments
+    attributes:
+      label: File, screenshots and further details
+      description: Drag files here. Only files you are allowed to publish. Attach them as a ZIP if GitHub refuses the format.
+  - type: textarea
+    id: log
+    attributes:
+      label: Log excerpt (optional)
+      description: |
+        The log is in `%LOCALAPPDATA%\Varak\logs\varak.log`. It never contains document content, but it can contain
+        file and folder names; remove what you do not want to publish.
+      render: text
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I searched the existing issues and the known limitations.
+          required: true
+        - label: I did not attach confidential, personal or third-party copyrighted documents.
+          required: true

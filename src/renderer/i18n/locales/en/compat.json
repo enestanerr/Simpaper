@@ -1,0 +1,55 @@
+{
+  "severity": {
+    "info": "Info",
+    "warning": "Warning",
+    "risk": "Risk of loss"
+  },
+  "finding": {
+    "macros": "Contains macros (VBA). Varak never runs macros. They are kept only when you save in a macro-enabled format (DOCM, XLSM, PPTM); Excel macros are rebuilt on save and lose their signatures.",
+    "activeX": "Contains ActiveX controls. In Word and Excel files they become form controls; in PowerPoint files they are lost when you save.",
+    "embeddedObjects": "Contains embedded objects (OLE). Office objects are kept; Visio and PDF objects are converted to drawings and can no longer be edited in their original programs.",
+    "smartArt": "Contains SmartArt graphics. They are shown and kept but cannot be edited; some may look different after saving.",
+    "chartEx": "Contains newer Office chart types (waterfall, treemap, sunburst, funnel, box and whisker, histogram/Pareto, map). They are not drawn and are only partly kept when you save; Pareto charts may break.",
+    "charts": "Contains charts. Charts can be edited; some formatting details may look different.",
+    "pivotTables": "Contains PivotTables. They are kept and can be refreshed, but custom formatting and some calculated fields may change.",
+    "slicers": "Contains slicers. Not supported; they are lost when you save.",
+    "timelines": "Contains timeline filters. Not supported; they are lost when you save.",
+    "externalLinks": "Contains links to other files. The links are kept; values may not update automatically from the linked files.",
+    "powerQuery": "Contains Power Query queries. The queries are lost when you save; only the data last loaded into the tables remains.",
+    "dataModel": "Contains a Data Model (Power Pivot). Not supported; it is lost when you save.",
+    "threadedComments": "Contains threaded comments. They are shown as plain notes; you cannot reply, and the thread structure may change.",
+    "trackedChanges": "Contains tracked changes. They are kept; some formatting changes may be shown differently.",
+    "contentControls": "Contains content controls (form fields). They are kept in DOCX and ODT; they are lost in older formats (DOC, RTF, TXT).",
+    "equations": "Contains equations. Word equations can be edited; in PowerPoint, equations inside text may be lost.",
+    "ink": "Contains ink (pen drawings). It cannot be edited; when you save it remains only as a picture or is lost.",
+    "model3d": "Contains 3D models. They are shown only as flat pictures; the 3D model is lost when you save.",
+    "media": "Contains audio or video. It is kept; playback depends on the codecs installed on your computer.",
+    "morphTransition": "Uses the Morph transition. Not supported; it is replaced by another transition or lost when you save.",
+    "customXml": "Contains custom XML data (for example SharePoint properties or data binding). Kept in Word documents; may be lost in other files.",
+    "digitalSignature": "Is digitally signed. Saving a changed file invalidates and removes the signature.",
+    "encryption": "Is password-protected. When you save, protection is applied again with the encryption the target format supports.",
+    "strictOoxml": "Uses the Strict Open XML format. It is converted when opened and saved in the standard (Transitional) format; some details may look different.",
+    "legacyFormat": "Uses an old binary Office format (97-2003). Newer features cannot be stored in it; save as DOCX, XLSX or PPTX when possible.",
+    "templateMacros": "Is a macro-enabled template or show. This format cannot be written back with its macros; save as DOCM, XLSM or PPTM to keep them.",
+    "missingFonts": "Uses fonts that are not installed on this computer. Similar fonts are shown instead, so line and page breaks may shift. The font names in the file are kept when you save.",
+    "fontEmbedding": "Contains embedded fonts. They are kept in DOCX and PPTX."
+  },
+  "loss": {
+    "macros": "The target format cannot store macros: the macros (VBA) are removed when you save.",
+    "macroTemplate": "Macro-enabled templates and shows (DOTM, XLTM, POTM, PPSM) cannot be written back with their macros.",
+    "legacyBinary": "The old 97-2003 format cannot store newer features; some formatting and content may be lost or changed.",
+    "rtf": "RTF keeps only basic formatting; advanced page layout, some objects and document properties may be lost.",
+    "plainText": "Plain text keeps only the text; all formatting, pictures, tables and objects are lost.",
+    "csv": "CSV keeps only the cell values of the active sheet; other sheets, formulas, formatting and charts are lost.",
+    "encryption": "The target format does not support password protection: the file is saved without a password.",
+    "encryptionWeak": "The old format supports only weak (RC4) encryption; the password protection is easier to break."
+  },
+  "saveRisk": {
+    "title": "Some content may not be kept",
+    "intro": "Saving this file in the selected format may lose or change the following. You can save a copy to keep your original file intact.",
+    "saveCopy": "Save a copy",
+    "saveAnyway": "Save anyway",
+    "saveOdf": "Save in ODF format",
+    "cancel": "Cancel"
+  }
+}

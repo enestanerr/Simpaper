@@ -1,0 +1,55 @@
+{
+  "severity": {
+    "info": "Bilgi",
+    "warning": "Uyarı",
+    "risk": "Kayıp riski"
+  },
+  "finding": {
+    "macros": "Makro (VBA) içeriyor. Varak makroları hiçbir zaman çalıştırmaz. Makrolar yalnızca makro destekli bir biçimde (DOCM, XLSM, PPTM) kaydedilirse korunur; Excel makroları kaydederken yeniden oluşturulur ve imzalarını kaybeder.",
+    "activeX": "ActiveX denetimleri içeriyor. Word ve Excel dosyalarında form denetimlerine dönüştürülür; PowerPoint dosyalarında kaydederken kaybolur.",
+    "embeddedObjects": "Gömülü nesneler (OLE) içeriyor. Office nesneleri korunur; Visio ve PDF nesneleri çizime dönüştürülür ve artık özgün uygulamalarında düzenlenemez.",
+    "smartArt": "SmartArt grafikleri içeriyor. Görünümleri korunur ancak düzenlenemezler; bazı SmartArt grafikleri kaydettikten sonra farklı görünebilir.",
+    "chartEx": "Yeni Office grafik türleri (şelale, ağaç haritası, güneş patlaması, huni, kutu-bıyık, histogram/Pareto, harita) içeriyor. Bu grafikler çizilmez ve kaydederken yalnızca kısmen korunur; Pareto grafikleri bozulabilir.",
+    "charts": "Grafikler içeriyor. Grafikler düzenlenebilir; bazı biçimlendirme ayrıntıları farklı görünebilir.",
+    "pivotTables": "Özet tablolar (PivotTable) içeriyor. Korunur ve yenilenebilir, ancak özel biçimlendirme ve bazı hesaplanmış alanlar değişebilir.",
+    "slicers": "Dilimleyiciler içeriyor. Desteklenmez; kaydettiğinizde kaybolur.",
+    "timelines": "Zaman çizelgesi filtreleri içeriyor. Desteklenmez; kaydettiğinizde kaybolur.",
+    "externalLinks": "Başka dosyalara bağlantılar içeriyor. Bağlantılar korunur; değerler bağlı dosyalardan kendiliğinden güncellenmeyebilir.",
+    "powerQuery": "Power Query sorguları içeriyor. Sorgular kaydettiğinizde kaybolur; tablolarda yalnızca en son alınan veriler kalır.",
+    "dataModel": "Veri modeli (Power Pivot) içeriyor. Desteklenmez; kaydettiğinizde kaybolur.",
+    "threadedComments": "Yanıtlı (yazışmalı) açıklamalar içeriyor. Normal not olarak gösterilir; yanıt yazılamaz ve yazışma yapısı değişebilir.",
+    "trackedChanges": "İzlenen değişiklikler içeriyor. Korunur; bazı biçimlendirme değişiklikleri farklı gösterilebilir.",
+    "contentControls": "İçerik denetimleri (form alanları) içeriyor. DOCX ve ODT biçimlerinde korunur; eski biçimlerde (DOC, RTF, TXT) kaybolur.",
+    "equations": "Denklemler içeriyor. Word denklemleri düzenlenebilir; PowerPoint'te metin içindeki denklemler kaybolabilir.",
+    "ink": "Mürekkep (kalemle çizim) içeriyor. Düzenlenemez; kaydettiğinizde yalnızca resim olarak kalır veya kaybolur.",
+    "model3d": "3B modeller içeriyor. Yalnızca düz bir resim olarak gösterilir; kaydettiğinizde 3B model kaybolur.",
+    "media": "Ses veya video içeriyor. Korunur; oynatma, bilgisayarınızdaki çözücülere bağlıdır.",
+    "morphTransition": "Dönüşüm (Morph) geçişi kullanıyor. Desteklenmez; kaydettiğinizde başka bir geçişe dönüşür veya kaybolur.",
+    "customXml": "Özel XML verileri (örneğin SharePoint özellikleri, veri bağlama) içeriyor. Word belgelerinde korunur; diğer dosyalarda kaybolabilir.",
+    "digitalSignature": "Dijital olarak imzalanmış. Değiştirilmiş dosyayı kaydettiğinizde imza geçersiz olur ve kaldırılır.",
+    "encryption": "Parola korumalı. Kaydederken koruma, hedef biçimin desteklediği şifrelemeyle yeniden uygulanır.",
+    "strictOoxml": "Katı (Strict) Open XML biçiminde. Açılırken dönüştürülür ve standart (Transitional) biçimde kaydedilir; bazı ayrıntılar farklı görünebilir.",
+    "legacyFormat": "Eski ikili Office biçiminde (97-2003). Yeni özellikler bu biçimde saklanamaz; mümkünse DOCX, XLSX veya PPTX olarak kaydedin.",
+    "templateMacros": "Makro içeren bir şablon veya gösteri. Bu biçim makrolarıyla birlikte yeniden yazılamaz; makroları korumak için DOCM, XLSM veya PPTM olarak kaydedin.",
+    "missingFonts": "Bu bilgisayarda yüklü olmayan yazı tipleri kullanıyor. Yerlerine benzerleri gösterilir, bu yüzden satır ve sayfa sonları kayabilir. Dosyadaki yazı tipi adları kaydederken korunur.",
+    "fontEmbedding": "Gömülü yazı tipleri içeriyor. DOCX ve PPTX biçimlerinde korunur."
+  },
+  "loss": {
+    "macros": "Hedef biçim makro saklayamaz: kaydettiğinizde makrolar (VBA) kaldırılır.",
+    "macroTemplate": "Makro içeren şablonlar ve gösteriler (DOTM, XLTM, POTM, PPSM) makrolarıyla birlikte yeniden yazılamaz.",
+    "legacyBinary": "Eski 97-2003 biçimi yeni özellikleri saklayamaz; bazı biçimlendirmeler ve içerikler kaybolabilir veya değişebilir.",
+    "rtf": "RTF yalnızca temel biçimlendirmeyi saklar; gelişmiş sayfa düzeni, bazı nesneler ve belge özellikleri kaybolabilir.",
+    "plainText": "Düz metin yalnızca yazıyı saklar; tüm biçimlendirme, resimler, tablolar ve nesneler kaybolur.",
+    "csv": "CSV yalnızca etkin sayfanın hücre değerlerini saklar; diğer sayfalar, formüller, biçimlendirme ve grafikler kaybolur.",
+    "encryption": "Hedef biçim parola korumasını desteklemez: dosya parolasız kaydedilir.",
+    "encryptionWeak": "Eski biçim yalnızca zayıf (RC4) şifrelemeyi destekler; parola koruması daha kolay aşılabilir."
+  },
+  "saveRisk": {
+    "title": "Bazı içerikler korunamayabilir",
+    "intro": "Bu dosyayı seçilen biçimde kaydederken aşağıdakiler kaybolabilir veya değişebilir. Özgün dosyanızı korumak için bir kopya kaydedebilirsiniz.",
+    "saveCopy": "Kopya olarak kaydet",
+    "saveAnyway": "Yine de kaydet",
+    "saveOdf": "ODF biçiminde kaydet",
+    "cancel": "İptal"
+  }
+}

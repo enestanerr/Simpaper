@@ -49,9 +49,13 @@ If you hit a limitation that is not listed here, please [open an issue](https://
   releases before closing a document (this removed a reproducible "release after close" crash, see
   [dev/engine.md](dev/engine.md)) and offers crash recovery, but an engine crash can still lose the changes made
   since the last autosave.
-- **A hung engine can't save.** When a document's engine stops responding, Varak shows a bar with "Restart engine"
-  and never ends the engine on its own. Closing that document (or quitting) asks first, names the time of the last
-  autosave whose later changes would be lost, and keeps that autosave under File → Recover; Cancel is the default.
+- **A hung engine can't save, and it blocks the Varak window.** LibreOffice's window lives inside the Varak window,
+  and Windows gives both one input queue: while the engine hangs, the Varak window does not react to the mouse or
+  keyboard (it still redraws and shows a "not responding" bar). After 8 seconds Varak offers "Restart engine" /
+  "Wait" in a separate message box, which names what a restart loses (the changes after the last autosave; "Wait"
+  is the default); it closes by itself if the engine recovers. Varak never ends an engine on its own. When the
+  window still takes input, closing the document or quitting asks first in the same way and keeps the autosave
+  under File → Recover.
 - **No grammar checking and no Python macros.** On Windows with Turkish regional settings, LibreOffice's built-in
   Python switches the C runtime locale to a name with a non-ASCII letter (`Turkish_Türkiye.utf8`); the runtime then
   reports an invalid parameter and LibreOffice's crash handler deadlocks, so creating a text document hung forever.
@@ -104,7 +108,9 @@ If you hit a limitation that is not listed here, please [open an issue](https://
 - **Only partly seen on screen.** Automated GUI runs (real mouse and keyboard, 100 % scaling) passed the core flows
   in the child hosting mode: placement, Turkish typing, ribbon commands, drop-downs over the document, saving,
   Calc formulas, Impress slides with the slide pane, PDF highlights and notes, LibreOffice dialogs, KeyTips, the loss
-  warning and quitting with unsaved changes, window moves and themes. The **owned (overlay) mode** hung LibreOffice
+  warning and quitting with unsaved changes, window moves and themes, typing into the ribbon's text boxes after
+  working in the document, a hung engine restarted from the rescue box, and a background document whose engine
+  ended restarting without covering the active one. The **owned (overlay) mode** hung LibreOffice
   on this PC and is not offered in Options (development only). Not yet exercised on screen: printing and scaled
   displays ([docs/testing/GUI_SPIKE.md](testing/GUI_SPIKE.md)).
 - **Accessibility** has not yet been audited with NVDA or Narrator (planned for M4).

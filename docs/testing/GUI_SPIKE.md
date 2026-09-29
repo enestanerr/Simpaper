@@ -114,6 +114,10 @@ than one frame.
 | H3 | Resume, or let recovery kill it. | Document restored from the working copy/recovery snapshot; no orphan `soffice.bin`/`python.exe`. |
 | H4 | Kill `soffice.bin` while editing. | View disappears cleanly (no frozen image left), recovery offered; other documents unaffected. |
 
+Result (2026-09-29, runs 10–12 below): H1 child mode — the Varak window gets no input while soffice hangs; the way
+out is the rescue message box (after 8 s, a window without owner). H2 — hang bar after ~5 s. H3 — restart from the
+box restores the autosave. H4 — checked for a background document.
+
 ## J. Shutdown and process lifetime
 
 | # | Steps | Pass criteria |
@@ -140,6 +144,8 @@ it does not start unless keyboard and mouse have been idle for `--idle-ms`, it n
 window is in front of Varak, and it logs other windows without their titles. It types at 40 ms per key: keys
 injected within milliseconds right after a document's first modification are lost inside LibreOffice.
 
+Single behaviours have their own scripts in `scripts/gui/checks/` (same safety rules; see the README there).
+
 ### Results (2026-09-29, D1, this PC)
 
 | Run | Mode | Result |
@@ -153,6 +159,10 @@ injected within milliseconds right after a document's first modification are los
 | 7 | child | `screenshots.mjs` tr/en: all README shots; PDF highlight + free text saved and read back; loss warning; KeyTips; quit prompts. Found: a LibreOffice dialog opened from the ribbon has no keyboard focus |
 | 8 | child | `quitcheck.mjs`: unsaved PDF and DOCX → one "Save your changes?" per document, "Don't save" → files unchanged, app exits |
 | 9 | child | `dialogcheck.mjs` after the `AllowSetForegroundWindow` fix: Paragraph and Font dialogs have the focus, a real Esc closes them, the ribbon is disabled while they are open and enabled afterwards |
+| 10 | child | `stuckcheck.mjs` (H4 for a background tab): the engine of a background Writer document killed with Calc in front → it restarts hidden, Calc stays in front, the tab switch shows the restarted Writer |
+| 11 | child | `stuckcheck.mjs`/`hangprobe.mjs` (H1–H2): soffice suspended while its view had the focus → hang bar after ~5 s, Varak's UI thread keeps running, but **no mouse/keyboard input reaches the Varak window** (clicks on "Restart engine", the File tab, Ctrl+W are processed only when soffice runs again); `AttachThreadInput(FALSE)` does not help. Also found: Ctrl+W after a click on the ribbon reached LibreOffice (the focus had stayed there) |
+| 12 | child | `rescuecheck.mjs` with the fixes (rescue message box without a parent, kill before detach): the box appeared 12.7–13.8 s after the suspension in front, real keys chose "Motoru yeniden başlat", the engine ended, the document came back from the autosave (1.7 s) with the keyboard in it, and Varak took input again (File view, Esc). Hanging again, the box closed by itself when the engine was resumed. Found on the way: after the restart the focus had fallen to the view container (fixed: it is taken back, and the restored document is focused) |
+| 13 | child | `focuscheck.mjs`: before the fix a letter typed into the ribbon's font box after a click into the document went into the document, and a real Esc did not close the File view; with `view:focusShell` the letter lands in the box, Esc closes the File view, the keyboard returns to the document, and a ribbon tab switch still leaves it in the document |
 
 
 ## L2. Automation later
@@ -166,4 +176,5 @@ criteria above are the assertions.
 ## M. Decision record
 
 Decided on D1 (2026-09-29, ADR 0003 amendment): **child** is the default — it passed runs 2, 3, 5 and 6, while owned
-hung (Varak in run 1, soffice in run 4). Still to fill in: D2–D5 (DPI), freeze latency, H1 (hung engine by hand).
+hung (Varak in run 1, soffice in run 4). Still to fill in: D2–D5 (DPI) and freeze latency. H1 was measured automatically (runs 11–12): a hung engine blocks
+input to the Varak window in child mode, which the rescue message box answers.

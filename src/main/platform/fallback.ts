@@ -118,5 +118,6 @@ export function createFallbackPlatform(log: Logger, deps: FallbackDeps = default
     processGuard: new FallbackProcessGuard(log.child('process'), deps),
     hangDetector: fallbackHangDetector,
     allowForeground: () => undefined,
+    focusHost: async () => false,
   };
 }

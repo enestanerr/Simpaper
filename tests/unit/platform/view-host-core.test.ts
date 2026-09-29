@@ -529,6 +529,8 @@ describe('ViewHostCore — child mode', () => {
     expect(ops.containerPlacements).toEqual([{ rect: { x: 0, y: 125, width: 1000, height: 750 }, visible: false, raise: false }]);
     expect(core.viewParamsFor(win, 'child', DOC).parentHwnd).toBe(formatHwnd(container));
     expect(ops.containersCreated).toBe(1);
+    // Handed to the focus logic (it takes the keyboard from the container, platform/win32/focus.ts).
+    expect(core.containerOf(win)).toBe(container);
   });
 
   it('fills the container with the LibreOffice child and keeps the container on top', async () => {

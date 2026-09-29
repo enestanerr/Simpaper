@@ -72,6 +72,8 @@ export interface IpcServices {
   isSubscribableUnoCommand?: (kind: OfficeKind, command: string) => boolean;
   /** Platform.allowForeground: a dispatched command may open a LibreOffice dialog that must get the focus. */
   allowEngineForeground?: (pid: number) => void;
+  /** Platform.focusHost for the main window (view:focusShell). */
+  focusShell?: () => Promise<boolean>;
   getWindow: () => BrowserWindow | null;
   log: Logger;
   /** Called once per renderer request (used to detect that the renderer is up). */

@@ -113,3 +113,14 @@ window's own redirection surface working (checked on every Electron upgrade by t
 container while the LibreOffice child has the keyboard focus still sends `WM_KILLFOCUS` synchronously to
 soffice; and scaling above 100 % and mixed-DPI monitors are not verified (the forced DPI-awareness reset of
 cross-process children, docs/dev/engine.md §10).
+
+Later runs the same day (runs 10–13 of docs/testing/GUI_SPIKE.md) measured two consequences of the shared input
+queue of the child hosting and changed the code accordingly:
+
+- The keyboard focus stays in the LibreOffice child when the user clicks Varak's web content. The shell now asks
+  for it (`view:focusShell`) for its own text boxes, dialogs, the File view and PDFs, and gives it back to the
+  document; ribbon tabs and commands leave it in the document as before.
+- While soffice hangs, the Varak window gets no mouse or keyboard input at all (its UI thread keeps running). A hang
+  that lasts 8 s therefore brings a message box without a parent window (its own input queue) that offers to
+  restart the engine, and a hung engine is killed before its view is detached. Isolating the input completely
+  would need a different surface (for example rendering the document off-screen), which is out of scope for M1.

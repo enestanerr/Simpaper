@@ -7,7 +7,7 @@ import { DocumentError } from '../../documents/errors';
 import type { EngineInstance } from '../../engine/types';
 import type { Handler } from '../router';
 import type { IpcServices } from '../services';
-import { arr, bool, cssRect, docId, int, obj, oneOf, opt, plainObject, req, str, unoArgs, unoCommand, unoDispatchCommand, type Validator } from '../validate';
+import { arr, bool, cssRect, docId, int, none, obj, oneOf, opt, plainObject, req, str, unoArgs, unoCommand, unoDispatchCommand, type Validator } from '../validate';
 
 interface QuerySpec {
   kinds: readonly OfficeKind[];
@@ -104,6 +104,10 @@ export function engineHandlers(s: IpcServices): Record<keyof EngineChannels, Han
       if (!known(r.docId)) return;
       // Native activation (owned mode) and the engine's own keyboard focus (docs/dev/platform.md §2.4).
       s.documents.focusView(r.docId);
+    },
+    'view:focusShell': async (p) => {
+      none(p, 'req');
+      return (await s.focusShell?.()) ?? false;
     },
     'view:freeze': async (p) => {
       const r = obj({ docId: req(docId) })(p, 'req');

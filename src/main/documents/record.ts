@@ -51,6 +51,8 @@ export interface DocRecord extends OpenDocumentRecord {
   viewVisible?: boolean;
   /** The native window stopped responding (hang watch); the descriptor state is `busy` meanwhile. */
   hung: boolean;
+  /** Pending or shown offer to restart the hung engine (DocumentServiceDeps.offerEngineRescue). */
+  rescue?: { controller: AbortController; timer: ReturnType<typeof setTimeout> | null };
   /** Engine work that is not user-visible (recovery snapshots): the hang watch leaves the view alone. */
   background: number;
   /** A user-requested engine restart is running. */

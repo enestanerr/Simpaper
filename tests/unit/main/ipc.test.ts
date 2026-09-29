@@ -178,6 +178,22 @@ describe('engine and view channels', () => {
     expect(allowed).toHaveLength(1); // nothing for refused commands
   });
 
+  it('view:focusShell asks the platform for the keyboard and takes no payload', async () => {
+    // GUI check: after a click into the document, a letter typed into the ribbon's font box went into the document.
+    let asked = 0;
+    const r = routerWith({
+      focusShell: async () => {
+        asked += 1;
+        return true;
+      },
+    });
+    expect(await r.dispatch('view:focusShell', trusted, undefined)).toBe(true);
+    expect(asked).toBe(1);
+    await expect(r.dispatch('view:focusShell', trusted, { docId: 'd1' })).rejects.toThrow();
+    expect(asked).toBe(1);
+    expect(await routerWith({}).dispatch('view:focusShell', trusted, undefined)).toBe(false);
+  });
+
   it('never forwards file or URL arguments: commands that load resources always show their own dialog', async () => {
     // The real allow-list of the app (src/main/index.ts passes it to bootstrap).
     const r = routerWith({ isAllowedUnoCommand });

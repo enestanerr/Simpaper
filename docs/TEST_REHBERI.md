@@ -27,6 +27,7 @@ dosyaları ve günlükler `%LOCALAPPDATA%\Varak` altında tutulur.
 | G4 | Birden fazla belge açın, Ctrl+Tab ile gezin | Sekmeler arasında geçiş yapılır, her belge kendi şeridini gösterir |
 | G5 | Şeride bir kez tıklayın, sonra Alt (veya F10) tuşuna basın | Şerit sekmelerinde tuş ipuçları (KeyTips) görünür; harfle sekme/komut seçilir, Esc kapatır. Belge içinde yazarken de istiyorsanız: Dosya → Seçenekler → "Belgede çalışırken tuş ipuçları (deneysel)" |
 | G6 | Ctrl+F1 | Şerit daralır/genişler |
+| G7 | Belgeye tıklayıp yazın; sonra şeritteki Yazı tipi kutusuna tıklayıp "Arial" yazın, Enter | Harfler kutuya yazılır, belgeye değil; Enter sonrası belgeye yazmaya devam edebilirsiniz. Şerit sekmesine (ör. Ekle) tıklamak ise klavyeyi belgede bırakır |
 
 ## 3. Belge (DOCX)
 
@@ -87,6 +88,7 @@ dosyaları ve günlükler `%LOCALAPPDATA%\Varak` altında tutulur.
 | V2 | Değiştirilmiş belgeyi kapatmayı deneyin | "Değişiklikler kaydedilsin mi?" sorusu: Kaydet / Kaydetme / İptal |
 | V3 | Belgeyi değiştirin, otomatik kayıt süresi kadar (varsayılan 3 dk) bekleyin, sonra Görev Yöneticisi'nden `soffice.bin` sürecini sonlandırın | Motor yeniden başlar; "Belge, en son otomatik kurtarma kopyasından geri yüklendi…" bildirimi; o kopyadan sonraki değişiklikler yoktur |
 | V4 | Belgeyi değiştirip otomatik kaydı bekleyin, Varak'ı Görev Yöneticisi'nden sonlandırıp yeniden açın | Başlangıç ekranında "Kaydedilmemiş 1 belge kurtarılabilir." bandı → Göster → Geri yükle |
+| V5 | (İleri düzey) Belgeyi değiştirip otomatik kaydı bekleyin; Kaynak İzleyicisi'nde (resmon) CPU sekmesinde belgenin `soffice.bin` sürecini (belgeye yazarken CPU kullanan; Varak bir yedek motor da çalıştırır, yanlışını seçerseniz bir şey olmaz, devam ettirip diğerini deneyin) → İşlemi askıya al | Varak penceresi tıklamalara yanıt vermez; yaklaşık 8 sn sonra ayrı bir "Varak" penceresi "Motoru yeniden başlat / Bekle" sorar. "Motoru yeniden başlat" → belge otomatik kayıttan açılır ve yazmaya devam edilir. "Bekle" seçerseniz süreci Kaynak İzleyicisi'nde devam ettirin |
 
 ## 8. Sorun bildirirken
 

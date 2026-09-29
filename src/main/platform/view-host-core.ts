@@ -423,6 +423,14 @@ export class ViewHostCore<W extends object> {
     return this.ownsForeground(win, fg) || sameHwnd(this.ops.rootOwner(fg), hwnd);
   }
 
+  /**
+   * Child mode: the container window of `win` (ours; it gets the keyboard focus when the LibreOffice window that had
+   * it is destroyed, e.g. by an engine restart).
+   */
+  containerOf(win: W): Hwnd | null {
+    return this.hosts.get(win)?.container ?? null;
+  }
+
   /** True when `hwnd` is `win` itself or one of the native views attached to it (not their dialogs). */
   ownsForeground(win: W, hwnd: Hwnd): boolean {
     const host = this.hosts.get(win);

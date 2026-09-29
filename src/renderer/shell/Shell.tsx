@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { getModule } from '../modules/registry';
 import { Ribbon } from '../ribbon/Ribbon';
 import { stateCommandOf } from '../ribbon/model';
+import { installKeyboardClaims } from '../services/keyboardFocus';
 import { trackWindowFocus } from '../services/windowActivity';
 import { selectActiveDocument, useApp } from '../state/appStore';
 import { Backstage } from './backstage/Backstage';
@@ -29,6 +30,7 @@ export function Shell() {
   const module = doc ? getModule(doc.kind) : undefined;
 
   useEffect(() => installGlobalKeyboard(), []);
+  useEffect(() => installKeyboardClaims(), []);
   useEffect(() => trackWindowFocus(), []);
 
   const extraCommands = useMemo(() => {

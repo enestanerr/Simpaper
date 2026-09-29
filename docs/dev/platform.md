@@ -181,6 +181,29 @@ it opens (Paragraph…, Font…) inactive, without the keyboard focus. Before ev
 calls `Platform.allowForeground(officePid)` (`AllowSetForegroundWindow`); the dialog then activates itself (checked
 on screen: focus, a real Esc closes it, the ribbon is disabled while it is open).
 
+**Keyboard focus and input with child views (measured on screen 2026-09-29, `scripts/gui/checks/`).**
+LibreOffice's child window and Chromium's window share one input queue (cross-thread parent/child).
+- A click on Chromium's web content does **not** take the keyboard focus back from the LibreOffice child: the DOM
+  focus moves (the font box showed a caret) but a letter typed next went into the document, and a real Esc after
+  opening the File view never reached it. Fix: the renderer asks for the focus (`view:focusShell` →
+  `Platform.focusHost` → `win32/focus.ts`: `GetFocus` on the UI thread; if it is a LibreOffice child *inside* the
+  host that answers `WM_NULL` within 250 ms on a worker, `SetFocus(host)`; LibreOffice dialogs, windows of this
+  process and hung windows are left alone). Asked for when a press on Varak's UI moves the focus into a text box
+  or outside ribbon/title bar/tab strip/status bar/ribbon menus, while a dialog or the File view is open (the
+  document gets the focus back when they close) and when a PDF becomes active (`services/keyboardFocus.ts`).
+  Ribbon tab switches and commands keep the keyboard in the document, as in Office (checked on screen).
+- While soffice is suspended, the Varak window gets **no mouse or keyboard input** although its UI thread keeps
+  running (IPC, timers, repaint, the "not responding" bar): clicks on "Restart engine", the File tab or the title
+  bar were processed only when soffice ran again. `AttachThreadInput(…, FALSE)` from another process returned TRUE
+  but did not release them. Hence (a) a hang that lasts 8 s makes `DocumentService` offer the restart in
+  Electron's message box **without a parent window** (it runs on a thread of its own and still gets input; checked
+  on screen: it appeared 13.7 s after the suspension, real keys chose "restart", the document came back from the
+  autosave 1.7 s later and Varak took input again), withdrawn through its `AbortSignal` when the engine answers;
+  (b) a hung engine is killed **before** its view is detached (`stopInstance`, `discard`): hiding the container
+  while the hung child has the focus sends it `WM_KILLFOCUS` and would block the UI thread.
+- The File tab did not freeze the UI thread in that state (sampled for 12 s); the view's operations queue behind
+  the hung window and retry every 500 ms.
+
 **Freeze-frame.** `freeze` captures with `PrintWindow(PW_RENDERFULLCONTENT)` on a worker thread (1.5 s
 budget; GDI objects are freed only when the call returns), converts BGRA → alpha 255 →
 `nativeImage.createFromBitmap` (BGRA verified) → PNG data URL, then hides the view. Calls nest; the view

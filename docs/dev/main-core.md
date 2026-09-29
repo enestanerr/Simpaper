@@ -186,12 +186,21 @@ document) is probed with `HangDetector.isResponding(hwnd, 1000)`; documents that
 snapshotted are skipped. After 2 failed probes in a row the state becomes `busy` with
 `errors.engine.notResponding`; it returns to `ready` (`errors.engine.responding`) when the window answers again
 (a hung view stays a probe target even when hidden). The engine is never killed automatically — a long operation
-also stops the message loop. Recovery paths for the user: wait; close the document (no prompt, snapshot kept and
-listed); or `documents:restartEngine`.
+also stops the message loop. Recovery paths for the user: wait; close the document (`closeStuck` prompt, snapshot
+kept and listed); or `documents:restartEngine`. A probe result that arrives while the document is restarting or
+closing, or has no current window, is ignored (a killed window may "answer").
+
+**Rescue offer** (`DocumentServiceDeps.offerEngineRescue`, `rescueTiming`) — a hung LibreOffice child blocks input
+for the whole Varak window (docs/dev/platform.md §6), so the bar's button may not be clickable. When a document stays
+hung for 8 s, the offer ("Restart engine" / "Wait", with what a restart loses: `none`, `sinceSnapshot` + time,
+`sinceSave`, `all`) is shown by bootstrap in Electron's message box without a parent window; "restart" runs
+`restartEngine`, "Wait" offers it again after 60 s. It is withdrawn (`AbortSignal`) when the engine answers, the
+document closes or is restarted from the bar.
 
 **Engine restart** (`documents:restartEngine`, `DocumentService.restartEngine`) — only for `busy` (hung) or
-`crashed` documents: kills soffice.bin through the ProcessGuard, releases the instance and runs the crash-restore
-path (newest snapshot, else the last saved file) with the automatic-restart limit reset. Other states reject with
+`crashed` documents: kills soffice.bin through the ProcessGuard **before** detaching the view (hiding a hung window
+that has the keyboard focus would block the UI thread), releases the instance and runs the crash-restore path
+(newest snapshot, else the last saved file) with the automatic-restart limit reset. Other states reject with
 `errors.engine.restartNotNeeded`.
 
 ## Recovery

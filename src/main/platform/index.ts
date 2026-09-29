@@ -9,8 +9,10 @@
  */
 import { createLogger } from '../log';
 import { createFallbackPlatform } from './fallback';
+import { hwndFromBuffer } from './hwnd';
 import type { Platform } from './types';
 import { win32, win32LoadError } from './win32/ffi';
+import { takeFocusFromViews } from './win32/focus';
 import { Win32HangDetector } from './win32/hang-detector';
 import { Win32ProcessGuard } from './win32/process-guard';
 import { Win32ShellKeys } from './win32/shell-keys';
@@ -33,6 +35,11 @@ export function createPlatform(): Platform {
     hangDetector: new Win32HangDetector(api),
     allowForeground: (pid) => {
       if (!api.user32.AllowSetForegroundWindow(pid)) log.debug('AllowSetForegroundWindow refused', { pid });
+    },
+    focusHost: async (win) => {
+      const host = win.isDestroyed() ? null : hwndFromBuffer(win.getNativeWindowHandle());
+      const container = viewHost.containerOf(win);
+      return host === null ? false : takeFocusFromViews(api.user32, host, process.pid, container ? [container] : []);
     },
     shellKeys: new Win32ShellKeys(api, (win, hwnd) => viewHost.ownsForeground(win, hwnd), log.child('keys')),
   };

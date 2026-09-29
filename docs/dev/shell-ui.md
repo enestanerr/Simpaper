@@ -312,3 +312,11 @@ Later in session 2 (found by the usage review and the GUI runs), each with a tes
   `shell.test.tsx` › "says what is lost before closing a document whose engine hangs".
 - CSV "Other" separator: the input drops quotes and line breaks; the main process accepts any single printable
   character (`isCsvSeparatorChar` in `@shared/formats`).
+- Keyboard between the shell and LibreOffice (`services/keyboardFocus.ts`, GUI check `focuscheck.mjs`): Windows keeps
+  the keyboard focus in LibreOffice's window when the web content is clicked. `installKeyboardClaims` (Shell) asks for
+  it (`view:focusShell`) when a press moves the focus into a text box, or outside `.rb-ribbon`, `.vr-titlebar`,
+  `.vr-doctabs`, `.vr-status`, `.vr-popup`; `holdKeyboard()` in `Dialog` (gives it back to the document if it took it)
+  and `holdKeyboard('always')` in the backstage; `activateDocument` claims it for a PDF. Programmatic focus alone
+  never claims it. Tests: `shell.test.tsx` › "keyboard between Varak and the document".
+- One "not responding" bar per document (`hang:<docId>`), dismissed when the document leaves `busy`. Test:
+  `shell.test.tsx` › "keeps one "not responding" bar per document".

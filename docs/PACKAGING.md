@@ -103,8 +103,8 @@ Measured on 2026-09-29 with LibreOffice 26.8.0.3:
 | — of which left out | spelling dictionaries 393 MiB, other UI languages 349 MiB, MSI copy 19 MiB, help 11 MiB, extension help 4.5 MiB, AutoText 3 MiB, 32-bit runtime 1.5 MiB |
 | Electron 44.4.5 runtime (before locale pruning) | about 368 MB |
 | Unpacked application (`release/win-unpacked`, 0.1.0 build of 2026-09-29 evening) | **1,109 MiB, 6,823 files**, of which `resources/engine` 742 MiB (6,713 files) and `app.asar` 44 MiB |
-| Installer `Varak-Setup-0.1.0-x64.exe` | 346,577,886 bytes (330.5 MiB) |
-| ZIP `Varak-0.1.0-x64.zip` | 456,779,831 bytes (435.6 MiB) |
+| Installer `Varak-Setup-0.1.0-x64.exe` | 346,580,644 bytes (330.5 MiB) |
+| ZIP `Varak-0.1.0-x64.zip` | 456,781,792 bytes (435.6 MiB) |
 
 The uncompressed payload of about 1.1 GB is below NSIS's 2 GB limit. The installer was installed and used on the
 development PC (per user, no administrator rights); a clean machine is still to be tried.

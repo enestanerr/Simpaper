@@ -50,3 +50,38 @@ export const DIALOG_STRINGS = {
   allSupported: { tr: 'Desteklenen tüm dosyalar', en: 'All supported files' },
   allFiles: { tr: 'Tüm dosyalar', en: 'All files' },
 } satisfies Record<string, T>;
+
+/** What restarting a hung engine loses (EngineRescueOffer.loss). */
+export type RescueLoss = 'none' | 'sinceSnapshot' | 'sinceSave' | 'all';
+
+const RESCUE = {
+  tr: {
+    message: (name: string) => `“${name}” belgesinin motoru yanıt vermiyor.`,
+    input: 'Bu sırada Varak penceresi fare ve klavyeye yanıt vermeyebilir.',
+    none: 'Motoru yeniden başlatırsanız belge yeniden açılır; kaydedilmemiş değişiklik yok.',
+    sinceSnapshot: (time: string) => `Motoru yeniden başlatırsanız belge saat ${time} otomatik kaydından yeniden açılır; sonraki değişiklikler kaybolur.`,
+    sinceSave: 'Motoru yeniden başlatırsanız belge son kaydedilen hâliyle yeniden açılır; kaydedilmemiş değişiklikler kaybolur.',
+    all: 'Belge hiç kaydedilmedi ve otomatik kaydı yok: motoru yeniden başlatırsanız değişiklikler kaybolur.',
+    wait: 'Uzun bir işlem sürüyorsa bekleyin.',
+    restart: 'Motoru yeniden başlat',
+    waitButton: 'Bekle',
+  },
+  en: {
+    message: (name: string) => `The engine of “${name}” is not responding.`,
+    input: 'Meanwhile the Varak window may not respond to the mouse and keyboard.',
+    none: 'If you restart the engine, the document is reopened; it has no unsaved changes.',
+    sinceSnapshot: (time: string) => `If you restart the engine, the document is reopened from the automatic save of ${time}; later changes are lost.`,
+    sinceSave: 'If you restart the engine, the document is reopened as last saved; unsaved changes are lost.',
+    all: 'The document was never saved and has no automatic save: if you restart the engine, the changes are lost.',
+    wait: 'If a long operation is running, wait.',
+    restart: 'Restart engine',
+    waitButton: 'Wait',
+  },
+};
+
+/** Texts of the message box that offers to restart a hung engine; `time` is the autosave time for 'sinceSnapshot'. */
+export function engineRescueTexts(lang: UiLanguage, fileName: string, loss: RescueLoss, time: string | null): { message: string; detail: string; buttons: [string, string] } {
+  const s = RESCUE[lang];
+  const lost = loss === 'sinceSnapshot' && time ? s.sinceSnapshot(time) : loss === 'sinceSnapshot' ? s.sinceSave : s[loss];
+  return { message: s.message(fileName), detail: `${s.input}\n\n${lost} ${s.wait}`, buttons: [s.restart, s.waitButton] };
+}

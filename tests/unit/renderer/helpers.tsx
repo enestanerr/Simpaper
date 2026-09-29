@@ -17,6 +17,7 @@ import { useViews } from '../../../src/renderer/state/viewStore';
 import { resetOverlay } from '../../../src/renderer/services/overlay';
 import { resetDocumentTracking } from '../../../src/renderer/services/documents';
 import { resetSubscriptions } from '../../../src/renderer/services/engine';
+import { resetKeyboardClaims } from '../../../src/renderer/services/keyboardFocus';
 import { resetWindowActivity } from '../../../src/renderer/services/windowActivity';
 import { stopKeyTips } from '../../../src/renderer/ribbon/keytipStore';
 
@@ -148,6 +149,7 @@ export function resetRendererState(): void {
   resetDocumentTracking();
   resetSubscriptions();
   resetWindowActivity();
+  resetKeyboardClaims();
   stopKeyTips();
 }
 

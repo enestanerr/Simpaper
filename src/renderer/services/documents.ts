@@ -1,6 +1,6 @@
 /** Document lifecycle actions (open/create/save/export/print/close) and their user feedback. */
 import type { DocumentDescriptor, PdfExportOptions, PromptAnswer, SaveOptions, SaveResult } from '@shared/api/documents';
-import type { ModuleKind } from '@shared/modules';
+import { isOfficeKind, type ModuleKind } from '@shared/modules';
 import {
   closeBackstage,
   getDocument,
@@ -13,6 +13,7 @@ import {
 import { allModules } from '../modules/registry';
 import { errorKeyOf, errorText } from './engine';
 import { hasBridge, invoke } from './ipc';
+import { claimKeyboard } from './keyboardFocus';
 
 let lastActivationSent: string | null = null;
 
@@ -64,9 +65,12 @@ function adoptDocument(doc: DocumentDescriptor): void {
 }
 
 export function activateDocument(docId: string): void {
-  if (!getDocument(docId)) return;
+  const doc = getDocument(docId);
+  if (!doc) return;
   setActiveDocId(docId);
   closeBackstage();
+  // A PDF is shown by Varak itself: its keys must not go to the hidden window of the office document before it.
+  if (!isOfficeKind(doc.kind)) void claimKeyboard();
   if (!hasBridge() || lastActivationSent === docId) return;
   lastActivationSent = docId;
   invoke('documents:activate', { docId }).catch(() => {

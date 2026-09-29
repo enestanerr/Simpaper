@@ -1,6 +1,7 @@
 /** Modal dialog with focus trap, Esc handling and airspace overlay (the scrim covers the document area). */
 import { useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
+import { holdKeyboard } from '../services/keyboardFocus';
 import { acquireOverlay, overlayPending, whenOverlayReady } from '../services/overlay';
 
 export interface DialogProps {
@@ -43,6 +44,9 @@ export function Dialog({ title, onCancel, children, footer, role = 'dialog', siz
       release();
     };
   }, []);
+
+  // Enter/Esc and the fields must reach the dialog, not LibreOffice's window (see services/keyboardFocus).
+  useEffect(() => holdKeyboard(), []);
 
   useEffect(() => {
     const previouslyFocused = document.activeElement as HTMLElement | null;

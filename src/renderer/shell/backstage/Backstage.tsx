@@ -8,6 +8,7 @@ import { IconArrowLeft } from '@tabler/icons-react';
 import { isOfficeKind } from '@shared/modules';
 import type { DocumentDescriptor } from '@shared/api/documents';
 import { closeBackstage, selectActiveDocument, setBackstagePage, useApp, type BackstagePage } from '../../state/appStore';
+import { holdKeyboard } from '../../services/keyboardFocus';
 import { runShellAction } from '../../services/shellActions';
 import { AboutPage } from './AboutPage';
 import { ExportPdfPage } from './ExportPdfPage';
@@ -59,6 +60,9 @@ export function Backstage() {
   const entries = NAV.filter((n) => n.available(doc));
   const current: BackstagePage = entries.some((e) => e.id === page) ? page : doc ? 'info' : 'new';
   const Page = PAGES[current];
+
+  // The keyboard belongs to the backstage while it is open (Esc, arrows, its fields), then to the document again.
+  useEffect(() => holdKeyboard('always'), []);
 
   useEffect(() => {
     navRef.current?.querySelector<HTMLElement>('[aria-current="page"]')?.focus();

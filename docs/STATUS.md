@@ -31,8 +31,8 @@ pushed**). Publishing on GitHub is the owner's decision.
 
 | Suite | Command | Result |
 |---|---|---|
-| Unit (main, renderer, PDF, platform, tools) | `npm test` | 62 files, 744 tests passed |
-| Engine integration (real LibreOffice, headless/hidden) | `npm run test:engine` | 14 files, 115 passed, 5 skipped (opt-in long loops), 300 s |
+| Unit (main, renderer, PDF, platform, tools) | `npm test` | 63 files, 763 tests passed |
+| Engine integration (real LibreOffice, headless/hidden) | `npm run test:engine` | 14 files, 115 passed, 5 skipped (opt-in long loops), 290 s |
 | Bridge (Python) | `vendor/libreoffice/program/python.exe -m unittest discover -s engine/bridge/tests -t engine/bridge` | 109 tests OK |
 | Smoke boot (real app, hidden window) | `node scripts/smoke-boot.mjs --kind calc\|writer\|impress` | all three PASSED |
 | Type check / lint | `npm run typecheck`, `npx tsc -p tests/unit/{renderer,pdf}/tsconfig.renderer-tests.json --noEmit`, `npm run lint` | clean |
@@ -57,13 +57,20 @@ refuses to start unless the PC has been idle for 60 s and never sends input when
   no longer forces a full Writer layout with a progress bar (Writer ignores keys while a progress runs).
 - Owned mode, second run: Varak stayed responsive, but soffice stopped responding after the first click into the
   document → removed from Options (settings.json only).
-- Later runs (`scripts/gui/screenshots.mjs`, `test-output/gui/*check.mjs`): PDF highlight (Highlight tool, drag) and
+- Later runs (`scripts/gui/screenshots.mjs`, `scripts/gui/checks/`): PDF highlight (Highlight tool, drag) and
   free-text note saved and read back with pdf-lib; closing the window with unsaved changes asks once per document and
   "Don't save" leaves the files untouched; KeyTips appear on Alt; the loss warning appears for Ctrl+S on a .doc.
   Found and fixed: LibreOffice dialogs opened from the ribbon (Paragraph, Font) came up without the keyboard focus,
   because soffice is not the foreground process — Varak now calls `AllowSetForegroundWindow` for the engine before
   every command; on screen the dialog then has the focus, a real Esc closes it, and the ribbon is disabled meanwhile.
 - README screenshots (Turkish and English, light theme, plus dark theme) are in `docs/screenshots/`.
+- End of session 2 (`scripts/gui/checks/`, runs 10–13 in [testing/GUI_SPIKE.md](testing/GUI_SPIKE.md)): a background
+  document whose engine was killed restarts hidden behind the active one. Found and fixed: (1) after a click into
+  the document, keys for the ribbon's text boxes, the File view and prompts went into the document (the keyboard
+  focus stayed in LibreOffice's window) → `view:focusShell`; (2) while an engine hangs, the Varak window gets no
+  mouse or keyboard input (shared input queue), so the bar's "Restart engine" could not be clicked → rescue
+  message box without a parent window after 8 s, and a hung engine is killed before its view is detached. Both
+  confirmed on screen after the fix.
 
 ### Review fixes (session 2)
 
@@ -96,8 +103,8 @@ the import, and choosing another number format switched a legacy file's code pag
 ## Not verified yet (needs the owner's permission to use the desktop)
 
 - Not covered by any GUI run yet: printing, the PDF page tools and forms, in-document KeyTips
-  (`ui.documentKeyTips`), background-tab crash restore, the hung-engine close prompt. Plan:
-  [testing/GUI_SPIKE.md](testing/GUI_SPIKE.md); manual checklist in Turkish: [TEST_REHBERI.md](TEST_REHBERI.md).
+  (`ui.documentKeyTips`), the `closeStuck` prompt on screen (reachable only while the window still takes input).
+  Plan: [testing/GUI_SPIKE.md](testing/GUI_SPIKE.md); manual checklist in Turkish: [TEST_REHBERI.md](TEST_REHBERI.md).
 - High-DPI (125/150 %) — both monitors of this PC run at 100 %.
 - The installer on a clean Windows machine (it was only installed on this development PC).
 - Nothing is claimed as verified in Microsoft Office (not installed here).

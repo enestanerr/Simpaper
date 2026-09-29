@@ -9,6 +9,7 @@ import { isAllowedExternalUrl } from '../../../src/main/app/security';
 import { forwardShellKey } from '../../../src/main/app/shellKeys';
 import { configureThreadPool, THREADPOOL_SIZE } from '../../../src/main/app/threadpool';
 import { saveFilters, openFilters } from '../../../src/main/app/dialogs';
+import { engineRescueTexts } from '../../../src/main/app/strings';
 import { chromeColors } from '../../../src/main/app/theme';
 import { silentLog } from './helpers/fakes';
 
@@ -173,5 +174,21 @@ describe('security and window chrome', () => {
   it('uses opaque title bar colours per theme', () => {
     expect(chromeColors(false).overlay.height).toBe(40);
     expect(chromeColors(true).overlay.color).not.toBe(chromeColors(false).overlay.color);
+  });
+});
+
+describe('engine rescue message box', () => {
+  it('names the file and what a restart loses; "Restart engine" first, "Wait" second (the default)', () => {
+    const tr = engineRescueTexts('tr', 'Rapor.docx', 'sinceSnapshot', '14:02');
+    expect(tr.message).toBe('“Rapor.docx” belgesinin motoru yanıt vermiyor.');
+    expect(tr.detail).toContain('fare ve klavyeye yanıt vermeyebilir');
+    expect(tr.detail).toContain('saat 14:02 otomatik kaydından');
+    expect(tr.buttons).toEqual(['Motoru yeniden başlat', 'Bekle']);
+    expect(engineRescueTexts('tr', 'Rapor.docx', 'sinceSave', null).detail).toContain('son kaydedilen hâliyle');
+    expect(engineRescueTexts('en', 'Report.docx', 'none', null).detail).toContain('no unsaved changes');
+    expect(engineRescueTexts('en', 'Report.docx', 'all', null).detail).toContain('never saved');
+    expect(engineRescueTexts('en', 'Report.docx', 'sinceSnapshot', '2:02 PM').buttons).toEqual(['Restart engine', 'Wait']);
+    // Without a time the snapshot sentence is not printed with a placeholder.
+    expect(engineRescueTexts('tr', 'Rapor.docx', 'sinceSnapshot', null).detail).not.toMatch(/null|undefined/);
   });
 });

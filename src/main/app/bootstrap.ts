@@ -45,6 +45,7 @@ import { hardenSession, hardenWebContents } from './security';
 import { applySettingsChange } from './settingsEffects';
 import { forwardShellKey } from './shellKeys';
 import { SmokeErrorCollector, startSmoke } from './smoke';
+import { engineRescueTexts } from './strings';
 import { readTestMode } from './testMode';
 import { applyChromeTheme, createMainWindow, loadApp, resolveAppEntry } from './window';
 
@@ -228,6 +229,15 @@ export function bootstrap(factories: Factories): void {
       // Restarting a hung engine: kill soffice at once (LibreOffice's own helpers go with it; programs it
       // opened for the user, outside its program folder, survive).
       killProcessTree: (pid) => platform.processGuard.killTree(pid, { ...(engineProgramDir ? { imageDir: engineProgramDir } : {}), timeoutMs: 5_000 }),
+      // A hung LibreOffice window holds back input for the whole Varak window (attached input queues). A message box
+      // without a parent window runs on a thread of its own and still gets the user's click.
+      offerEngineRescue: async ({ fileName, loss, snapshotAt }, signal) => {
+        const lang = settings.get().language;
+        const time = snapshotAt ? new Date(snapshotAt).toLocaleTimeString(documentLocale(lang), { hour: '2-digit', minute: '2-digit' }) : null;
+        const t = engineRescueTexts(lang, fileName, loss, time);
+        const { response } = await dialog.showMessageBox({ type: 'warning', title: BRAND.productName, message: t.message, detail: t.detail, buttons: t.buttons, defaultId: 1, cancelId: 1, noLink: true, signal });
+        return response === 0 ? 'restart' : 'wait';
+      },
     });
     const recovery = new RecoveryService({ root: paths.recovery, sessionId, documents, safeWrite, settings: () => settings.get(), log: log.child('recovery') });
     documents.setLifecycleHooks(recovery);
@@ -282,6 +292,10 @@ export function bootstrap(factories: Factories): void {
         isAllowedUnoCommand: factories.isAllowedUnoCommand,
         ...(factories.isSubscribableUnoCommand ? { isSubscribableUnoCommand: factories.isSubscribableUnoCommand } : {}),
         allowEngineForeground: (pid) => platform.allowForeground(pid),
+        focusShell: async () => {
+          const w = getWindow();
+          return w && !w.isDestroyed() ? platform.focusHost(w).catch(() => false) : false;
+        },
         getWindow,
         log: log.child('ipc'),
       }),

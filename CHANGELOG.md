@@ -61,6 +61,14 @@ Nothing has been released yet. This section collects the work towards **v0.1.0**
 - Closing a changed document whose engine hangs or has crashed (or quitting with one open) discarded its unsaved
   changes without asking. Varak now asks first, names the time of the last autosave (kept under File → Recover)
   and makes Cancel the default.
+- After a click into the document, keys typed into Varak's own text boxes (for example the font box), the File view
+  and prompts went into the document: Windows kept the keyboard focus in LibreOffice's window. Varak now takes it
+  for its text boxes and modal views and gives it back afterwards; switching ribbon tabs still leaves the keyboard
+  in the document, as in Office.
+- While a document's engine hung, the Varak window did not react to the mouse or keyboard (Windows shares its input
+  queue with LibreOffice's window), so "Restart engine" could not be clicked. After 8 seconds Varak now offers the
+  restart in a separate message box; a hung engine is ended before its view is removed (removing it first could
+  block the app); the "not responding" bar disappears once the document responds again or is restarted.
 - CSV import: a separator typed under "Other" was shown in the preview but the import used the default separator;
   and choosing other number formats for a legacy-encoded file (Windows-1254/1252) switched its code page, so the
   imported text differed from the preview.

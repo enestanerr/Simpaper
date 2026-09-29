@@ -6,7 +6,7 @@
  * Nothing here opens windows or starts the engine.
  */
 import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
-import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { AppInfo, Settings } from '@shared/api/app';
 import type { CompatReport, DocumentDescriptor, Prompt, RecentFile } from '@shared/api/documents';
 import type { RecoveryEntry } from '@shared/api/recovery';
@@ -19,8 +19,9 @@ import { registerModules } from '../../../src/renderer/modules/registry';
 import type { ModuleDefinition } from '../../../src/renderer/modules/types';
 import { writerModule } from '../../../src/renderer/modules/writer';
 import { handleDocumentEvent } from '../../../src/renderer/services/bootstrap';
+import { activateDocument } from '../../../src/renderer/services/documents';
 import { Shell } from '../../../src/renderer/shell/Shell';
-import { setActiveDocId, upsertDocument, useApp } from '../../../src/renderer/state/appStore';
+import { closeBackstage, enqueuePrompt, openBackstage, setActiveDocId, upsertDocument, useApp } from '../../../src/renderer/state/appStore';
 import { descriptor, FakeIpc, flush, installIpc, removeIpc, resetRendererState } from './helpers';
 
 const pdfModule = { kind: 'pdf', ribbon: pdfRibbon, actions: pdfActions, Workspace: () => <div>pdf</div> } as unknown as ModuleDefinition;
@@ -414,6 +415,25 @@ describe('message bars and shortcuts', () => {
     expect(within(screen.getByRole('alert')).queryByRole('button', { name: 'Motoru yeniden başlat' })).toBeNull();
   });
 
+  it('keeps one "not responding" bar per document and removes it once the document no longer hangs', async () => {
+    open(descriptor('w1', 'writer'));
+    await renderShell();
+    act(() => handleDocumentEvent({ type: 'updated', doc: descriptor('w1', 'writer', { state: 'busy' }) }));
+    const bars = () => [...document.querySelectorAll('.vr-msgbar')].map((b) => b.textContent ?? '');
+    act(() => handleDocumentEvent({ type: 'error', docId: 'w1', errorKey: 'errors.engine.notResponding' }));
+    act(() => handleDocumentEvent({ type: 'error', docId: 'w1', errorKey: 'errors.engine.notResponding' }));
+    expect(bars()).toEqual([expect.stringContaining('Belge motoru yanıt vermiyor')]);
+    // Restarted from the rescue box (busy → crashed → restored): the bar and its restart button go away.
+    act(() => handleDocumentEvent({ type: 'updated', doc: descriptor('w1', 'writer', { state: 'crashed' }) }));
+    expect(bars()).toEqual([]);
+    // Answering again (busy → ready) as well; other errors stay.
+    act(() => handleDocumentEvent({ type: 'updated', doc: descriptor('w1', 'writer', { state: 'busy' }) }));
+    act(() => handleDocumentEvent({ type: 'error', docId: 'w1', errorKey: 'errors.engine.notResponding' }));
+    act(() => handleDocumentEvent({ type: 'error', docId: 'w1', errorKey: 'shell.messages.saveFailed' }));
+    act(() => handleDocumentEvent({ type: 'updated', doc: descriptor('w1', 'writer', { state: 'ready' }) }));
+    expect(bars()).toEqual([expect.stringContaining('Belge kaydedilemedi')]);
+  });
+
   it('Ctrl+S saves the active office document; Ctrl+Z in a text field stays native', async () => {
     ipc.handle('documents:save', () => ({ outcome: 'saved' as const }));
     ipc.handle('engine:dispatch', () => undefined);
@@ -431,5 +451,85 @@ describe('message bars and shortcuts', () => {
     fireEvent.keyDown(document.body, { key: 'z', code: 'KeyZ', ctrlKey: true });
     await act(flush);
     expect(ipc.callsTo('engine:dispatch').map((c) => c.req)).toEqual([{ docId: 'w1', command: '.uno:Undo' }]);
+  });
+});
+
+describe('keyboard between Varak and the document (GUI check 2026-09-29: a letter for the font box went into the document)', () => {
+  it('a press into a text box claims the keyboard; switching ribbon tabs or a focus change without a press does not', async () => {
+    ipc.handle('view:focusShell', () => true);
+    open(descriptor('w1', 'writer'));
+    await renderShell();
+    const tab = document.querySelector<HTMLElement>('[data-tab-id="insert"]');
+    if (!tab) throw new Error('no Insert tab');
+    fireEvent.pointerDown(tab);
+    fireEvent.focusIn(tab);
+    await act(flush);
+    expect(ipc.callsTo('view:focusShell')).toEqual([]);
+    const box = screen.getByRole('combobox', { name: 'Yazı tipi' });
+    fireEvent.pointerDown(box);
+    fireEvent.focusIn(box);
+    await act(flush);
+    expect(ipc.callsTo('view:focusShell')).toHaveLength(1);
+    // Later focus changes that no press started (a component focusing itself) leave the keyboard alone.
+    const now = Date.now();
+    const clock = vi.spyOn(Date, 'now').mockReturnValue(now + 5_000);
+    try {
+      fireEvent.focusIn(box);
+      await act(flush);
+      expect(ipc.callsTo('view:focusShell')).toHaveLength(1);
+    } finally {
+      clock.mockRestore();
+    }
+  });
+
+  it('prompts and the backstage hold the keyboard; the document gets it back when the last one closes', async () => {
+    ipc.handle('view:focusShell', () => true);
+    open(descriptor('w1', 'writer'));
+    await renderShell();
+    act(() => openBackstage('info'));
+    await act(flush);
+    expect(ipc.callsTo('view:focusShell')).toHaveLength(1);
+    act(() => enqueuePrompt({ id: 'p1', kind: 'unsavedChanges', docId: 'w1', fileName: 'w1.docx' }));
+    await act(flush);
+    expect(ipc.callsTo('view:focusShell')).toHaveLength(2);
+    fireEvent.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'İptal' }));
+    await act(flush);
+    // The backstage is still open: the keyboard stays with it.
+    expect(ipc.callsTo('view:focus')).toEqual([]);
+    act(() => closeBackstage());
+    await act(flush);
+    expect(ipc.callsTo('view:focus').map((c) => c.req)).toContainEqual({ docId: 'w1' });
+  });
+
+  it('closing the backstage always returns the keyboard to the document, as in Office', async () => {
+    // The focus was in Varak already (e.g. the font box): nothing was taken, yet the document gets the keyboard.
+    ipc.handle('view:focusShell', () => false);
+    open(descriptor('w1', 'writer'));
+    await renderShell();
+    act(() => openBackstage('info'));
+    await act(flush);
+    expect(ipc.callsTo('view:focus')).toEqual([]);
+    act(() => closeBackstage());
+    await act(flush);
+    expect(ipc.callsTo('view:focus').map((c) => c.req)).toContainEqual({ docId: 'w1' });
+  });
+
+  it('gives nothing back when the keyboard was not taken from the document; a PDF tab claims it', async () => {
+    ipc.handle('view:focusShell', () => false);
+    open(descriptor('w1', 'writer'));
+    upsertDocument(descriptor('p1', 'pdf'));
+    await renderShell();
+    act(() => enqueuePrompt({ id: 'p2', kind: 'unsavedChanges', docId: 'w1', fileName: 'w1.docx' }));
+    await act(flush);
+    fireEvent.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'İptal' }));
+    await act(flush);
+    expect(ipc.callsTo('view:focus')).toEqual([]);
+    const before = ipc.callsTo('view:focusShell').length;
+    act(() => activateDocument('p1'));
+    await act(flush);
+    expect(ipc.callsTo('view:focusShell')).toHaveLength(before + 1);
+    act(() => activateDocument('w1'));
+    await act(flush);
+    expect(ipc.callsTo('view:focusShell')).toHaveLength(before + 1);
   });
 });

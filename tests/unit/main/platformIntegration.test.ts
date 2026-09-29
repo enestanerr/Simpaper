@@ -11,7 +11,7 @@ import type { WindowState } from '@shared/api/app';
 import { computeWindowState, trackActiveState, type TrackedWindow } from '../../../src/main/app/activeState';
 import { engineFontFolders } from '../../../src/main/app/engineDirs';
 import { readTestMode } from '../../../src/main/app/testMode';
-import type { DocumentServiceDeps } from '../../../src/main/documents/service';
+import type { DocumentServiceDeps, EngineRescueOffer } from '../../../src/main/documents/service';
 import { createHarness, waitFor, type Harness } from './helpers/harness';
 import { buildOoxml } from './helpers/packages';
 
@@ -261,6 +261,174 @@ describe('DocumentService — restartEngine', () => {
     expect(hh.service.get(docId)?.descriptor.state).toBe('ready');
     expect(hh.eventsOf('notice').map((n) => n.noticeKey)).toContain('errors.engine.restarted');
     await expect(hh.service.restartEngine('dunknown')).rejects.toThrow('errors.ipc.unknownDocument');
+  });
+});
+
+describe('DocumentService — hung engine (GUI check 2026-09-29: a hung view holds back input for the Varak window)', () => {
+  /** One watchdog round with `responding()`; the watch is returned for further rounds. */
+  async function hang(hh: Harness, responding: () => boolean = () => false) {
+    const watch = hh.service.watchHangs({ isResponding: async () => responding() }, { intervalMs: 60_000, strikes: 1 });
+    await watch.tick();
+    return watch;
+  }
+
+  it('ends a hung engine before detaching its view, when restarting and when closing', async () => {
+    // Hiding a hung window that has the keyboard focus makes Windows wait for it (WM_KILLFOCUS) on the UI thread.
+    const hh = await setup({ killProcessTree: async (pid) => void h?.view.log.push(`kill:${pid}`) });
+    const a = await openDocx(hh, 'A.docx');
+    const first = hh.engine.instance(a);
+    (await hang(hh)).stop();
+    await hh.service.restartEngine(a);
+    const log = hh.view.log;
+    expect(log).toContain(`kill:${first.officePid}`);
+    expect(log.indexOf(`kill:${first.officePid}`)).toBeLessThan(log.indexOf(`detach:${a}`));
+
+    const b = await openDocx(hh, 'B.docx');
+    const second = hh.engine.instance(b);
+    (await hang(hh)).stop();
+    expect(hh.service.get(b)?.descriptor.state).toBe('busy');
+    expect(await hh.service.close(b)).toBe('closed');
+    expect(log).toContain(`kill:${second.officePid}`);
+    expect(log.lastIndexOf(`kill:${second.officePid}`)).toBeLessThan(log.lastIndexOf(`detach:${b}`));
+  });
+
+  it('ignores a probe that ends while the engine is being restarted (a killed window may "answer")', async () => {
+    let resolveProbe: ((ok: boolean) => void) | null = null;
+    let mode: 'hung' | 'pending' = 'hung';
+    const hh = await setup({
+      killProcessTree: async () => {
+        resolveProbe?.(true);
+        await new Promise((r) => setTimeout(r, 5));
+      },
+    });
+    const docId = await openDocx(hh, 'Yaris.docx');
+    const detector = { isResponding: () => (mode === 'hung' ? Promise.resolve(false) : new Promise<boolean>((r) => (resolveProbe = r))) };
+    const watch = hh.service.watchHangs(detector, { intervalMs: 60_000, strikes: 1 });
+    try {
+      await watch.tick();
+      expect(hh.service.get(docId)?.descriptor.state).toBe('busy');
+      mode = 'pending';
+      const inFlight = watch.tick();
+      await hh.service.restartEngine(docId);
+      await inFlight;
+    } finally {
+      watch.stop();
+    }
+    expect(hh.eventsOf('notice').map((n) => n.noticeKey)).not.toContain('errors.engine.responding');
+    const states = hh.eventsOf('updated').filter((e) => e.doc.docId === docId).map((e) => e.doc.state);
+    expect(states[states.indexOf('busy') + 1]).toBe('crashed');
+    expect(hh.service.get(docId)?.descriptor.state).toBe('ready');
+  });
+
+  it('offers a restart in a window of its own when the hang lasts; "restart" reloads the newest snapshot', async () => {
+    const offers: EngineRescueOffer[] = [];
+    const killed: number[] = [];
+    const hh = await setup({
+      killProcessTree: async (pid) => void killed.push(pid),
+      offerEngineRescue: async (offer) => {
+        offers.push(offer);
+        return 'restart';
+      },
+      rescueTiming: { delayMs: 5 },
+    });
+    const docId = await openDocx(hh, 'Kurtar.docx');
+    const first = hh.engine.instance(docId);
+    first.emit({ type: 'modified', docId, modified: true });
+    await hh.recovery.start();
+    await hh.recovery.snapshotAll();
+    (await hang(hh)).stop();
+    await waitFor(() => hh.engine.history.length === 2 && hh.service.get(docId)?.descriptor.state === 'ready');
+    expect(offers).toEqual([{ docId, fileName: 'Kurtar.docx', loss: 'sinceSnapshot', snapshotAt: expect.stringMatching(/^\d{4}-\d\d-\d\dT/) }]);
+    expect(killed).toEqual([first.officePid]);
+    expect(hh.service.get(docId)?.descriptor).toMatchObject({ modified: true, recoveredAt: expect.any(String) });
+    // The restored document gets the keyboard back (on screen the focus had fallen to the view container).
+    await waitFor(() => hh.engine.history[1]?.callsOf('view.focus').length === 1);
+    expect(hh.view.log).toContain(`focus:${docId}`);
+  });
+
+  it('withdraws the offer when the engine answers again, and asks again after "wait" while it still hangs', async () => {
+    const signals: AbortSignal[] = [];
+    let answer: 'hold' | 'wait' = 'hold';
+    const hh = await setup({
+      offerEngineRescue: (_offer, signal) => {
+        signals.push(signal);
+        // 'hold': the box stays until it is withdrawn; its late answer must not restart anything.
+        return answer === 'wait' ? Promise.resolve('wait') : new Promise((resolve) => signal.addEventListener('abort', () => resolve('restart')));
+      },
+      rescueTiming: { delayMs: 5, repeatMs: 5 },
+    });
+    const docId = await openDocx(hh, 'Bekle.docx');
+    let responding = false;
+    const watch = await hang(hh, () => responding);
+    try {
+      await waitFor(() => signals.length === 1);
+      responding = true;
+      await watch.tick();
+      expect(signals[0]?.aborted).toBe(true);
+      expect(hh.service.get(docId)?.descriptor.state).toBe('ready');
+      await new Promise((r) => setTimeout(r, 20));
+      expect(hh.engine.history).toHaveLength(1);
+
+      answer = 'wait';
+      responding = false;
+      await watch.tick();
+      await waitFor(() => signals.length >= 3);
+      expect(hh.engine.history).toHaveLength(1);
+      expect(hh.service.get(docId)?.descriptor.state).toBe('busy');
+    } finally {
+      watch.stop();
+    }
+  });
+
+  it('offers nothing for a document closed during the delay; a restart from the message bar withdraws the offer', async () => {
+    const signals: AbortSignal[] = [];
+    const hh = await setup({
+      killProcessTree: async () => undefined,
+      offerEngineRescue: (_offer, signal) => {
+        signals.push(signal);
+        return new Promise((resolve) => signal.addEventListener('abort', () => resolve('wait')));
+      },
+      rescueTiming: { delayMs: 30 },
+    });
+    const a = await openDocx(hh, 'A.docx');
+    (await hang(hh)).stop();
+    expect(await hh.service.close(a)).toBe('closed');
+    await new Promise((r) => setTimeout(r, 60));
+    expect(signals).toEqual([]);
+
+    const b = await openDocx(hh, 'B.docx');
+    (await hang(hh)).stop();
+    await waitFor(() => signals.length === 1);
+    await hh.service.restartEngine(b);
+    expect(signals[0]?.aborted).toBe(true);
+    expect(hh.service.get(b)?.descriptor.state).toBe('ready');
+  });
+
+  it('says what a restart would lose: nothing, the changes since the last save, or everything', async () => {
+    const offers: EngineRescueOffer[] = [];
+    const hh = await setup({
+      offerEngineRescue: async (offer) => {
+        offers.push(offer);
+        return 'wait';
+      },
+      rescueTiming: { delayMs: 1, repeatMs: 60_000 },
+    });
+    await openDocx(hh, 'Temiz.docx');
+    (await hang(hh)).stop();
+    await waitFor(() => offers.length === 1);
+    const saved = await openDocx(hh, 'Kayitli.docx');
+    hh.engine.instance(saved).emit({ type: 'modified', docId: saved, modified: true });
+    (await hang(hh)).stop();
+    await waitFor(() => offers.length === 2);
+    const fresh = (await hh.service.create('writer')).docId;
+    hh.engine.instance(fresh).emit({ type: 'modified', docId: fresh, modified: true });
+    (await hang(hh)).stop();
+    await waitFor(() => offers.length === 3);
+    expect(offers.map((o) => [o.fileName, o.loss, o.snapshotAt])).toEqual([
+      ['Temiz.docx', 'none', null],
+      ['Kayitli.docx', 'sinceSave', null],
+      [hh.service.get(fresh)?.descriptor.title, 'all', null],
+    ]);
   });
 });
 

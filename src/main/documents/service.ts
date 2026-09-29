@@ -99,6 +99,27 @@ export interface DocumentServiceDeps {
   killProcessTree?: (pid: number) => Promise<void>;
   /** How long a PDF flush request waits for the renderer's `documents:flushDone` (default 10 s). */
   flushTimeoutMs?: number;
+  /**
+   * Offers to restart a hung engine in a window of its own. While LibreOffice's window inside the Varak window
+   * hangs, Windows holds back mouse and keyboard input for the whole Varak window (their input queues are
+   * attached), so the message bar's "Restart engine" can't be clicked; a window without an owner still gets input.
+   * Resolves with the user's choice; `signal` withdraws the offer (the engine answers again, the document is
+   * closed or restarted).
+   */
+  offerEngineRescue?: (offer: EngineRescueOffer, signal: AbortSignal) => Promise<'restart' | 'wait'>;
+  /** How long an engine hangs before the rescue is offered (default 8 s), and again after "wait" (default 60 s). */
+  rescueTiming?: { delayMs?: number; repeatMs?: number };
+}
+
+export interface EngineRescueOffer {
+  docId: string;
+  fileName: string;
+  /**
+   * What a restart loses: nothing (no unsaved changes), the changes after the autosave at `snapshotAt`, those
+   * since the last save, or everything (never saved and no autosave).
+   */
+  loss: 'none' | 'sinceSnapshot' | 'sinceSave' | 'all';
+  snapshotAt: string | null;
 }
 
 /** Size limit for the optional re-open verification (settings.verifyAfterSave). */
@@ -106,6 +127,9 @@ const REOPEN_VERIFY_LIMIT = 50 * 1024 * 1024;
 const FLUSH_TIMEOUT_MS = 10_000;
 const MAX_AUTO_RESTARTS = 2;
 const RESTART_WINDOW_MS = 10 * 60 * 1000;
+const RESCUE_DELAY_MS = 8_000;
+const RESCUE_REPEAT_MS = 60_000;
+const RESTART_FOCUS_DELAY_MS = 400;
 const SNAPSHOT_FILTER_FORMAT: Record<OfficeKind, FormatId> = ODF_FORMAT;
 
 export function documentLocale(lang: Settings['language']): string {
@@ -1138,24 +1162,26 @@ export class DocumentService implements DocumentRegistry {
     const keepSnapshot = record.descriptor.modified && (record.descriptor.state === 'crashed' || record.descriptor.state === 'busy');
     record.closing = true;
     record.abort.abort();
+    this.cancelRescue(record);
     // Closing the engine takes a moment; tell the renderer now so its pollers stop querying this document.
     this.update(docId, { state: 'closed' });
     this.records.delete(docId);
     this.prompts.cancelFor(docId);
     if (keepSnapshot) await this.hooks?.engineCrashed(docId).catch(() => null);
     this.dropInstanceSubs(record);
-    this.detachView(docId);
     const instance = record.instance;
     record.instance = undefined;
+    // Never a PID of an instance that already ended (Windows may have reused it).
+    const pid = instance ? this.killablePid(instance) : undefined;
+    const killer = record.hung && pid ? this.deps.killProcessTree : undefined;
+    if (killer && pid) {
+      // A hung engine answers neither doc.close nor a graceful shutdown: end it at once, and before its view is
+      // detached (hiding a hung window that has the keyboard focus makes Windows wait for it).
+      await killer(pid).catch((err) => this.log.warn('killing the engine process failed', { docId, error: err }));
+    }
+    this.detachView(docId);
     if (instance) {
-      // Never a PID of an instance that already ended (Windows may have reused it).
-      const pid = this.killablePid(instance);
-      if (record.hung && pid && this.deps.killProcessTree) {
-        // A hung engine answers neither doc.close nor a graceful shutdown: end it at once.
-        await this.deps.killProcessTree(pid).catch((err) => this.log.warn('killing the engine process failed', { docId, error: err }));
-      } else {
-        await instance.call('doc.close', { docId }, { timeoutMs: 5_000 }).catch(() => undefined);
-      }
+      if (!killer) await instance.call('doc.close', { docId }, { timeoutMs: 5_000 }).catch(() => undefined);
       await this.deps.engine.releaseDocumentInstance(docId).catch((err) => this.log.warn('engine release failed', { docId, error: err }));
     }
     await this.deps.workingCopies.remove(docId);
@@ -1194,8 +1220,9 @@ export class DocumentService implements DocumentRegistry {
   /**
    * Hang watchdog (docs/dev/platform.md §2.6): a document whose window stops responding becomes `busy` with
    * `errors.engine.notResponding` and `ready` again (`errors.engine.responding`) when it answers. Recovery
-   * paths for the user: wait, close the document (no prompt; its recovery snapshot is kept and listed), or
-   * `restartEngine` (documents:restartEngine).
+   * paths for the user: wait, close the document (`closeStuck` prompt; its recovery snapshot is kept and
+   * listed), or `restartEngine` (documents:restartEngine, or the rescue offer in a window of its own when the
+   * hang outlasts `rescueTiming.delayMs`: the Varak window itself may not get input meanwhile).
    */
   watchHangs(detector: HangDetector, timing: { intervalMs?: number; timeoutMs?: number; strikes?: number } = {}): HangWatch {
     return startHangWatch({
@@ -1204,14 +1231,18 @@ export class DocumentService implements DocumentRegistry {
       targets: () => this.hangTargets(),
       onChange: (docId, responding) => {
         const r = this.records.get(docId);
-        if (!r || r.closing) return;
+        // A probe of a window whose engine is being restarted or closed can end either way (a killed window may
+        // "answer"): only the current window of a running engine counts.
+        if (!r || r.closing || r.restarting || !r.hwnd || !r.instance) return;
         if (!responding && !r.hung && r.descriptor.state === 'ready') {
           r.hung = true;
           this.log.warn('engine window not responding', { docId });
           this.update(docId, { state: 'busy' });
           this.error(docId, 'errors.engine.notResponding');
+          this.scheduleRescue(r, this.deps.rescueTiming?.delayMs ?? RESCUE_DELAY_MS);
         } else if (responding && r.hung) {
           r.hung = false;
+          this.cancelRescue(r);
           if (r.descriptor.state === 'busy') {
             this.update(docId, { state: 'ready' });
             this.notice(docId, 'errors.engine.responding');
@@ -1219,6 +1250,55 @@ export class DocumentService implements DocumentRegistry {
         }
       },
     });
+  }
+
+  /** Offers the engine rescue (deps.offerEngineRescue) if the document still hangs after `delayMs`. */
+  private scheduleRescue(record: DocRecord, delayMs: number): void {
+    if (!this.deps.offerEngineRescue || record.rescue) return;
+    const rescue: NonNullable<DocRecord['rescue']> = { controller: new AbortController(), timer: null };
+    rescue.timer = setTimeout(() => {
+      rescue.timer = null;
+      void this.offerRescue(record, rescue);
+    }, delayMs);
+    record.rescue = rescue;
+  }
+
+  /** Withdraws a pending or shown rescue offer (the engine answers again, is restarted, or the document closes). */
+  private cancelRescue(record: DocRecord): void {
+    const rescue = record.rescue;
+    if (!rescue) return;
+    record.rescue = undefined;
+    if (rescue.timer) clearTimeout(rescue.timer);
+    rescue.controller.abort();
+  }
+
+  private stillHung(record: DocRecord): boolean {
+    return this.records.get(record.descriptor.docId) === record && record.hung && !record.closing && !record.restarting && record.descriptor.state === 'busy';
+  }
+
+  private async offerRescue(record: DocRecord, rescue: NonNullable<DocRecord['rescue']>): Promise<void> {
+    const offer = this.deps.offerEngineRescue;
+    if (!offer || record.rescue !== rescue || !this.stillHung(record)) return;
+    const docId = record.descriptor.docId;
+    const snapshotAt = record.descriptor.modified ? await this.lastSnapshotAt(docId) : null;
+    const loss: EngineRescueOffer['loss'] = !record.descriptor.modified ? 'none' : snapshotAt ? 'sinceSnapshot' : record.descriptor.path ? 'sinceSave' : 'all';
+    if (record.rescue !== rescue || rescue.controller.signal.aborted) return;
+    this.log.warn('offering to restart the hung engine', { docId, loss });
+    let answer: 'restart' | 'wait';
+    try {
+      answer = await offer({ docId, fileName: record.descriptor.title, loss, snapshotAt }, rescue.controller.signal);
+    } catch (err) {
+      this.log.warn('engine rescue offer failed', { docId, error: err });
+      answer = 'wait';
+    }
+    if (record.rescue !== rescue || rescue.controller.signal.aborted) return;
+    record.rescue = undefined;
+    if (!this.stillHung(record)) return;
+    if (answer === 'restart') {
+      await this.restartEngine(docId).catch((err) => this.log.warn('engine restart from the rescue offer failed', { docId, error: err }));
+    } else {
+      this.scheduleRescue(record, this.deps.rescueTiming?.repeatMs ?? RESCUE_REPEAT_MS);
+    }
   }
 
   /**
@@ -1235,6 +1315,7 @@ export class DocumentService implements DocumentRegistry {
     if (record.closing || (state !== 'busy' && state !== 'crashed')) throw new DocumentError('errors.engine.restartNotNeeded');
     if (record.restarting) return;
     record.restarting = true;
+    this.cancelRescue(record);
     try {
       this.log.warn('engine restart requested', { docId, state });
       // The user asked for it: the limit of automatic restarts does not apply.
@@ -1248,6 +1329,16 @@ export class DocumentService implements DocumentRegistry {
     } finally {
       record.restarting = false;
     }
+    // The user restarted it to go on working: the restored document gets the keyboard back (the window that had it is
+    // gone, and Windows gave the focus to the view container). LibreOffice ignores a focus request for a window that is
+    // not shown yet, and the view host shows the new one a moment after the load; never while another app is in front.
+    const refocus = setTimeout(() => {
+      const win = this.deps.getWindow();
+      if (this.activeId !== docId || this.records.get(docId) !== record || record.descriptor.state !== 'ready') return;
+      if (win && this.deps.viewHost.isForeground?.(win) === false) return;
+      this.focusView(docId);
+    }, RESTART_FOCUS_DELAY_MS);
+    refocus.unref?.();
   }
 
   /** Detaches a document from its engine instance and ends the instance (fast kill when possible). */
@@ -1257,12 +1348,13 @@ export class DocumentService implements DocumentRegistry {
     record.instance = undefined;
     record.hwnd = undefined;
     record.busy.delete('dialog');
-    this.detachView(docId);
-    // Never a PID of an instance that already ended (Windows may have reused it).
+    // Never a PID of an instance that already ended (Windows may have reused it). The kill comes before the view
+    // is detached: hiding a hung window that has the keyboard focus makes Windows wait for it (WM_KILLFOCUS).
     const pid = this.killablePid(instance);
     if (pid && this.deps.killProcessTree) {
       await this.deps.killProcessTree(pid).catch((err) => this.log.warn('killing the engine process failed', { docId, error: err }));
     }
+    this.detachView(docId);
     await this.deps.engine.releaseDocumentInstance(docId).catch((err) => this.log.warn('engine release failed', { docId, error: err }));
   }
 
@@ -1335,6 +1427,7 @@ export class DocumentService implements DocumentRegistry {
     record.instance = undefined;
     record.hwnd = undefined;
     record.hung = false;
+    this.cancelRescue(record);
     record.busy.delete('dialog');
     this.detachView(docId);
     this.log.error('engine instance ended unexpectedly', { docId, crashed: info.crashed, code: info.code });

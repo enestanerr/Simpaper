@@ -3,6 +3,7 @@ import type { DocumentEvent } from '@shared/api/documents';
 import { SHELL_ACTIONS } from '../ribbon/types';
 import { stopKeyTips } from '../ribbon/keytipStore';
 import {
+  dismissMessage,
   enqueuePrompt,
   getDocument,
   openBackstage,
@@ -38,6 +39,9 @@ import { noteDocumentActivity, noteWindowState } from './windowActivity';
 
 /** Engine errors that leave the document `busy` (hung) or `crashed`; the user may restart the engine from the message bar. */
 const RESTARTABLE_ERRORS = new Set(['errors.engine.notResponding', 'errors.engine.restartLimit', 'errors.engine.restoreFailed']);
+const NOT_RESPONDING = 'errors.engine.notResponding';
+/** One "not responding" bar per document; it goes away once the document is no longer hung (`busy`). */
+const hangMessageId = (docId: string) => `hang:${docId}`;
 
 export async function loadInitialState(): Promise<void> {
   if (!hasBridge()) {
@@ -70,6 +74,7 @@ export function handleDocumentEvent(ev: DocumentEvent): void {
       // A late update of a document that is gone must not bring its tab back.
       if (!prev && wasDocumentClosed(ev.doc.docId)) break;
       upsertDocument(ev.doc);
+      if (prev?.state === 'busy' && ev.doc.state !== 'busy') dismissMessage(hangMessageId(ev.doc.docId));
       if (prev && prev.state !== ev.doc.state && (ev.doc.state === 'crashed' || ev.doc.state === 'closed')) {
         clearFrozen(ev.doc.docId);
         forgetSubscriptions(ev.doc.docId);
@@ -113,7 +118,8 @@ export function handleDocumentEvent(ev: DocumentEvent): void {
     case 'error': {
       const docId = ev.docId;
       const action = docId !== null && RESTARTABLE_ERRORS.has(ev.errorKey) ? { labelKey: 'shell.messages.restartEngine', run: () => void restartEngine(docId) } : undefined;
-      pushMessage({ kind: 'error', docId, key: ev.errorKey, detail: ev.detail, ...(action ? { action } : {}) });
+      const id = docId !== null && ev.errorKey === NOT_RESPONDING ? hangMessageId(docId) : undefined;
+      pushMessage({ kind: 'error', docId, key: ev.errorKey, detail: ev.detail, ...(action ? { action } : {}), ...(id ? { id } : {}) });
       break;
     }
     case 'notice':

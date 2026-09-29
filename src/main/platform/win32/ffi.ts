@@ -65,6 +65,9 @@ export interface Win32Api {
     GetForegroundWindow: KoffiFunc<() => bigint | null>;
     SetForegroundWindow: KoffiFunc<(hwnd: Ptr) => boolean>;
     AllowSetForegroundWindow: KoffiFunc<(pid: number) => boolean>;
+    GetFocus: KoffiFunc<() => bigint | null>;
+    SetFocus: KoffiFunc<(hwnd: Ptr) => bigint | null>;
+    IsChild: KoffiFunc<(parent: Ptr, hwnd: Ptr) => boolean>;
     GetWindowThreadProcessId: KoffiFunc<(hwnd: Ptr, pid: number[]) => number>;
     GetWindowLongPtrW: KoffiFunc<(hwnd: Ptr, index: number) => number | bigint>;
     SetWindowLongPtrW: KoffiFunc<(hwnd: Ptr, index: number, value: number | bigint) => number | bigint>;
@@ -230,6 +233,9 @@ function bind(koffi: KoffiModule): Win32Api {
       GetForegroundWindow: fn(user32Lib, 'GetForegroundWindow', P, []),
       SetForegroundWindow: fn(user32Lib, 'SetForegroundWindow', 'bool', [P]),
       AllowSetForegroundWindow: fn(user32Lib, 'AllowSetForegroundWindow', 'bool', ['uint32']),
+      GetFocus: fn(user32Lib, 'GetFocus', P, []),
+      SetFocus: fn(user32Lib, 'SetFocus', P, [P]),
+      IsChild: fn(user32Lib, 'IsChild', 'bool', [P, P]),
       GetWindowThreadProcessId: fn(user32Lib, 'GetWindowThreadProcessId', 'uint32', [P, koffi.out(koffi.pointer('uint32'))]),
       GetWindowLongPtrW: fn(user32Lib, 'GetWindowLongPtrW', 'intptr_t', [P, 'int']),
       SetWindowLongPtrW: fn(user32Lib, 'SetWindowLongPtrW', 'intptr_t', [P, 'int', 'intptr_t']),

@@ -1,6 +1,6 @@
 # Status and hand-off
 
-_Last updated: 2026-09-29 evening (session 2: review fixes, GUI runs, screenshots, first local commit)._ This file is
+_Last updated: 2026-09-29 evening (session 2: review fixes, GUI runs, screenshots, focus and hang fixes, local commits)._ This file is
 the entry point for the next working session: read it first, then [ROADMAP.md](ROADMAP.md) (checked boxes = proven
 by automated tests) and the area notes in [dev/](dev/).
 
@@ -12,7 +12,7 @@ session 2: the default **child** hosting mode passes; the **owned** mode is kept
 installed the 0.1.0 installer on this PC and used it (per user, no administrator rights). What still needs a person
 at the screen is listed under "Not verified yet".
 
-The project is a local Git repository (branch `main`, first commit made at the end of session 2, **no remote, nothing
+The project is a local Git repository (branch `main`, two commits at the end of session 2, **no remote, nothing
 pushed**). Publishing on GitHub is the owner's decision.
 
 ### Implemented (code + tests)
@@ -20,8 +20,8 @@ pushed**). Publishing on GitHub is the owner's decision.
 | Area | What exists | Notes |
 |---|---|---|
 | Engine | Python UNO bridge on LibreOffice's bundled Python, NDJSON JSON-RPC, main-thread execution via AsyncCallback, dispatch interception, state/context/selection/dialog events, process-per-document, conversion instance, profile template (macros off, updaters off, Office-like shortcuts) | [dev/engine.md](dev/engine.md) |
-| Main process | Composition root, IPC router with sender/payload validation and a UNO command allow-list, DocumentService (open/new/save/save as/export PDF/print/close), SafeWriter (temp → verify → ReplaceFileW), compatibility analyzer (macros, SmartArt, chartex, pivots, fonts …), save-risk prompt with "save a copy", autosave + crash recovery (also for encrypted documents), hang watchdog, settings, logs without document content | [dev/main-core.md](dev/main-core.md) |
-| Windows platform | Child (default) and owned (experimental) hosting of the LibreOffice window, DPI mapping, freeze-frame (PrintWindow), Job Object process guard, hang detector, optional Alt/F10 keyboard hook | [dev/platform.md](dev/platform.md), [ADR 0003](adr/0003-document-surface.md) |
+| Main process | Composition root, IPC router with sender/payload validation and a UNO command allow-list, DocumentService (open/new/save/save as/export PDF/print/close), SafeWriter (temp → verify → ReplaceFileW), compatibility analyzer (macros, SmartArt, chartex, pivots, fonts …), save-risk prompt with "save a copy", autosave + crash recovery (also for encrypted documents), hang watchdog with a restart offer in its own message box, settings, logs without document content | [dev/main-core.md](dev/main-core.md) |
+| Windows platform | Child (default) and owned (experimental) hosting of the LibreOffice window, DPI mapping, freeze-frame (PrintWindow), Job Object process guard, hang detector, keyboard focus hand-over between Varak and LibreOffice (`view:focusShell`), optional Alt/F10 keyboard hook | [dev/platform.md](dev/platform.md), [ADR 0003](adr/0003-document-surface.md) |
 | Renderer | Title bar with QAT, document tabs, start screen, File backstage, ribbons for Writer (202 commands), Calc (225), Impress (164) and PDF, contextual tabs, KeyTips, adaptive ribbon layout, formula bar, status bars with zoom, prompts, message bars, TR/EN (9 namespaces), light/dark/high contrast | [dev/shell-ui.md](dev/shell-ui.md) |
 | PDF | pdf.js 6.3 viewer (thumbnails, zoom, rotate view, Turkish-aware search, text selection), annotation editors, forms, page operations, merge/extract, add text/image as page content (Unicode font), incremental saves, own appearance streams for Turkish FreeText/form values, printing | [dev/pdf.md](dev/pdf.md) |
 | Tests & corpus | Generated DOCX/XLSX/PPTX/PDF corpus + license-clean third-party samples, independent OOXML/VBA/PDF readers, visual regression with documented known changes | [dev/testing-corpus.md](dev/testing-corpus.md) |

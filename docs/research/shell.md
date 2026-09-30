@@ -38,7 +38,7 @@
 - Pass the HWND value (`buf.readBigUInt64LE(0)`), not the Buffer itself.
 
 **Packaging.** electron-builder 26.x builds a one-click NSIS installer that installs per-user to `%LOCALAPPDATA%\Programs` without admin rights. Gotchas:
-- Built-in `fileAssociations` on NSIS "works only if nsis.perMachine is true". A per-user install needs a custom NSIS include that writes the associations under HKCU and calls SHChangeNotify.
+- Built-in `fileAssociations` on NSIS "works only if nsis.perMachine is true". A per-user install needs a custom NSIS include that writes the associations under HKCU and calls SHChangeNotify. _Correction 2026-09-30:_ that sentence of the documentation is outdated: the NSIS templates write the associations below `SHELL_CONTEXT`, i.e. under HKCU for a per-user install. The project uses its own include anyway ([ADR 0010](../adr/0010-file-associations.md)).
 - NSIS silently produces a broken installer above 2 GB uncompressed. The payload is about 1.05–1.1 GB (LO 696 MB + Electron about 360 MB, both measured on existing installations).
 - The `portable` target re-extracts to %TEMP% on every launch, so ship a ZIP instead.
 - electron-updater supports NSIS only. Forge has no NSIS maker.
@@ -81,7 +81,7 @@
 |---|---|---|
 | Per-user installer, no admin | NSIS one-click (perMachine=false), installs to `%LOCALAPPDATA%\Programs` | Squirrel.Windows / MSIX / WiX |
 | NSIS support | Built in | No official maker |
-| .docx/.xlsx/.pptx/.pdf associations | Built-in only for perMachine; per-user needs an `nsis.include` writing HKCU Classes/Capabilities + SHChangeNotify | Not evaluated |
+| .docx/.xlsx/.pptx/.pdf associations | Built-in only for perMachine; per-user needs an `nsis.include` writing HKCU Classes/Capabilities + SHChangeNotify. _Correction 2026-09-30:_ the built-in templates write under HKCU for per-user installs too; the project uses its own include anyway ([ADR 0010](../adr/0010-file-associations.md)) | Not evaluated |
 | ~1.1 GB payload | Fine (limit is 2 GB uncompressed; NSISBI above that) | Not evaluated |
 | Portable build | `portable` re-extracts to %TEMP% on each launch, so use `zip` | maker-zip |
 | Auto-update | electron-updater (NSIS only, blockmap differential updates) | Squirrel-based |
@@ -108,7 +108,7 @@
 - The architecture is Windows-only. Cross-process embedding is impossible on macOS (LO expects an in-process NSView*) and on Wayland, so a cross-platform version needs a different document surface (LOK tiles).
 - LOK alternative: TDF's README still labels tiled rendering 'experimental', and Collabora ships its own core branch. Editing parity on the stock TDF Windows build is unverified, and a large web front-end is required (Collabora's is MPL-2.0 reusable, but its branding must be removed).
 - koffi 3.x churn: a May-2026 rewrite plus frequent point releases. Mistakes such as passing the getNativeWindowHandle Buffer instead of the HWND value crash or misbehave silently.
-- Packaging: file associations need a custom per-user NSIS script; NSIS breaks silently above 2 GB uncompressed if more LO language or help packs are added; the portable EXE target is unusable at this size.
+- Packaging: file associations need a custom per-user NSIS script; NSIS breaks silently above 2 GB uncompressed if more LO language or help packs are added; the portable EXE target is unusable at this size. _(Correction 2026-09-30: electron-builder's own templates also write per user; the project uses its own include for other reasons, see [ADR 0010](../adr/0010-file-associations.md).)_
 - Code signing: Azure Artifact Signing is not available to individuals in Turkey. Unsigned installers trigger SmartScreen warnings. SignPath Foundation requires a published signing policy, MFA and a CI-built release.
 - PDF module security: pdf.js must be ≥4.2.67 (CVE-2024-4367) with isEvalSupported:false, running in a sandboxed renderer with a strict CSP.
 
@@ -190,7 +190,7 @@ For i18n use i18next with `lang="tr"`, tr-TR locale casing and `Intl.Collator('t
 - [medium] Bundling koffi naively includes all platform binaries (about 72 MB); a community Forge plugin prunes the unused ones. (https://github.com/rhy3h/electron-forge-plugin-koffi)
 - [high] electron-builder npm dist-tags: latest 26.15.3, v26 26.17.0, next 27.0.0-alpha.9; MIT license. (https://registry.npmjs.org/-/package/electron-builder/dist-tags)
 - [high] NSIS defaults: oneClick true, perMachine false, allowElevation true, allowToChangeInstallationDirectory false, differentialPackage true, useZip false, unicode true. Per-user install dir is $LocalAppData\Programs\${APP_FILENAME}; per-machine is $PROGRAMFILES64. (https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/src/targets/win/nsis/nsisOptions.ts ; .../templates/nsis/multiUser.nsh)
-- [high] FileAssociation docs: 'On Windows (NSIS) works only if nsis.perMachine is set to true.' (https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/src/options/FileAssociation.ts)
+- [high] FileAssociation docs: 'On Windows (NSIS) works only if nsis.perMachine is set to true.' (https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/src/options/FileAssociation.ts) _Correction 2026-09-30:_ the docs are outdated here: the NSIS template `include/FileAssociation.nsh` (electron-builder 26.15.3) writes below `SHELL_CONTEXT`, i.e. under HKCU for a per-user install ([ADR 0010](../adr/0010-file-associations.md)).
 - [high] electron-builder NSIS installers for apps larger than 2 GB uncompressed are silently malformed (#8399); workarounds are a custom NSISBI binary or nsis-web. (https://github.com/electron-userland/electron-builder/issues/8399)
 - [medium] The portable target unpacks resources into %TEMP% at launch (unpackDirName defaults to a per-build UUID). (nsisOptions.ts (above) ; https://github.com/electron-userland/electron-builder/issues/8739)
 - [high] electron-updater supports NSIS as the only Windows auto-update target (Squirrel.Windows is unsupported) and verifies code signatures. (https://raw.githubusercontent.com/electron-userland/electron-builder/master/website/docs/features/auto-update.md)

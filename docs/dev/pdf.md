@@ -122,7 +122,9 @@ and form values it cannot encode without appearance plus `/NeedAppearances true`
 
 - draws FreeText appearances with an embedded Unicode font, mirroring pdf.js' own layout
   (`FreeTextAnnotation.createNewAppearanceStream`: line factor 1.35, rotation matrices, shrink to fit). A hash of the
-  inputs in the stream (`/SimpaperAP`) lets later edits made by pdf.js (which keeps the old `/AP`) be detected and redrawn;
+  inputs in the stream (`/SimpaperAP`) lets later edits made by pdf.js (which keeps the old `/AP`) be detected and
+  redrawn; streams written by builds before the rename carry `/VarakAP`, which is still recognised as Simpaper's own
+  ([ADR 0009](../adr/0009-product-name-simpaper.md));
 - regenerates text/choice field appearances with pdf-lib and the Unicode font (field `/DA` kept) and clears
   `/NeedAppearances` when no widget lacks an appearance.
 

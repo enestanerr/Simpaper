@@ -3,7 +3,8 @@
 Code: `src/main/platform/**`. Tests: `tests/unit/platform/**`. GUI test plan: [`docs/testing/GUI_SPIKE.md`](../testing/GUI_SPIKE.md).
 Status (2026-09-29): implemented and verified headless; child hosting passed the GUI runs at 100 % (placement,
 visibility, keyboard focus, hung-engine rescue: §6, §10). DPI at 125/150 % and mixed-DPI monitors are **not**
-verified yet.
+verified yet. The read-only file-association query (§8, 2026-09-30) has unit tests with scripted Win32 functions; it
+was not checked on an installed copy yet (§10).
 
 ## 1. What it provides
 
@@ -15,19 +16,20 @@ verified yet.
 | `processGuard: ProcessGuard` | Job Object (`KILL_ON_JOB_CLOSE`, no breakaway) + `killTree` via Toolhelp | `taskkill /T /F` (Windows) or `ps` + `SIGKILL`, `supported = false` |
 | `hangDetector: HangDetector` | `IsHungAppWindow` + `SendMessageTimeoutW(WM_NULL)` on a worker thread | always `true` (no native windows) |
 | `shellKeys?: ShellKeys` | experimental Alt/F10 detector (low-level hook, foreground-gated) | absent |
+| `associations?: AssociationQuery` | read-only file-association query (`AssocQueryStringW`, `RegGetValueW` on worker threads, §8) | absent |
 
 | File | Role |
 |---|---|
-| `types.ts` | contracts (`ViewHost`, `ProcessGuard`, `HangDetector`, `ShellKeys`, `Platform`, `KillTreeOptions`) |
+| `types.ts` | contracts (`ViewHost`, `ProcessGuard`, `HangDetector`, `ShellKeys`, `AssociationQuery`, `Platform`, `KillTreeOptions`) |
 | `hwnd.ts` | HWND ↔ decimal string / BigInt / `getNativeWindowHandle()` Buffer |
 | `geometry.ts` | CSS → physical mapping, DPI virtualisation formulas (pure) |
 | `view-host-core.ts` | all view-host logic over an injected `NativeViewOps` (pure, unit-tested with fakes) |
 | `process-tree.ts` | PID-reuse-safe descendant walk (pure) |
 | `key-state.ts` | bare-Alt / F10 state machine (pure) |
 | `fallback.ts` | non-Windows platform |
-| `win32/ffi.ts` | lazy koffi bindings (user32, gdi32, kernel32, shcore) |
+| `win32/ffi.ts` | lazy koffi bindings (user32, gdi32, kernel32, shcore, shlwapi, advapi32) |
 | `win32/view-ops.ts`, `win32/capture.ts`, `win32/view-host.ts` | Win32 `NativeViewOps`, PrintWindow capture, Electron adapter |
-| `win32/process-guard.ts`, `win32/hang-detector.ts`, `win32/shell-keys.ts` | the other services |
+| `win32/process-guard.ts`, `win32/hang-detector.ts`, `win32/shell-keys.ts`, `win32/associations.ts` | the other services |
 | `win32/styles.ts`, `win32/constants.ts` | window-style computations, SDK constants |
 
 ## 2. Wiring it into the app (integrator checklist)
@@ -69,6 +71,9 @@ verified yet.
     `node_modules/@koromix/koffi-win32-x64/**` from the asar; only the win32-x64 binary is needed.
 11. **Process guard mode.** Default `adopt`. `SIMPAPER_PROCESS_GUARD=self` puts the app process itself into
     the job (see §7 for why that is not the default).
+12. **File types.** Hand `platform.associations` (Windows only) to the `app:*` services, which only read it for
+    Options › File types (docs/dev/main-core.md, "File types (Windows)"). The installer registers the file types;
+    the app never writes the registry ([ADR 0010](../adr/0010-file-associations.md)).
 
 ### Requirements for the engine bridge
 
@@ -242,7 +247,7 @@ Refuses PID ≤ 0 (`process.kill(0)` terminates the calling process on Windows),
 parent. Orphans whose parent already exited are not reachable by parent id; kill them through their own
 PID (e.g. `officePid` from `engine.hello`).
 
-## 8. Hang detection and shell keys
+## 8. Hang detection, shell keys and file associations
 
 `isResponding(hwnd, timeout)`: false for a destroyed window or one Windows flags as hung
 (`IsHungAppWindow`, 5 s without message retrieval), else `SendMessageTimeoutW(WM_NULL,
@@ -257,6 +262,16 @@ ignores AltGr (Turkish Q/F: synthetic Left-Ctrl + Right-Alt) and any combination
 key-up it missed (2 s). The hooks themselves are not exercised by automated tests (they would affect the
 real keyboard); the state machine is.
 
+`AssociationQuery` (`win32/associations.ts`, for Options › File types) never writes the registry: a default app may
+only be changed in Windows' own UI ([ADR 0010](../adr/0010-file-associations.md)). `handler(assoc)` asks
+`AssocQueryStringW` (shlwapi, `ASSOCF_NONE`) for the program (`ASSOCSTR_EXECUTABLE`) and the ProgID in effect
+(`ASSOCSTR_PROGID`) of an extension (`.docx`) or a ProgID (`Simpaper.docx`). Windows applies the user's choice
+(`UserChoice`) itself, so the app never reads it. The program is null for app packages and for Windows' "choose an
+app" state; either part is null when there is no association, when the answer does not fit the 2048-character
+buffer or when the call fails. `registeredApp(name)` checks with `RegGetValueW` (advapi32, `RRF_RT_ANY`, size only)
+whether `Software\RegisteredApplications` holds the value `name`, first in HKCU, then in HKLM, and answers `user`,
+`machine` or null. Every call runs on a koffi worker thread (`.async` through `callAsync`); neither method throws.
+
 ## 9. Tests
 
 ```powershell
@@ -266,7 +281,9 @@ node tests/unit/platform/electron/run-headless-check.ts    # Node ≥ 22.18 (typ
 
 - Pure: HWND conversions, geometry/DPI (100–200 %, mixed monitors), style bits, process tree (PID reuse,
   cycles, filters), Alt/F10 state machine, view-host core with fake windows/ops (owned + child, freeze,
-  coalescing, retries, host events, closing, dispose), fallback platform, pixel helpers.
+  coalescing, retries, host events, closing, dispose), fallback platform, pixel helpers, the association query
+  with scripted `AssocQueryStringW`/`RegGetValueW` (answers, missing associations, failures, HKCU before HKLM; no
+  registry access).
 - Real, headless: `killTree` on node → node trees (single and wide), `imageDir` filter, job adoption
   (before/after grandchildren), self mode, hang detection on message-only windows, owned-mode conversion of
   hidden cross-process windows (top-level and WS_CHILD frames).
@@ -288,6 +305,9 @@ node tests/unit/platform/electron/run-headless-check.ts    # Node ≥ 22.18 (typ
   117 key presses; the OS focus stayed on the LibreOffice window and the renderer received nothing). The same
   text typed at 40 ms per key — faster than people type — arrives completely, as does every later burst. VK_PACKET
   (Unicode) input works too. The GUI spike therefore types at 40 ms per key. Cause inside VCL not identified.
+- File associations: not verified yet on a PC where the installer registered Simpaper (the answers of
+  `AssociationQuery` there, and the Settings page that Options › File types opens); this needs a real installation
+  (ADR 0010, Consequences).
 - The DPI virtualisation anchor (virtual-screen origin) is from Windows 8.1 observations.
 - A renderer (not only GPU/utility processes) inside a `self`-mode job was not started (needs a window).
 - `killTree` cannot find orphans of an intermediate process that already exited.

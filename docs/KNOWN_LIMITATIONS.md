@@ -1,9 +1,10 @@
 # Known limitations
 
-_Last updated: 2026-09-29._ Simpaper is in early development (milestone v0.1 in progress, see
+_Last updated: 2026-09-30._ Simpaper is in early development (milestone v0.1 in progress, see
 [STATUS.md](STATUS.md)). This list is honest on purpose: it names what does not work, what has not been verified
 and what is lost in certain file formats. Format-by-format details are in [COMPATIBILITY.md](COMPATIBILITY.md).
-If you hit a limitation that is not listed here, please [open an issue](https://github.com/ncreativestudios/Simpaper/issues).
+If you hit a limitation that is not listed here, please
+[open an issue](https://github.com/ncreativestudios/Simpaper/issues).
 
 ## General
 
@@ -49,14 +50,13 @@ If you hit a limitation that is not listed here, please [open an issue](https://
   releases before closing a document (this removed a reproducible "release after close" crash, see
   [dev/engine.md](dev/engine.md)) and offers crash recovery, but an engine crash can still lose the changes made
   since the last autosave.
-- **A hung engine can't save, and it blocks the Simpaper window.** LibreOffice's window lives inside the Simpaper window,
-  and Windows gives both one input queue: while the engine hangs, the Simpaper window does not react to the mouse or
-  keyboard (it still redraws and shows a "not responding" bar). About 8 seconds after that bar appears (roughly
-  13 seconds after the engine stopped responding), Simpaper offers "Restart engine" / "Wait" in a separate message box,
-  which names what a restart loses (the changes after the last autosave; "Wait" is the default); it closes by itself
-  if the engine recovers. Simpaper never ends an engine on its own. When the
-  window still takes input, closing the document or quitting asks first in the same way and keeps the autosave
-  under File → Recover.
+- **A hung engine can't save, and it blocks the Simpaper window.** LibreOffice's window lives inside the Simpaper
+  window, and Windows gives both one input queue: while the engine hangs, the Simpaper window does not react to the
+  mouse or keyboard (it still redraws and shows a "not responding" bar). About 8 seconds after that bar appears
+  (roughly 13 seconds after the engine stopped responding), Simpaper offers "Restart engine" / "Wait" in a separate
+  message box, which names what a restart loses (the changes after the last autosave; "Wait" is the default); it
+  closes by itself if the engine recovers. Simpaper never ends an engine on its own. When the window still takes
+  input, closing the document or quitting asks first in the same way and keeps the autosave under File → Recover.
 - **No grammar checking and no Python macros.** On Windows with Turkish regional settings, LibreOffice's built-in
   Python switches the C runtime locale to a name with a non-ASCII letter (`Turkish_Türkiye.utf8`); the runtime then
   reports an invalid parameter and LibreOffice's crash handler deadlocks, so creating a text document hung forever.
@@ -121,9 +121,22 @@ If you hit a limitation that is not listed here, please [open an issue](https://
 - **Unsigned installer.** Code signing is not configured yet (planned: SignPath Foundation), so Windows SmartScreen
   warns when the installer or the app is started for the first time. The LibreOffice programs inside keep The
   Document Foundation's own signatures; Simpaper's build never re-signs or changes them.
-- **No automatic updates and no file associations** in v0.1 (planned for M3). Simpaper does not register itself as
-  the default app for any file type.
+- **No automatic updates** yet (planned for M3).
+- **File types and default apps.** The installer registers Simpaper's file types with their own icons
+  ([ADR 0010](adr/0010-file-associations.md)), but Windows lets only the user choose the default app. A type that
+  already opens with another app (for example Microsoft Office, LibreOffice, or Microsoft Edge for PDF) stays with it
+  until you pick Simpaper: Windows offers Simpaper the next time such a file is opened, and File → Options → File
+  types shows which types open with Simpaper and opens Windows Settings (Apps → Default apps). Plain text, CSV and TSV
+  files are only offered (under "Open with" and on Simpaper's Default apps page), never made the default. The type
+  names Explorer shows are in the installer's language and do not follow a later change of the app's language. The ZIP
+  archive registers no file types. The registration is checked automatically (install, update and uninstall against a
+  scratch registry key); Explorer's icons, Windows' prompt and Simpaper's page in Settings have not yet been checked
+  on a real installation.
+- **Templates and slide shows open for editing.** Opening a template (DOTX, XLTX, POTX …) opens the template
+  itself, not a new document based on it, and PPS, PPSX and PPSM files open for editing, not as a slide show.
 - **Download size.** The installer contains the LibreOffice engine (about 0.74 GB unpacked after removing unused
   languages) and the Electron runtime.
-- **Name.** "Simpaper" is a working name; a formal trademark search is still required before a public launch
-  ([ADR 0007](adr/0007-product-name.md)).
+- **Name.** The name "Simpaper" ([ADR 0009](adr/0009-product-name-simpaper.md)) was checked on 2026-09-30 on the
+  web, in app stores, package registries and the USPTO and TMview trademark registers: no software and no
+  registered trademark of that name was found. That check is not a trademark clearance; a trademark filing and an
+  attorney's clearance search are still to be done before a commercial launch.

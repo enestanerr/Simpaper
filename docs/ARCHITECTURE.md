@@ -80,7 +80,7 @@ Key facts behind the table (details and sources in `docs/research/`):
 | Compatibility analysis (loss-risk detection) | `src/main/compat/` |
 | Crash recovery and autosave | `src/main/recovery/` |
 | PDF file operations | `src/main/pdf/` |
-| Native window hosting, DPI, process guard (Windows) | `src/main/platform/` |
+| Native window hosting, DPI, process guard, file-association queries (Windows) | `src/main/platform/` |
 | Printing | engine (office documents), pdf.js / Chromium (PDF) |
 | UI shell, ribbon framework, i18n, themes | `src/renderer/shell/`, `src/renderer/ribbon/`, `src/renderer/i18n/`, `src/renderer/theme/` |
 | Module UIs | `src/renderer/modules/{writer,calc,impress,pdf}/` |
@@ -136,3 +136,8 @@ The shell (Electron/React), the bridge (Python/UNO), the PDF module and the data
 portable. Native window hosting is Windows-specific; Linux/X11 can reuse the child strategy, while macOS
 and Wayland need a different document surface (e.g. a LibreOffice build with LibreOfficeKit). The
 `ViewHost` interface is the seam for that work.
+
+File types are Windows-specific as well: the installer (`build/installer.nsh`) registers them with Simpaper's icons
+and gives Simpaper its own page under Settings › Apps › Default apps. The app only reads which types open with it
+(Options › File types) and never writes the registry, because Windows leaves the choice of the default app to the
+user ([ADR 0010](adr/0010-file-associations.md)).

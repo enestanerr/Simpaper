@@ -14,7 +14,7 @@ bundle build and headless engine probes. The app was used on screen in the GUI r
 | `shell/Shell.tsx` | Layout: title bar, document tabs, ribbon, module toolstrip, message bars, workspaces / start screen, status bar, backstage, prompts. |
 | `shell/TitleBar.tsx`, `shell/qat.ts` | Title (document, modified marker, read-only badge), active/inactive look, Quick Access Toolbar (+ customize menu). |
 | `shell/DocumentTabs.tsx`, `shell/WorkspaceHost.tsx` | One tab and one always-mounted workspace per open document (native views and pdf.js survive tab switches). |
-| `shell/StartScreen.tsx`, `shell/backstage/*` | Home screen; File backstage: Info (compatibility report), New, Open (+recent), Save As (formats + known losses), Export PDF, Print, Recover, Options, About. |
+| `shell/StartScreen.tsx`, `shell/backstage/*` | Home screen; File backstage: Info (compatibility report), New, Open (+recent), Save As (formats + known losses), Export PDF, Print, Recover, Options (with File types on Windows, §5), About. |
 | `shell/prompts/*` | Main-process prompts: password, save risk (save a copy), unsaved changes, file changed on disk, CSV import with live preview. |
 | `shell/StatusBar.tsx`, `shell/MessageBars.tsx` | Status bar frame (module items, view buttons, zoom slider); non-blocking message bars. |
 | `shell/keyboard.ts` | Global shortcuts, KeyTip keys (bare left Alt, F10), F6 region cycling. |
@@ -117,6 +117,22 @@ with its current state, so `openWithDialog()` only activates the last document o
 `openPath`, `restoreRecovery` add their result only when no event delivered that id and it was not reported `closed`
 (`noteDocumentClosed()` in bootstrap's `closed` handler; a late `updated` for a closed id is ignored as well).
 
+**Options › File types** (Windows only; `FileTypesSection` in `shell/backstage/OptionsPage.tsx`, the last section of
+File › Options, keys `shell.options.fileTypes*`) — shows which of the types the installer registered open with
+Simpaper today. The main process reads that from Windows (`app:fileTypes`, main-core.md "File types (Windows)");
+the app never changes a default itself ([ADR 0010](../adr/0010-file-associations.md)). It lists one row per module
+(Documents, Spreadsheets, Presentations, PDF files), each with the module icon, the extensions and a chip: "Opens with
+Simpaper", "Simpaper opens n of m types" or, muted, "Opens with another app" (the English "Some" text is worded so it
+needs no plural form). Notes explain that only the user decides in Windows which app opens a type, and that setup
+leaves the default apps of plain text, CSV and TSV alone (Simpaper is only offered for them). The
+button "Choose default apps…" calls `app:openDefaultApps` (no argument; main opens Settings › Apps › Default apps on
+Simpaper's page); when it answers false, an alert says that Windows Settings could not be opened. The state is read
+when the page opens and again on every window `focus` event, so the rows change when the user comes back from
+Settings. A copy that registered nothing (`registration: null`: a development run or the ZIP archive) shows only a
+note, without rows or button; `thisCopy: false` adds a note that the registered types start another Simpaper
+installation. Without Windows (`supported: false`, also when the Win32 bindings failed to load), without the IPC
+bridge and until the first answer arrives, the section is not rendered.
+
 ## 6. KeyTips
 
 - Scopes: `root` (File `F`, tabs, QAT `1…9`, `09…`), `tab:<id>` (controls of the selected tab), `popup:<groupId>`
@@ -190,7 +206,7 @@ Contextual tabs use `--ctx-table|picture|drawing|chart`; each module has an acce
   process (`errors.*`, `compat.*`) resolve as they are. `translateExternal()` falls back to a generic message.
 - Every key exists in `tr` and `en` with the same structure and the same `{{variables}}`; plurals use `_one`/`_other`
   (Turkish uses both forms). Keys built at runtime (colour hues/shades, severities, themes, view modes, CSV locales,
-  busy reasons, format labels) are listed in `tests/unit/renderer/i18n.test.tsx`.
+  busy reasons, format labels, file-type groups and states) are listed in `tests/unit/renderer/i18n.test.tsx`.
 - Turkish: familiar ribbon terms (Giriş, Ekle, Tasarım, Düzen, Başvurular, Gözden Geçir, Görünüm, Sayfa Düzeni,
   Formüller, Veri, Geçişler, Animasyonlar, Slayt Gösterisi …) without Microsoft branding; format names follow the
   names Windows users know (as in the main process' dialog filters).
@@ -214,9 +230,10 @@ ribbon `.uno:` action passes the IPC checks), `commands` (allow-list rules, regi
 components; the freeze following the shown document; dialogs across blur; the ribbon peek), `popup` (nested popups
 in collapsed groups), `lifecycle` (closing notice, open/create/restore results, pushing PDF edits before a close and
 on `flushRequest`, Calc input line after an engine restart), `integration` (action routing, `pdf:*` states in the ribbon, engine state, contextual tabs, KeyTips,
-title bar), `shell` (start screen, recent/recovery, tabs, backstage, prompts, message bars, shortcuts — jsdom with a fake
-`window.simpaperIpc`), `modules` (registry, lazy PDF workspace). JSX in test files needs the `// @jsxRuntime automatic`
-pragma (the test files are outside `tsconfig.web.json`, so esbuild would use the classic runtime).
+title bar), `shell` (start screen, recent/recovery, tabs, backstage, Options › File types, prompts, message bars,
+shortcuts — jsdom with a fake `window.simpaperIpc`), `modules` (registry, lazy PDF workspace). JSX in test files
+needs the `// @jsxRuntime automatic` pragma (the test files are outside `tsconfig.web.json`, so esbuild would use
+the classic runtime).
 
 Verified results (2026-09-29):
 
@@ -245,7 +262,8 @@ Verified results (2026-09-29):
 ## 13. Known gaps
 
 - **Not seen on screen**: DPI > 100 %, the full keyboard focus order, the title bar look with a real owned document
-  window (ribbon layout, KeyTips and the freeze-frame under a drop-down were seen in GUI runs 3 and 7).
+  window (ribbon layout, KeyTips and the freeze-frame under a drop-down were seen in GUI runs 3 and 7), Options › File
+  types in an installed copy and the Settings page its button opens (needs a real installation, ADR 0010).
 - Calc cell-attribute dispatches (`Bold`, `BackgroundColor`, `NumberFormatPercent`, `Color`) had no effect on
   **hidden headless** Calc documents in this session's probe (an earlier probe with another sequence saw them apply);
   to be verified with a real view by the engine tests.

@@ -5,6 +5,11 @@ Real screenshots of the running application, captured as described in [docs/DEMO
 sample documents from `tests/corpus/generated/` copied to `C:\Users\Public\Documents`). Only Simpaper's own window is
 captured, and every image was reviewed before it was added. No image in this repository is a mock-up or retouched.
 
+The images were captured before the product was renamed from its working name "Varak" to Simpaper
+([ADR 0009](../adr/0009-product-name-simpaper.md)). They still show "Varak" in the title bar, in the text of some
+sample documents ("Varak Test Belgesi") and in the recent-file paths of the backstage shots, and will be replaced by
+a new run of `node scripts/gui/screenshots.mjs --lang both`.
+
 | File | Content | Language | Captured on | Build | Windows |
 |---|---|---|---|---|---|
 | `writer-home-tr.png` | DOCX with Turkish text, table, image, comment and tracked change; Home tab | Turkish | 2026-09-29 | 0.1.0 (before the first commit) | 11 Pro 26200 |

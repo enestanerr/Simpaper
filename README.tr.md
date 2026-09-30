@@ -44,14 +44,14 @@ Aşağıdakiler ilk sürümün hedefleridir; her birinin ne kadarının hazır o
 
 ## Bugün neler çalışıyor?
 
-Simpaper ilk kurulabilir sürümüne doğru geliştiriliyor. 2026-09-29 itibarıyla dürüst bir özet: "Birim testlerinden
+Simpaper ilk kurulabilir sürümüne doğru geliştiriliyor. 2026-09-30 itibarıyla dürüst bir özet: "Birim testlerinden
 geçti" ifadesi, uygulama çalıştırılmadan yürütülen otomatik testleri; "gerçek motorla test edildi" ifadesi, pencere
-göstermeden LibreOffice'i süren otomatik testleri; "ekranda kullanıldı" ifadesi ise paketlenmiş uygulamada gerçek
-fare ve klavye girdisiyle yapılan otomatik GUI denemelerini kasteder. Bu denemeler dışında uygulama yalnızca sahibi
-tarafından geliştirme bilgisayarında kurulup denendi; kayıtlı bir elle test turu
-([docs/TEST_REHBERI.md](docs/TEST_REHBERI.md)) henüz yok. Test sayıları: 763 birim testi (63 dosya), 115 motor
-entegrasyon testi (14 dosya; ayrıca 5 test atlandı: isteğe bağlı üç uzun döngü ve tasarım gereği iki test), 109
-köprü testi ([docs/STATUS.md](docs/STATUS.md)).
+göstermeden LibreOffice'i süren otomatik testleri; "ekranda kullanıldı" ifadesi ise paketlenmiş uygulamada gerçek fare
+ve klavye girdisiyle yapılan otomatik GUI denemelerini kasteder. Bu denemeler dışında yalnızca ad değişikliğinden
+önceki bir derleme (o zamanki adıyla Varak) sahibi tarafından geliştirme bilgisayarında kurulup denendi; kayıtlı bir
+elle test turu ([docs/TEST_REHBERI.md](docs/TEST_REHBERI.md)) henüz yok. Test sayıları: 784 birim testi (67 dosya),
+115 motor entegrasyon testi (14 dosya; ayrıca 5 test atlandı: isteğe bağlı üç uzun döngü ve tasarım gereği iki test),
+109 köprü testi ([docs/STATUS.md](docs/STATUS.md)).
 
 | Alan | Durum |
 |---|---|
@@ -64,7 +64,7 @@ köprü testi ([docs/STATUS.md](docs/STATUS.md)).
 | Belge, Hesap Tablosu ve Sunu modülleri | **Uygulandı; temel akışlar ekranda kullanıldı:** Writer'da yazma ve kaydetme, Calc'te Türkçe söz dizimiyle formül, Impress'te slayt paneliyle yeni slayt. 202 Writer, 225 Calc ve 164 Impress komutunun her biri LibreOffice 26.8 komut kaydında denetlendi ve pencere açmadan çalışan motorda gönderilebildiği doğrulandı; Calc formül çubuğu ve seçim istatistikleri; slayt komutları ve slayt gösterisi |
 | Motorda dosya biçimi gidiş-dönüşleri | **Otomatik testlerden geçiyor** (`tests/engine`): Türkçe içerikli üretilmiş DOCX, XLSX ve PPTX dosyaları ile lisansı temiz örnek dosyalar, pencere açmadan çalışan LibreOffice ile açılıp kaydediliyor; sonuç, LibreOffice kullanmayan okuyucularla ve sayfa sayfa görsel karşılaştırmayla denetleniyor. ODF, CSV, TXT, RTF, eski Office ve şablon biçimlerine dönüştürmeler de test ediliyor. Bu testler motoru doğrudan kullanır, henüz Simpaper uygulaması üzerinden değil; bulguları [uyumluluk tablosunda](docs/COMPATIBILITY.md#test-status) listelenir. |
 | PDF modülü | **Uygulandı, birim testlerinden geçti; görüntüleyici ekranda kullanıldı** (Türkçe metinli bir metin PDF'i ve bir form PDF'i): küçük resimlerle görüntüleme, Türkçeye uygun arama (İ/ı), vurgulama, metin kutusu, çizim, resim ve yorumlar, form doldurma, sayfaları döndürme, silme, taşıma, ekleme ve çoğaltma, PDF birleştirme ve sayfa çıkarma, metin ve resim ekleme, yazdırma ve doğrulamalı kaydetme (`tests/unit/pdf`). Vurgulama, metin kutusu notu ve kaydetme ekranda da denetlendi (kaydedilen dosya bağımsız olarak geri okundu); diğer araçlar yalnızca birim testleriyle. |
-| Yükleyici, CI, depo belgeleri | **Yükleyici ve ZIP üretiliyor** (`npm run dist:win`: 331 MB yükleyici, 436 MB ZIP); paketlenmiş uygulama üç ofis modülü için gizli pencereli açılış testinden geçti. Yükleyici geliştirme bilgisayarında kurulup kullanıldı (kullanıcı başına, yönetici izni olmadan); henüz temiz bir makinede çalıştırılmadı ve genel bir sürüm yok. CI iş akışları, topluluk dosyaları ve belgeler hazır; CI iş akışı `main` dalına yapılan her gönderimde ve her çekme isteğinde GitHub Actions'ta çalışır (sonuçlar deponun Actions sekmesinde). |
+| Yükleyici, CI, depo belgeleri | **Yükleyici ve ZIP üretiliyor** (`npm run dist:win`: 330 MiB yükleyici, 436 MiB ZIP); paketlenmiş uygulama üç ofis modülü için gizli pencereli açılış testinden geçti. Ad değişikliğinden önceki bir derleme (o zamanki adıyla Varak, dosya türleri olmadan) geliştirme bilgisayarında kurulup kullanıldı (kullanıcı başına, yönetici izni olmadan); Simpaper yükleyicisi henüz kurulmadı, temiz bir makinede de çalıştırılmadı ve genel bir sürüm yok. CI iş akışları, topluluk dosyaları ve belgeler hazır; CI iş akışı `main` dalına yapılan her gönderimde ve her çekme isteğinde GitHub Actions'ta çalışır (sonuçlar deponun Actions sekmesinde). |
 
 Hiçbir şey Microsoft Office'te doğrulanmadı; bkz. [docs/TESTING.md](docs/TESTING.md).
 
@@ -79,8 +79,7 @@ Hiçbir şey Microsoft Office'te doğrulanmadı; bkz. [docs/TESTING.md](docs/TES
   bölmeleri dondurma, koşullu biçimlendirme ve grafikler; Impress'te düzenler ve geçişler) ekranda doğrulanması ve
   derinleştirilmesi; daha fazla PDF açıklama türü; yüksek DPI doğrulaması; daha kapsamlı görsel regresyon testleri.
 - **v0.3 — biçim kapsamı ve sağlamlık:** tüm eski ve ODF biçimleri için doğrulanmış uyumluluk tablosu, belgelere
-  parola koyma ve parolayı kaldırma, büyük dosyalarda performans, dosya ilişkilendirmeleri, otomatik güncelleme ve
-  imzalı sürümler.
+  parola koyma ve parolayı kaldırma, büyük dosyalarda performans, otomatik güncelleme ve imzalı sürümler.
 - **Daha sonra:** özet tablolar ve gelişmiş grafikler, PDF'deki mevcut metni düzeltme, karartma (redaksiyon), taranmış
   PDF'ler için OCR, erişilebilirlik denetimi, Linux ve macOS için ön çalışma.
 
@@ -91,6 +90,9 @@ Ayrıntılar ve kabul ölçütleri: [docs/ROADMAP.md](docs/ROADMAP.md).
 Paketlenmiş uygulamanın gerçek ekran görüntüleri (Windows 11, %100 ölçek); [docs/DEMO.md](docs/DEMO.md) dosyasındaki
 kurallara göre `scripts/gui/screenshots.mjs` ile alındı, taslak görsel ya da rötuş yok. Tüm görüntüler ve ayrıntıları
 [docs/screenshots/](docs/screenshots/README.md) klasöründe.
+
+Görüntüler ad değişikliğinden önce alındığı için başlık çubuğunda (ve bazı örnek metinlerde ve yollarda) hâlâ eski
+çalışma adı "Varak" görünüyor; yeniden alınacaklar ([ADR 0009](docs/adr/0009-product-name-simpaper.md)).
 
 ![Simpaper'ın belge modülünde Türkçe metinli bir DOCX](docs/screenshots/writer-home-tr.png)
 
@@ -107,14 +109,32 @@ Aynı ekranların İngilizce arayüzlü hâlleri [İngilizce README](README.md#s
 Henüz yayımlanmış bir sürüm yok. v0.1 yayımlandığında GitHub'daki
 [sürümler (Releases)](https://github.com/ncreativestudios/Simpaper/releases) sayfasında şunlar olacak:
 
-- **`Simpaper-Setup-<sürüm>-x64.exe`**: yönetici hakları gerektirmeyen, yalnızca geçerli kullanıcı için kurulum yapan bir
-  yükleyici;
-- **`Simpaper-<sürüm>-x64.zip`**: aynı uygulamanın taşınabilir kullanım için ZIP hali (ZIP'i açıp `Simpaper.exe` dosyasını
-  çalıştırın).
+- **`Simpaper-Setup-<sürüm>-x64.exe`**: yönetici hakları gerektirmeyen, yalnızca geçerli kullanıcı için kurulum yapan
+  bir yükleyici;
+- **`Simpaper-<sürüm>-x64.zip`**: aynı uygulamanın taşınabilir kullanım için ZIP hali (ZIP'i açıp `Simpaper.exe`
+  dosyasını çalıştırın).
 
 Gereksinimler: Windows 10 veya 11, 64 bit, yaklaşık 1,5 GB boş disk alanı. İlk sürümler kod imzalı olmayacak; bu yüzden
 Windows SmartScreen bir uyarı gösterecek. SignPath Foundation aracılığıyla imzalama planlanıyor
 ([docs/PACKAGING.md](docs/PACKAGING.md#signing-plan)).
+
+Yükleyici, Simpaper'ın açabildiği dosya türlerini Windows'a kaydeder
+([ADR 0010](docs/adr/0010-file-associations.md)):
+
+- O tür için varsayılan başka bir uygulama olmadığı sürece Word, Excel, PowerPoint, OpenDocument, RTF ve PDF
+  dosyaları Simpaper'ın simgeleriyle görünür ve çift tıklandığında Simpaper'da açılır.
+- Başka bir uygulama varsayılansa (örneğin Microsoft Office, LibreOffice ya da PDF için Microsoft Edge), seçimi
+  Windows size bırakır: böyle bir dosyayı bir sonraki açışınızda Simpaper'ı önerir; Simpaper'ı Windows Ayarları ›
+  Uygulamalar › Varsayılan uygulamalar sayfasından da seçebilirsiniz. **Dosya › Seçenekler › Dosya türleri**, hangi
+  türlerin Simpaper ile açıldığını gösterir ve bu sayfayı açan bir düğme içerir; yükleyici de son adımında bu
+  sayfayı açmayı önerir.
+- Düz metin, CSV ve TSV dosyalarının varsayılan uygulaması değişmez: Simpaper bunlar için yalnızca seçenek olarak
+  sunulur ("Birlikte aç" menüsünde ve Varsayılan uygulamalar sayfasında), varsayılan yapılmaz. ZIP sürümü hiçbir
+  dosya türünü kaydetmez.
+
+Kayıt işlemi, birim testleriyle ve yükleyicinin kurma, güncelleme ve kaldırma adımlarını yalnızca deneme için
+kullanılan bir kayıt defteri anahtarında çalıştıran bir betikle denetleniyor; gerçek bir kurulum (Dosya
+Gezgini'ndeki simgeler, çift tıklama, Windows'un önerisi) henüz denenmedi.
 
 ## Kaynaktan derleme
 
@@ -152,7 +172,7 @@ testlerin pencere açabileceği de anlatılıyor.
 | Belge | İçerik |
 |---|---|
 | [Mimari](docs/ARCHITECTURE.md) | Parçaların nasıl bir araya geldiği ve nedenleri |
-| [Karar kayıtları](docs/adr/README.md) | Motor, kabuk, belge yüzeyi, PDF altyapısı, veri bütünlüğü, lisans, ad, paketleme |
+| [Karar kayıtları](docs/adr/README.md) | Motor, kabuk, belge yüzeyi, PDF altyapısı, veri bütünlüğü, lisans, ad, paketleme, dosya türleri |
 | [Uyumluluk tablosu](docs/COMPATIBILITY.md) | Biçim biçim neyin açıldığı, düzenlendiği, kaydedildiği ve neyin kaybolabileceği |
 | [Bilinen sınırlamalar](docs/KNOWN_LIMITATIONS.md) | Neyin çalışmadığı veya henüz doğrulanmadığı |
 | [Testler](docs/TESTING.md) | Test katmanları, komutlar ve testlerin neyi kanıtlayabildiği |
@@ -171,8 +191,8 @@ bildirimlerini ve katkıları Türkçe de yazabilirsiniz. Hata kayıtlarına asl
 ## Güvenlik ve gizlilik
 
 Güvenlik açıklarını herkese açık kayıtlarda değil, [SECURITY.md](SECURITY.md) dosyasında anlatıldığı gibi gizli olarak
-bildirin. Simpaper'da telemetri ve çevrimiçi özellik yoktur; çalışırken hiçbir şey indirmez ve belge makrolarını ya da PDF
-JavaScript'ini asla çalıştırmaz.
+bildirin. Simpaper'da telemetri ve çevrimiçi özellik yoktur; çalışırken hiçbir şey indirmez ve belge makrolarını ya da
+PDF JavaScript'ini asla çalıştırmaz.
 
 ## Lisans
 
@@ -183,6 +203,7 @@ içerir; bunların başında, lisans dosyalarıyla birlikte dağıtılan değiş
 ## Ticari markalar
 
 LibreOffice, The Document Foundation'ın tescilli ticari markasıdır. Microsoft, Word, Excel ve PowerPoint, Microsoft
-şirketler grubunun ticari markalarıdır. Simpaper bağımsız bir projedir; The Document Foundation veya Microsoft ile bağlantılı
-değildir, onlar tarafından onaylanmamış ve desteklenmemektedir. "Simpaper" bir çalışma adıdır; bkz.
-[ADR 0007](docs/adr/0007-product-name.md).
+şirketler grubunun ticari markalarıdır. Simpaper bağımsız bir projedir; The Document Foundation veya Microsoft ile
+bağlantılı değildir, onlar tarafından onaylanmamış ve desteklenmemektedir. "Simpaper" adının seçimi ve yapılan ad
+taraması [ADR 0009](docs/adr/0009-product-name-simpaper.md) dosyasında anlatılır; bu tarama hukuki bir marka
+araştırması değildir.

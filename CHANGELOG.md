@@ -18,8 +18,8 @@ Nothing has been released yet. This section collects the work towards **v0.1.0**
   license-clean test corpus ([docs/research/](docs/research/README.md)).
 - Initial architecture ([docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)) and decision records ADR 0001–0008: unmodified
   LibreOffice 26.8 as the document engine with one process per document, Electron + React + TypeScript shell,
-  LibreOffice's editing window hosted in the Simpaper window, pdf.js + @cantoo/pdf-lib for PDF, safe save and loss-risk
-  warnings, MPL-2.0, the working name "Simpaper", per-user installer.
+  LibreOffice's editing window hosted in the Simpaper window, pdf.js + @cantoo/pdf-lib for PDF, safe save and
+  loss-risk warnings, MPL-2.0, the working name "Varak" (since replaced by Simpaper, see below), per-user installer.
 - Engine pinned to LibreOffice 26.8.0.3 with scripts that download it, verify its SHA-256 digest and OpenPGP
   signature, extract it without installing anything, build a trimmed copy for packaging (byte-identical files,
   English and Turkish only) and smoke-test it headlessly.
@@ -45,6 +45,30 @@ Nothing has been released yet. This section collects the work towards **v0.1.0**
 - Packaging and project files: electron-builder configuration for a per-user NSIS installer and a ZIP, CI and
   release workflows for GitHub Actions, README in English and Turkish, contributing guide, code of conduct, security
   policy, issue forms and pull request template, third-party notices.
+- Windows file types ([ADR 0010](docs/adr/0010-file-associations.md)): the installer (`build/installer.nsh`)
+  registers a ProgID per format with Simpaper's own document, spreadsheet, presentation or PDF icon, "Open with"
+  entries and a page under Settings › Apps › Default apps. It makes Simpaper the default only for office and PDF
+  types that no installed app owns yet; uninstalling removes these entries, an update keeps them, switching an
+  "only for me" installation to "all users" removes the per-user entries, and the finish page offers to open Windows
+  Settings to choose Simpaper as the default app. The ZIP registers nothing. Not yet tried in a real installation.
+- Options › File types (Windows): shows whether documents, spreadsheets, presentations and PDF files open with
+  Simpaper; its "Choose default apps…" button opens Simpaper's page in Windows Settings. The app itself never writes
+  the registry.
+- `npm run icons` renders the app and module icons and the new file-type icons in `resources/fileicons/` (original
+  artwork). `scripts/installer/check-associations.mjs` compiles `build/installer.nsh` and runs its install, update
+  and uninstall parts against a scratch registry key, comparing every value and the complete list of keys and values;
+  it passed on the development PC, and the release workflow runs it after building.
+- `electron-builder.yml` sets `publish: null`: without an update feed, builds no longer ship a
+  `resources/app-update.yml` derived from the build machine's git remote.
+
+### Changed
+
+- Renamed from the working name "Varak" to Simpaper ([ADR 0009](docs/adr/0009-product-name-simpaper.md)): application
+  id `io.github.ncreativestudios.simpaper`, data folders `%APPDATA%\Simpaper` and `%LOCALAPPDATA%\Simpaper`,
+  `Simpaper.exe`, `Simpaper-Setup-<version>-x64.exe` and `Simpaper-<version>-x64.zip`, `SIMPAPER_*` environment
+  variables and the `simpaper_bridge` Python package. The repository is https://github.com/ncreativestudios/Simpaper.
+  Simpaper installs next to a Varak test installation (new installer GUID) and does not migrate its settings. Varak's
+  PDF appearance streams (`/VarakAP`) and leftovers of an interrupted save (`.~varak-…`) are still recognised.
 
 ### Fixed
 
@@ -82,6 +106,8 @@ Nothing has been released yet. This section collects the work towards **v0.1.0**
   over IPC; explicit save targets were accepted from the renderer; restoring a crashed document could lose the old
   recovery entry; DOCM/PPTM restored from a snapshot lost the macro warning; text import decided the encoding from
   the first 64 KiB only.
+- Files opened together from a multi-selection in Explorer (Windows starts one Simpaper process per file) started
+  their engines all at once; they now open one after another through a single queue.
 
 ### Security
 

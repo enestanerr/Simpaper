@@ -1,7 +1,7 @@
 # Compatibility matrix
 
 **Engine:** LibreOffice 26.8.0.3 (unmodified) for documents, spreadsheets and presentations; pdf.js 6.3.289 and
-@cantoo/pdf-lib 2.11.1 for PDF. **Last reviewed:** 2026-09-29.
+@cantoo/pdf-lib 2.11.1 for PDF. **Last reviewed:** 2026-09-30.
 
 > **Read this first**
 >
@@ -56,20 +56,20 @@ The engine opens these formats and saves them back in the same format.
 | Format | Open | Display | Edit | Save in same format | Convert to | Preserved | May be lost | Test status |
 |---|---|---|---|---|---|---|---|---|
 | **DOCM** | Yes | Yes | Yes | Yes (macro-enabled filter) | Documents list | As DOCX, plus the VBA project: every stream of `vbaProject.bin` unchanged, only the compound file around them is rewritten *(tested)* | Macros are **never executed**; saving as DOCX drops them (Simpaper warns) | **Engine round trip tested** (Apache POI sample): VBA project name, modules, declarations, code and every stream |
-| **DOTX** | Yes, as the template itself or as a new document based on it | Yes | Yes | Yes | Documents list | As DOCX | No password protection for templates | Saving *as* DOTX tested (template content type, text); opening not yet tested |
+| **DOTX** | Yes, for editing the template itself (not as a new document based on it; see [KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md#distribution)) | Yes | Yes | Yes | Documents list | As DOCX | No password protection for templates | Saving *as* DOTX tested (template content type, text); opening not yet tested |
 | **DOC** | Yes: Word 97–2003 (older Word versions import only); XOR/RC4/CryptoAPI passwords | Yes | Yes | Yes (Word 97–2003) | Documents list | Text, formatting, tables, images, headers/footers, comments, tracked changes | Features newer than Word 2003 (content controls, modern charts, …); password saved with RC4 | Converting tested both ways: a DOCX saved as DOC reopens with its text and table; the text of a third-party DOC (Apache POI sample) survives conversion to DOCX |
 | **RTF** | Yes | Yes | Yes | Yes | Documents list | Text, formatting, tables, images | Features RTF can't represent (for example some fields, comments and layout details) | Saving *as* RTF tested (the text is present); opening not yet tested |
 | **TXT** | Yes; UTF-8 by default, other encodings (for example Windows-1254) selectable | Yes | Yes | Yes (UTF-8 with BOM and CRLF line ends by default) | Documents list | The text | **All formatting**, images and tables (plain text only) | Saving *as* TXT tested (UTF-8 with BOM, the text is present); opening not yet tested |
 | **ODT** | Yes (LibreOffice's native format) | Yes | Yes | Yes (ODF 1.4 Extended) | Documents list | Everything LibreOffice supports | Nothing expected; Microsoft Word may not support every ODF feature | Saving *as* ODT tested (text, headings, table, header/footer, comment, picture); ODT round trip not yet tested |
 | **XLSM** | Yes | Yes | Yes | Yes (macro-enabled filter) | Spreadsheets list | As XLSX, plus the VBA modules: project name, module names, types and order, declarations and the code of every module *(tested)* | Macros are **never executed**; the VBA project is **rebuilt** from its modules, not copied: new project ID, no compiled code caches, and **macro descriptions and shortcut keys (procedure attributes) are lost** *(tested)*; VBA signatures are lost | **Engine round trip tested** (Apache POI sample); whether Excel runs the rebuilt project is not verified |
-| **XLTX** | Yes, as the template itself or as a new document based on it | Yes | Yes | Yes | Spreadsheets list | As XLSX | As XLSX | Saving *as* XLTX tested (template content type, formula results); opening not yet tested |
+| **XLTX** | Yes, for editing the template itself (not as a new document based on it) | Yes | Yes | Yes | Spreadsheets list | As XLSX | As XLSX | Saving *as* XLTX tested (template content type, formula results); opening not yet tested |
 | **XLS** | Yes: Excel 97–2003 (Excel 4/5/95 import only); XOR/RC4/CryptoAPI passwords | Yes | Yes | Yes (Excel 97–2003) | Spreadsheets list | Values, formulas, formatting, charts, notes | Features newer than Excel 2003 (more rows/columns, newer functions and charts); password saved with RC4 | Converting tested both ways: an XLSX saved as XLS reopens with its formula results; the text of a third-party XLS (Apache POI sample) survives conversion to XLSX |
 | **CSV** | Yes, with explicit options: separator, text delimiter, encoding and locale (Turkish: `;` and decimal comma) | Yes | Yes | Yes, **one sheet per file** | Spreadsheets list | Cell values of the current sheet | **All formatting, formulas, other sheets, charts**; formulas in imported CSV are not evaluated (protects against CSV formula injection) | Saving *as* CSV tested (Turkish: `;`, decimal comma, UTF-8 with BOM; English: `,`); the import options (separator guess, Turkish encodings, prompt) are unit-tested without the engine |
 | **TSV** | Yes (tab-separated) | Yes | Yes | Yes, one sheet per file | Spreadsheets list | Cell values | As CSV | Saving *as* TSV tested (English locale) |
 | **ODS** | Yes (LibreOffice's native format) | Yes | Yes | Yes (ODF 1.4 Extended) | Spreadsheets list | Everything LibreOffice supports | Nothing expected; Excel may not support every ODF feature | Saving *as* ODS tested (data, formulas, recalculated values); ODS round trip not yet tested |
 | **PPTM** | Yes | Yes | Yes | Yes (macro-enabled filter) | Presentations list | As PPTX, plus the VBA project: every stream unchanged, only the compound file rewritten *(tested)* | Macros are **never executed**; saving as PPTX drops them | **Engine round trip tested** (Apache POI sample): VBA project name, modules, declarations, code and every stream |
 | **PPSX** | Yes, opened **for editing** (not as a running slide show) | Yes | Yes | Yes (keeps the show type) | Presentations list | As PPTX | As PPTX | Saving *as* PPSX tested (slideshow content type, slide titles); opening not yet tested |
-| **POTX** | Yes, as the template itself or as a new document based on it | Yes | Yes | Yes | Presentations list | As PPTX | As PPTX | Saving *as* POTX tested (template content type, slide titles); opening not yet tested |
+| **POTX** | Yes, for editing the template itself (not as a new document based on it) | Yes | Yes | Yes | Presentations list | As PPTX | As PPTX | Saving *as* POTX tested (template content type, slide titles); opening not yet tested |
 | **PPT** | Yes: PowerPoint 97–2003 (older versions import only); **not if password-protected** | Yes | Yes | Yes (PowerPoint 97–2003) | Presentations list | Slides, text, images, tables, notes, animations | Features newer than PowerPoint 2003; **password-protected PPT can neither be opened nor saved with a password** | Converting tested both ways: a PPTX saved as PPT reopens with its slide texts and notes; the text of a third-party PPT (Apache POI sample) survives conversion to PPTX |
 | **PPS** | Yes, opened for editing (not as a running slide show) | Yes | Yes | Yes (keeps the show type) | Presentations list | As PPT | As PPT | not yet tested |
 | **ODP** | Yes (LibreOffice's native format) | Yes | Yes | Yes (ODF 1.4 Extended) | Presentations list | Everything LibreOffice supports | Nothing expected; PowerPoint may not support every ODF feature | Saving *as* ODP tested (slide texts, notes, pictures); ODP round trip not yet tested |
@@ -114,7 +114,7 @@ file will be kept ([ADR 0004](adr/0004-pdf-stack.md)).
 
 ## Test status
 
-What Simpaper's own automated tests cover today (all headless, in the repository, passing on 2026-09-29):
+What Simpaper's own automated tests cover today (all headless, in the repository, passing on 2026-09-30):
 
 - **Office formats, engine round trips** (`tests/engine/independent.test.ts`, `tests/engine/visual.test.ts`; reported
   passing in [dev/testing-corpus.md](dev/testing-corpus.md#test-runs): 64 passed + 3 skipped for both together,

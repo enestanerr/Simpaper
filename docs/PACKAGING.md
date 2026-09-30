@@ -1,7 +1,8 @@
 # Packaging
 
 How a Windows release of Simpaper is built, reproducibly, from a clean checkout. The reasoning is in
-[ADR 0008](adr/0008-packaging.md); the configuration is `electron-builder.yml` and `scripts/engine/`.
+[ADR 0008](adr/0008-packaging.md) and, for file types, [ADR 0010](adr/0010-file-associations.md); the configuration
+is `electron-builder.yml`, `build/installer.nsh` and `scripts/engine/`.
 
 ## Prerequisites
 
@@ -102,21 +103,27 @@ Measured on 2026-09-29 with LibreOffice 26.8.0.3:
 | Prepared engine (`vendor/engine-dist`) | **741 MiB, 6,712 files** |
 | — of which left out | spelling dictionaries 393 MiB, other UI languages 349 MiB, MSI copy 19 MiB, help 11 MiB, extension help 4.5 MiB, AutoText 3 MiB, 32-bit runtime 1.5 MiB |
 | Electron 44.4.5 runtime (before locale pruning) | about 368 MB |
-| Unpacked application (`release/win-unpacked`, 0.1.0 build of 2026-09-29 evening) | **1,109 MiB, 6,823 files**, of which `resources/engine` 742 MiB (6,713 files) and `app.asar` 44 MiB |
-| Installer `Simpaper-Setup-0.1.0-x64.exe` | 346,332,767 bytes (330.3 MiB; without `elevate.exe`) |
-| ZIP `Simpaper-0.1.0-x64.zip` | 456,570,179 bytes (435.4 MiB) |
+| Unpacked application (`release/win-unpacked`, 0.1.0 build of 2026-09-30) | **1,108 MiB, 6,827 files**, of which `resources/engine` 742 MiB (6,714 files: the 6,713 LibreOffice files and `SIMPAPER-ENGINE.json`), `app.asar` 44 MiB and `resources/fileicons` 68 KiB (4 files) |
+| Installer `Simpaper-Setup-0.1.0-x64.exe` | 346,425,480 bytes (330.4 MiB; without `elevate.exe`) |
+| ZIP `Simpaper-0.1.0-x64.zip` | 456,662,558 bytes (435.5 MiB) |
 
-The uncompressed payload of about 1.1 GB is below NSIS's 2 GB limit. The installer was installed and used on the
-development PC (per user, no administrator rights); a clean machine is still to be tried.
+The uncompressed payload of about 1.1 GB is below NSIS's 2 GB limit. A build from before the rename (then called
+Varak, without the file types) was installed and used on the development PC (per user, no administrator rights);
+the Simpaper installer has not been installed yet, and a clean machine is still to be tried.
 
 ### Checking the package layout without an installer
 
-`npm run dist:dir` (or `npx electron-builder --win dir --config.directories.output=<folder>` after
-`npm run build`) produces `win-unpacked/`. On 2026-09-29 such a build was checked file by file: the 6,713 files
-of `resources/engine` were byte-identical to `vendor/engine-dist` (SHA-256), `resources/bridge` contained only
-the `simpaper_bridge` modules, koffi and `@koromix/koffi-win32-x64` were in `app.asar.unpacked` and loaded from the
-packaged path, `LICENSE.txt` and `THIRD_PARTY_NOTICES.md` were next to `Simpaper.exe`, and the fuses listed below were
-set. The application itself was not started (that opens windows).
+`npm run dist:dir` (or `npx electron-builder --win dir --config.directories.output=<folder>` after `npm run build`)
+produces `win-unpacked/`. On 2026-09-29 such a build was checked file by file: the 6,713 files of `resources/engine`
+were byte-identical to `vendor/engine-dist` (SHA-256), `resources/bridge` contained only the `simpaper_bridge`
+modules, koffi and `@koromix/koffi-win32-x64` were in `app.asar.unpacked` and loaded from the packaged path,
+`LICENSE.txt` and `THIRD_PARTY_NOTICES.md` were next to `Simpaper.exe`, and the fuses listed below were set. The
+application itself was not started (that opens windows). That build still had the names from before the rename
+(`varak_bridge`, `Varak.exe`). On 2026-09-30 the renamed build of `npm run dist:win` was checked the same way: the
+6,714 files of `resources/engine` byte-identical to `vendor/engine-dist`, `resources/bridge` exactly the 16
+`simpaper_bridge` modules of the repository, the four `resources/fileicons` icons identical to the repository's, no
+`resources/app-update.yml`, koffi unpacked, the license files next to `Simpaper.exe` and the fuses set; the packaged
+app then passed the hidden-window smoke test for Writer, Calc and Impress documents.
 
 ## Installer behaviour
 
@@ -130,13 +137,88 @@ set. The application itself was not started (that opens windows).
 - Packaged resources: `resources/engine` (prepared engine; program folder `resources/engine/program`, fonts in
   `resources/engine/share/fonts/truetype`), `resources/bridge` (UNO bridge without tests and caches),
   `resources/profile` (engine profile template). The main process finds them through
-  `src/main/engine/locate.ts`. pdf.js' worker, CMaps, fonts and WASM decoders are bundled into `out/renderer` by
-  Vite.
+  `src/main/engine/locate.ts`. `resources/fileicons` holds the icons of the registered file types (see
+  [File types and icons](#file-types-and-icons)). pdf.js' worker, CMaps, fonts and WASM decoders are bundled into
+  `out/renderer` by Vite.
 - The native module koffi (Win32 bindings) is unpacked from `app.asar` (`asarUnpack`), as Node-API binaries can't
   be loaded from inside an archive.
 - `LICENSE.txt` (MPL-2.0) and `THIRD_PARTY_NOTICES.md` are installed next to `Simpaper.exe`; Electron's
   `LICENSE.electron.txt` and `LICENSES.chromium.html` are added by electron-builder.
-- No file associations and no auto-update in v0.1 (planned for M3).
+- The installer registers Simpaper's file types with their icons and Simpaper's page under Default apps; the
+  uninstaller removes them again ([File types and icons](#file-types-and-icons)).
+- No auto-update in v0.1 (planned for M3).
+
+## File types and icons
+
+`build/installer.nsh` registers the file types; electron-builder includes it in the installer and the uninstaller
+automatically. electron-builder's own `fileAssociations` option is not used. What Windows allows, and why the
+registration looks like this, is explained in [ADR 0010](adr/0010-file-associations.md).
+
+For the file types, the installer writes to `Software\Classes`, `Software\Simpaper` and
+`Software\RegisteredApplications`, below `HKEY_CURRENT_USER` for the default "Only for me" install and below
+`HKEY_LOCAL_MACHINE` when an administrator chooses "all users" on the install-mode page:
+
+- a ProgID per format, `Simpaper.<format>` (27 ProgIDs; `.tsv` and `.tab` share `Simpaper.tsv`), with the type name
+  of the file dialogs in the installer's language (for example "Word Document" or "Word Belgesi"), the app's
+  `AppUserModelID`, the file-type icon and the command `"<install folder>\Simpaper.exe" "%1"`;
+- an "Open with" entry (`OpenWithProgids`) for each of the 28 extensions the app opens;
+- Simpaper's page under Settings › Apps › Default apps (`Software\Simpaper\Capabilities` and
+  `Software\RegisteredApplications\Simpaper`);
+- the extension's default value for the 24 office and PDF extensions, but only where no installed app owns the type
+  yet (the default, in the merged view and in the key the installer writes, is empty or names a ProgID that does not
+  exist); Office's or LibreOffice's registration is never replaced. TXT, CSV, TSV and TAB get only the "Open with"
+  entry and the Default apps page, never the default (their ProgIDs carry `AllowSilentDefaultTakeOver`).
+
+When an administrator switches an earlier "only for me" installation to "all users", electron-builder removes the
+per-user copy first; the installer then also removes that user's per-user registration, which would otherwise win
+over the machine-wide one and start the deleted program.
+
+At the end the installer notifies Explorer (`SHChangeNotify`), so the icons appear at once. The user's default-app
+choice (`UserChoice`) is protected by Windows; neither the installer nor the app reads or writes it. Where another app
+is the default, the user decides, and Windows offers Simpaper the next time such a file is opened. The installer's
+finish page has an unchecked box, "Make Simpaper the default in Windows Settings" ("Simpaper'ı Windows Ayarları'nda
+varsayılan yap"; Modern UI draws this box one line high, so the labels stay short), and File › Options › File types
+in the app shows which types open with Simpaper and has a "Choose default apps…" button. Both open Simpaper's
+Default apps page (Windows 11 21H2/22H2 with the April 2023 update and 23H2 and later open it directly, Windows 10
+the list of default apps). The app only reads the association state and never writes to the registry.
+
+Uninstalling removes the ProgIDs, the "Open with" entries, the extension defaults that still name a Simpaper ProgID,
+the Default apps registration and the `Applications\Simpaper.exe` key that Windows may have created; the extension
+keys stay (other apps' values may live there). An update runs the previous uninstaller with `--updated`, which keeps
+everything, so the users' default-app choices stay valid. The ZIP registers nothing.
+
+The icons `resources/fileicons/{document,spreadsheet,presentation,pdf}.ico` are original artwork (a white sheet with
+the brand's leaf corners, an offset edge in the module's colour and the module's glyph) in ten sizes from 16 to
+256 px. They are generated by `npm run icons` (`scripts/brand/generate-icons.mjs` with
+`scripts/brand/filetype-icons.mjs`), not by the build: electron-builder ships the files as they are through
+`extraResources` to `resources\fileicons` in the installation folder, where the ProgIDs point.
+
+Known limitations: the type names are written in the installer's language and do not follow a later change of the
+app's language, and templates and slide shows open for editing
+([KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md#distribution)).
+
+### Checking the registration
+
+`node scripts/installer/check-associations.mjs` compiles the include's install and uninstall macros with
+electron-builder's makensis the way electron-builder compiles the include (`-WX`, UTF-8 input,
+`APP_EXECUTABLE_FILENAME` defined only after it). It then runs, silently and against the scratch key
+`HKCU\Software\SimpaperInstallerCheck`: the install in Turkish, an update's uninstall (`--updated`), the install in
+English as a switch to "all users" (the per-user clean-up path; the root stays the current user) and the real
+uninstall. After each run it compares every value with the table in `build/installer.nsh` and the complete list of
+keys and values below the scratch key with the expected one; at the end it removes the key. The computer's real file
+associations are not changed and nothing is shown on screen. The finish page and the machine-wide root are compiled
+only by the real build (`npm run dist:win`) and exercised only by a real installation. The check needs makensis from
+electron-builder's cache (run `npm run dist:win` once) or `SIMPAPER_MAKENSIS` set to the path of a `makensis.exe`. The
+release workflow runs it right after building.
+
+It passed on the development PC: 28 extensions and 27 ProgIDs; the installer could set the default of 23 of the 24
+office and PDF types there, and the user's own choices still decide for `.xlsx` (a former "Open with › Always"
+choice) and `.pdf` (Edge). `tests/unit/main/fileAssociations.test.ts` keeps the table in step with the app's formats
+and the type names of the file dialogs, and checks the icons.
+
+Not verified yet: a real installation, that is, that Explorer shows the icons, that a double-click opens the file in
+Simpaper, that Windows' prompt offers Simpaper, and how Settings presents Simpaper's page. This needs an install on a
+PC with someone at the screen.
 
 ## Signing plan
 
@@ -190,6 +272,8 @@ and verified again.
 `.github/workflows/release.yml` runs on tags `v*` (and can be started by hand for an existing tag). It never uses
 the CI cache: it downloads the engine and requires a valid OpenPGP signature (`-RequireSignature`), prepares and
 verifies it (`npm run engine:prepare -- --verify`), checks that the tag matches the version in `package.json`,
-builds the installer and the ZIP with `npm run dist:win -- --publish never`, records SHA-256 checksums, and uploads
-everything to a **draft** GitHub release for manual review. Nothing is published automatically, and nothing is
-signed (see [Signing plan](#signing-plan)).
+builds the installer and the ZIP with `npm run dist:win -- --publish never`, checks the file types the installer
+registers (`node scripts/installer/check-associations.mjs`, see
+[Checking the registration](#checking-the-registration)), records SHA-256 checksums, and uploads everything to a
+**draft** GitHub release for manual review. Nothing is published automatically, and nothing is signed (see
+[Signing plan](#signing-plan)).

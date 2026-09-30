@@ -1,10 +1,11 @@
 # ADR 0008: Packaging and distribution for Windows
 
-- **Status:** Accepted for v0.1 (signing and auto-update are planned, not configured)
+- **Status:** Accepted for v0.1 (signing and auto-update are planned, not configured); item 4 amended 2026-09-30
+  by [ADR 0010](0010-file-associations.md) (file associations)
 - **Date:** 2026-09-29
 - **Related:** [PACKAGING.md](../PACKAGING.md), `electron-builder.yml`, `scripts/engine/`,
-  [ADR 0001](0001-engine.md), [ADR 0006](0006-license.md), research: [engine](../research/engine.md),
-  [shell](../research/shell.md)
+  [ADR 0001](0001-engine.md), [ADR 0006](0006-license.md), [ADR 0010](0010-file-associations.md), research:
+  [engine](../research/engine.md), [shell](../research/shell.md)
 
 ## Context
 
@@ -16,7 +17,9 @@
   `Fonts` folder that a portable LibreOffice does not read (they are normally installed into Windows).
 - NSIS installers built by electron-builder silently break above 2 GB of uncompressed payload. The `portable`
   target unpacks itself to `%TEMP%` on every start. electron-builder's built-in file associations only work for
-  per-machine installs.
+  per-machine installs. _Update 2026-09-30:_ that is what electron-builder's documentation says, but its NSIS
+  templates write the associations per user as well (below `SHELL_CONTEXT`, i.e. HKCU for a per-user install);
+  [ADR 0010](0010-file-associations.md) explains why Simpaper uses its own include instead.
 - Code signing: Azure Artifact Signing is not open to individual developers outside the US/Canada; the
   SignPath Foundation signs OSI-licensed projects for free when they meet its policy (published signing
   policy, MFA, builds from CI).
@@ -52,6 +55,8 @@
    (`win.signExecutable: false`, added 2026-09-29): with a certificate it would re-sign every `.exe` copied from
    `extraResources`, i.e. replace The Document Foundation's signatures on the engine and break the
    byte-identical guarantee. Signing will be a separate CI step limited to Simpaper's own files.
+   _Update 2026-09-30:_ file associations are part of v0.1 after all: `build/installer.nsh` registers the file
+   types with their icons and Simpaper's Default apps page, as decided in [ADR 0010](0010-file-associations.md).
 5. **Never** register LibreOffice's Maintenance Service or updaters; the engine's update checks are disabled in
    the engine profile, and updates come only with new Simpaper releases.
 6. **Source code of the engine:** release notes and [THIRD_PARTY_NOTICES.md](../../THIRD_PARTY_NOTICES.md)

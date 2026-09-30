@@ -41,12 +41,12 @@ These are the goals of the first version; [What works today](#what-works-today) 
 
 ## What works today
 
-Simpaper is being built toward its first installable version. Honest summary as of 2026-09-29. "Unit-tested"
-means automated tests without the running application; "tested with the real engine" means automated tests that
-drive LibreOffice without showing windows; "used on screen" means automated GUI runs with real mouse and keyboard
-input on the packaged app. Beyond those runs, the app has only been installed and tried by its owner on the
-development PC; no manual test pass ([docs/TEST_REHBERI.md](docs/TEST_REHBERI.md)) is recorded yet.
-Test counts: 763 unit tests (63 files), 115 engine integration tests (14 files; 5 more are skipped: three opt-in
+Simpaper is being built toward its first installable version. Honest summary as of 2026-09-30. "Unit-tested" means
+automated tests without the running application; "tested with the real engine" means automated tests that drive
+LibreOffice without showing windows; "used on screen" means automated GUI runs with real mouse and keyboard input on
+the packaged app. Beyond those runs, only a build from before the rename (then called Varak) was installed and tried
+by its owner on the development PC; no manual test pass ([docs/TEST_REHBERI.md](docs/TEST_REHBERI.md)) is recorded
+yet. Test counts: 784 unit tests (67 files), 115 engine integration tests (14 files; 5 more are skipped: three opt-in
 long loops and two by design), 109 bridge tests ([docs/STATUS.md](docs/STATUS.md)).
 
 | Area | State |
@@ -60,7 +60,7 @@ long loops and two by design), 109 bridge tests ([docs/STATUS.md](docs/STATUS.md
 | Documents, Spreadsheets and Presentations modules | **Implemented; the core flows were used on screen:** typing and saving in Writer, a formula in Turkish syntax in Calc, a new slide with the slide pane in Impress. 202 Writer, 225 Calc and 164 Impress commands, each checked against LibreOffice 26.8's command registry and confirmed to dispatch in a headless engine; Calc formula bar and selection statistics; slide commands and slide show |
 | File-format round trips in the engine | **Automated tests pass** (`tests/engine`): generated DOCX, XLSX and PPTX files with Turkish content and license-clean sample files are opened and saved by headless LibreOffice and checked with independent readers and a page-by-page visual comparison, plus conversions to ODF, CSV, TXT, RTF, legacy and template formats. These tests drive the engine directly, not yet through Simpaper's app; what they found is listed in the [compatibility matrix](docs/COMPATIBILITY.md#test-status). |
 | PDF module | **Implemented and unit-tested; the viewer was used on screen** (a text PDF and a form PDF with Turkish text): viewing with thumbnails, Turkish-aware search (İ/ı), highlight, free text, ink, images and comments, form filling, rotating, deleting, moving, inserting and duplicating pages, merging and extracting, adding text and images, printing, and saving with verification (`tests/unit/pdf`). Highlighting, free-text notes and saving were also checked on screen (the saved file read back independently); the other tools only by unit tests. |
-| Installer, CI, repository documents | **Installer and ZIP build** (`npm run dist:win`: 331 MB installer, 436 MB ZIP); the packaged app passed the hidden-window smoke test for all three office modules. The installer was installed and used on the development PC (per user, without administrator rights); it has not yet been run on a clean machine and there is no public release. CI workflows, community files and documentation are in place; the CI workflow runs on GitHub Actions for every push to `main` and every pull request (results in the repository's Actions tab). |
+| Installer, CI, repository documents | **Installer and ZIP build** (`npm run dist:win`: 330 MiB installer, 436 MiB ZIP); the packaged app passed the hidden-window smoke test for all three office modules. A build from before the rename (then called Varak, without the file types) was installed and used on the development PC (per user, without administrator rights); the Simpaper installer has not been installed yet, nor run on a clean machine, and there is no public release. CI workflows, community files and documentation are in place; the CI workflow runs on GitHub Actions for every push to `main` and every pull request (results in the repository's Actions tab). |
 
 Nothing has been verified in Microsoft Office; see [docs/TESTING.md](docs/TESTING.md).
 
@@ -74,7 +74,7 @@ Nothing has been verified in Microsoft Office; see [docs/TESTING.md](docs/TESTIN
   Calc sort/filter/freeze/conditional formatting/charts, Impress layouts and transitions); more PDF annotation types;
   high-DPI verification; broader visual regression tests.
 - **v0.3 — format coverage and robustness:** verified matrix for all legacy and ODF formats, setting and removing
-  document passwords, large-file performance, file associations, auto-update and signed releases.
+  document passwords, large-file performance, auto-update and signed releases.
 - **Later:** pivot tables and advanced charts, correcting existing PDF text, redaction, OCR for scanned PDFs,
   accessibility audit, and exploration of Linux and macOS.
 
@@ -85,6 +85,9 @@ Details and acceptance criteria: [docs/ROADMAP.md](docs/ROADMAP.md).
 Real screenshots of the packaged app (Windows 11, 100 % scaling), captured with `scripts/gui/screenshots.mjs` as
 described in [docs/DEMO.md](docs/DEMO.md); no mock-ups, no retouching. All images and their details are listed in
 [docs/screenshots/](docs/screenshots/README.md).
+
+The images were taken before the rename ([ADR 0009](docs/adr/0009-product-name-simpaper.md)) and still show the
+former working name "Varak" in the title bar (and in some sample texts and paths); they will be captured again.
 
 ![A DOCX with Turkish text in Simpaper's documents module](docs/screenshots/writer-home-en.png)
 
@@ -98,8 +101,8 @@ The same screens with the Turkish interface are in the [Turkish README](README.t
 
 ## Install
 
-There is no release yet. When v0.1 is released, the [GitHub releases](https://github.com/ncreativestudios/Simpaper/releases)
-page will offer:
+There is no release yet. When v0.1 is released, the
+[GitHub releases](https://github.com/ncreativestudios/Simpaper/releases) page will offer:
 
 - **`Simpaper-Setup-<version>-x64.exe`** — a per-user installer that does not need administrator rights;
 - **`Simpaper-<version>-x64.zip`** — the same application for portable use (unzip and run `Simpaper.exe`).
@@ -107,6 +110,22 @@ page will offer:
 Requirements: Windows 10 or 11, 64-bit, about 1.5 GB of free disk space. The first releases will not be code-signed,
 so Windows SmartScreen will show a warning; signing through the SignPath Foundation is planned
 ([docs/PACKAGING.md](docs/PACKAGING.md#signing-plan)).
+
+The installer registers Simpaper with Windows for the file types it opens
+([ADR 0010](docs/adr/0010-file-associations.md)):
+
+- Word, Excel, PowerPoint, OpenDocument, RTF and PDF files get Simpaper's icons and open in Simpaper with a
+  double-click, as long as no other app is the default for the type.
+- Where another app is the default (for example Microsoft Office, LibreOffice, or Microsoft Edge for PDF), Windows
+  leaves the choice to you: it offers Simpaper the next time you open such a file, and you can choose Simpaper in
+  Windows Settings › Apps › Default apps. **File › Options › File types** shows which types open with Simpaper and
+  has a button that opens this page; the installer offers to open it on its last page as well.
+- Plain text, CSV and TSV files keep their default app: Simpaper is only offered for them (under "Open with" and on
+  its Default apps page), never made the default. The ZIP registers no file types.
+
+The registration is checked by unit tests and by a script that runs the installer's install, update and uninstall
+steps against a scratch registry key; a real installation (icons in Explorer, double-click, Windows' prompt) has not
+been tried yet.
 
 ## Build from source
 
@@ -144,7 +163,7 @@ tests may open windows.
 | Document | Content |
 |---|---|
 | [Architecture](docs/ARCHITECTURE.md) | How the pieces fit together and why |
-| [Decision records](docs/adr/README.md) | Engine, shell, document surface, PDF stack, data integrity, license, name, packaging |
+| [Decision records](docs/adr/README.md) | Engine, shell, document surface, PDF stack, data integrity, license, name, packaging, file types |
 | [Compatibility matrix](docs/COMPATIBILITY.md) | What opens, edits, saves and may be lost, per format |
 | [Known limitations](docs/KNOWN_LIMITATIONS.md) | What does not work or has not been verified |
 | [Testing](docs/TESTING.md) | Test layers, commands and what they can prove |
@@ -162,8 +181,8 @@ documents to issues.
 
 ## Security and privacy
 
-Please report vulnerabilities privately as described in [SECURITY.md](SECURITY.md), not in public issues. Simpaper has no
-telemetry and no online features, downloads nothing at run time, and never executes document macros or PDF
+Please report vulnerabilities privately as described in [SECURITY.md](SECURITY.md), not in public issues. Simpaper has
+no telemetry and no online features, downloads nothing at run time, and never executes document macros or PDF
 JavaScript.
 
 ## License
@@ -176,5 +195,5 @@ licenses — above all the unmodified LibreOffice engine, whose license files ar
 
 LibreOffice is a registered trademark of The Document Foundation. Microsoft, Word, Excel and PowerPoint are trademarks
 of the Microsoft group of companies. Simpaper is an independent project and is not affiliated with, endorsed by or
-sponsored by The Document Foundation or Microsoft. "Simpaper" is a working name; see
-[ADR 0007](docs/adr/0007-product-name.md).
+sponsored by The Document Foundation or Microsoft. The choice of the name "Simpaper" and the name check behind it are
+described in [ADR 0009](docs/adr/0009-product-name-simpaper.md); that check is not a trademark clearance.

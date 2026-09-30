@@ -22,8 +22,15 @@ Not full Office compatibility — the first installable version.
 
 **Installation**
 - [ ] `npm run dist:win` produces a per-user NSIS installer and a ZIP that include the engine; the app starts
-      offline on a clean Windows 10/11 x64 machine without admin rights. _(Both are built; the installer was
-      installed and used on the development PC without admin rights. A clean machine is still to be tried.)_
+      offline on a clean Windows 10/11 x64 machine without admin rights. _(Both are built; a build from before the
+      rename (then called Varak) was installed and used on the development PC without admin rights. The Simpaper
+      installer and a clean machine are still to be tried.)_
+- [x] `build/installer.nsh` writes a ProgID per format with its icon, the "Open with" entries and the Default apps
+      registration, takes a type's default only where no other app owns it, keeps everything on an update and
+      removes it on uninstall ([ADR 0010](adr/0010-file-associations.md)). _(tests/unit/main,
+      scripts/installer/check-associations.mjs against a scratch registry key)_
+- [ ] On a real installation: Explorer shows Simpaper's icons, a double-click opens Simpaper, Windows' prompt and
+      Settings › Apps › Default apps offer Simpaper, and uninstalling leaves nothing behind.
 
 **Documents (DOCX)**
 - [ ] Open a DOCX, type Turkish text, apply bold/italic/underline, font, size, color, alignment, bullets,
@@ -60,8 +67,9 @@ Not full Office compatibility — the first installable version.
 
 **Project**
 - [ ] README (EN/TR) with real screenshots, compatibility matrix, known limitations, contribution files, CI.
-      _(All in place, screenshots taken from the running app; open: a green CI run on GitHub, where the workflows
-      run since the first push.)_
+      _(All in place except current screenshots: the ones taken from the running app still show the former name
+      "Varak" and are to be captured again ([ADR 0009](adr/0009-product-name-simpaper.md)); open: a green CI run on
+      GitHub, where the workflows run since the first push.)_
 
 ## M2 — Editing depth and fidelity (v0.2)
 
@@ -88,7 +96,8 @@ Not full Office compatibility — the first installable version.
   preview are already in M1, see CHANGELOG.md); macro-enabled format policy.
 - Large-file performance budget and cancellable long operations.
 - Hot-path UNO glue moved into the engine process (in-process Python component) if latency requires it.
-- Per-user file associations (HKCU), auto-update, signed releases (SignPath Foundation).
+- Auto-update, signed releases (SignPath Foundation). (File associations with Simpaper's own file-type icons were
+  implemented in M1, see [ADR 0010](adr/0010-file-associations.md).)
 
 ## M4 — Advanced features
 

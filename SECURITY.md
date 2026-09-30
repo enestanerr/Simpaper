@@ -99,6 +99,14 @@ These properties are part of Simpaper's design; a way to break them is a securit
 - **Macros never run**: documents are loaded with macro execution disabled; VBA code is kept where the format
   allows it, but it is not executable. JavaScript in PDFs never runs.
 - **No automatic link updates**: the engine loads documents without updating external links.
+- **File types are registered by the installer only**: the installer registers Simpaper's file types, their icons
+  and Simpaper's page under Settings → Apps → Default apps in `Software\Classes`, `Software\Simpaper` and
+  `Software\RegisteredApplications` below `HKEY_CURRENT_USER` (`HKEY_LOCAL_MACHINE` when an administrator installs
+  for all users); uninstalling removes this registration and an update keeps it
+  ([ADR 0010](docs/adr/0010-file-associations.md)). The app itself never writes to the registry and never changes
+  your default apps: File → Options → File types only reads which app opens a file type. Its button opens
+  Simpaper's page in Windows Settings through `app:openDefaultApps`, which takes no argument; the main process builds
+  that `ms-settings:` link itself. `app:openExternal` still accepts only allow-listed https URLs.
 - **Local working data**: documents are edited as working copies in `%LOCALAPPDATA%\Simpaper\work`, and autosave
   snapshots are stored in `%LOCALAPPDATA%\Simpaper\recovery` (password-protected documents stay password-protected
   in their snapshots). Both are removed when a document is closed normally.

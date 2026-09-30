@@ -72,7 +72,9 @@ Useful commands:
 | `npm run engine:prepare -- --verify` | builds the trimmed engine for packaging and smoke-tests it |
 | `npm run corpus:generate` | writes the generated test documents to `tests/corpus/generated/` |
 | `npm run notices` | regenerates `THIRD_PARTY_NOTICES.md` (after dependency or engine changes) |
+| `npm run icons` | regenerates `build/icon.ico` and `icon.png`, `resources/icons/` and `resources/fileicons/` from `resources/brand/` and `scripts/brand/filetype-icons.mjs` (after artwork changes) |
 | `npm run dist:dir` / `npm run dist:win` | unpacked app / installer and ZIP in `release/` ([docs/PACKAGING.md](docs/PACKAGING.md)) |
+| `node scripts/installer/check-associations.mjs` | checks the file types that `build/installer.nsh` registers, against a scratch registry key (no windows; needs electron-builder's makensis: run `npm run dist:win` once, see [docs/PACKAGING.md](docs/PACKAGING.md#checking-the-registration)) |
 
 `npm run engine:fetch` writes only inside the repository (`vendor/`, git-ignored) and installs nothing on your
 system. To test with another LibreOffice `program` folder, for example the prepared engine in
@@ -110,7 +112,7 @@ notes in [docs/dev/](docs/dev/).
 | `src/renderer/` | React UI: `shell/` (title bar, backstage, tabs, status bar), `ribbon/` (ribbon framework), `modules/` (writer, calc, impress, pdf), `i18n/`, `theme/` |
 | `engine/bridge/` | `simpaper_bridge`, a Python package that runs on LibreOffice's bundled Python and talks UNO to the engine; NDJSON JSON-RPC over stdio |
 | `engine/profile/` | Template of the engine's user profile (macros disabled, updates off, shortcuts) |
-| `scripts/` | Engine fetch/prepare/verify, corpus generator, notices, icons, smoke boot (`smoke-boot.mjs`), GUI runs and on-screen checks (`gui/`, `gui/checks/`; they open windows, see [Testing rules](#testing-rules)) |
+| `scripts/` | Engine fetch/prepare/verify, corpus generator, notices, icons (`brand/`), installer check (`installer/`), smoke boot (`smoke-boot.mjs`), GUI runs and on-screen checks (`gui/`, `gui/checks/`; they open windows, see [Testing rules](#testing-rules)) |
 | `tests/` | `unit/`, `engine/` (headless LibreOffice), `tools/` (independent OOXML/ODF/PDF readers), `corpus/` |
 
 Contracts live in `src/shared/*.ts`, `src/shared/api/*.ts`, `src/main/*/types.ts`, `src/renderer/ribbon/types.ts`

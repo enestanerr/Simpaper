@@ -63,8 +63,10 @@ Completion pass after the interrupted first pass — all items done:
 | `src/main/app/security.ts` | Permission handlers, navigation/new-window blocking, allow-listed external links. |
 | `src/main/app/quit.ts` | Graceful quit: unsaved-changes prompts, dispose, clean-shutdown marker, hard timeout. |
 | `src/main/app/dialogs.ts`, `strings.ts` | Native open/save dialogs (format filters in Turkish/English). |
-| `src/main/app/appController.ts` | `app:*` services (info, settings, window controls, external links). |
+| `src/main/app/appController.ts` | `app:*` services (info, settings, window controls, external links, file types). |
+| `src/main/app/fileTypes.ts` | Options › File types: which registered types open with Simpaper (read from Windows), Settings link (see "File types (Windows)"). |
 | `src/main/app/paths.ts`, `argv.ts` | Data folders; files from the command line / second instance. |
+| `src/main/app/openQueue.ts` | Opens the files from Windows one after another, one queue for all batches (see "Files from Windows"). |
 | `src/main/app/activeState.ts` | `WindowState` incl. `active` (ViewHost.isForeground), pushed as `app:windowState`. |
 | `src/main/app/testMode.ts`, `smoke.ts` | Test-only switches (`SIMPAPER_VIEW_MODE=hidden`, `SIMPAPER_DATA_DIR`, `SIMPAPER_SMOKE`); smoke boot script. |
 | `src/main/app/engineDirs.ts` | Engine font folders (font check; PDF text insertion). |
@@ -109,6 +111,16 @@ the visibility the renderer asked for last (`viewVisible`, else "is the active d
 an engine restart of a background tab must not show its new window over the active one.
 Read-only files open for editing but Save becomes Save As.
 
+**Files from Windows** (`argv.ts`, `openQueue.ts`) — a double-click, "Open with" and the command line pass files as
+arguments. A second process hands its arguments to the running instance (single-instance lock, `second-instance`;
+the window is restored and focused) and quits. Until the renderer's first IPC request the files wait
+(`pendingFiles`; 5 s after `did-finish-load` they are opened anyway). All of them go through **one** queue
+(`createOpenQueue`): one `DocumentService.open` after another, across batches. Explorer starts one process per
+selected file, so a multi-selection arrives as one batch per file; opened in parallel, every file would start an
+engine at the same time and their prompts (CSV import, password) would pile up. A file that cannot be opened
+becomes an `error` event with the file name as `detail`; a cancelled prompt (`errors.open.cancelled`) reports
+nothing. Smoke runs ignore command-line files.
+
 **Save** — serialised per document:
 1. `decideSaveTarget` (Save As for new/read-only documents, format changes, import-only formats → `saveFallback`).
 2. `assessSaveRisk`: compat findings whose rule says the target may lose them (`compat/findings.ts`),
@@ -136,6 +148,11 @@ Read-only files open for editing but Save becomes Save As.
    before the next snapshot reloads it with the target's import filter and UTF-8 text options, not with the
    options of the file it came from), recent files, recovery snapshot removed, compat report refreshed from the
    new file.
+
+The temp and backup siblings are named `.~simpaper-<token>-<name>.tmp` / `.bak` (`siblingName`). Before an office
+document is written or exported to PDF, `DocumentService` removes siblings that an interrupted save left in the
+target folder more than 10 minutes ago (`STALE_SIBLING`); the pattern also matches `.~varak-…`, the prefix of the
+development builds before the rename ([ADR 0009](../adr/0009-product-name-simpaper.md)).
 
 **Export PDF** — `PDF_EXPORT_FILTER[kind]`, FilterData `SelectPdfVersion` (2 = PDF/A-2b), `UseTaggedPDF`
 (default on), `ExportBookmarks`, `IsAddStream` (hybrid); SafeWriter + PDF header/trailer check; optional open.
@@ -250,6 +267,32 @@ keeps the protection (OOXML: agile-encrypted compound file). Snapshots are backg
 | Freeze-frames never hang the renderer | `ViewHostCore.freeze` resolves after captureTimeout + 2 × hideWait at most, even when a native call of the view blocks (`null` image then) |
 | `viewHost.dispose()` on quit; documents closed before the window is destroyed | `QuitController`: `closeAll`, then `disposeServices` |
 | Entry point without top-level await | `src/main/index.ts` |
+| `platform.associations` for Options › File types (read only) | `bootstrap.ts` → `createAppController({ associations })` → `fileTypes.ts` (below) |
+
+## File types (Windows)
+
+The installer registers the file types, their icons and Simpaper's page under Settings › Apps › Default apps
+(`build/installer.nsh`, [ADR 0010](../adr/0010-file-associations.md)). Windows leaves the choice of the default app
+to the user, so the app only reads the state and opens Settings; nothing in the app writes the registry.
+
+`app:fileTypes` (`fileTypes.ts`, `fileTypesStatus`) asks `Platform.associations` (platform.md §8) on every request,
+about fifty lookups on koffi worker threads, and answers a `FileTypesStatus`:
+- `supported`: false without `Platform.associations` (not Windows, or koffi failed to load); nothing is looked up.
+- `registration`: where `Software\RegisteredApplications` lists `BRAND.registeredAppName`: `user` (HKCU), `machine`
+  (HKLM, an all-users install) or `null` (development runs and the ZIP copy register nothing).
+- `thisCopy`: the ProgID `Simpaper.docx` starts this copy's `process.execPath` (false when another installation
+  registered the types).
+- `groups`: per module, the default candidates of `FILE_ASSOCIATIONS` (`src/shared/fileAssociations.ts`, derived from
+  `FORMATS`) and those of them that open with Simpaper today. An extension counts when the ProgID in effect (the
+  user's choice included) is its `Simpaper.<format>` or when the program Windows starts is this executable (e.g.
+  `Applications\Simpaper.exe` after "Look for another app"). TXT, CSV, TSV and TAB are never proposed as the default
+  ("Open with" and the Default apps page only) and are not asked for.
+
+`app:openDefaultApps` opens Settings on Simpaper's page (`defaultAppsUri`:
+`ms-settings:defaultapps?registeredAppUser=Simpaper`, `registeredAppMachine` for an all-users install; Windows 11
+21H2/22H2 with the April 2023 update and 23H2 and later open the page itself, Windows 10 the list of default apps).
+The target is fixed in the main process and the request has no payload. It resolves false when the installer did not
+register Simpaper (Windows would have nothing to show there) or when `shell.openExternal` fails.
 
 ## IPC
 
@@ -273,19 +316,26 @@ The renderer is untrusted (a pdf.js or script-injection bug must not reach files
 - `app:settings:update` rejects a changed `engine.programDir` (`errors.ipc.invalidRequest`; the unchanged value is
   accepted, the settings page sends the whole `engine` group); the folder is set in settings.json or with
   SIMPAPER_ENGINE_DIR, must be a local drive path (no UNC/device paths) and takes effect at the next start.
+- Windows Settings opens only through `app:openDefaultApps` (no payload, target built in the main process; see "File
+  types (Windows)"). `app:openExternal` still accepts only allow-listed https URLs, so an `ms-settings:` URL from the
+  renderer is refused.
 
 Renderer expectations:
 - Subscribe to `documents:event` first, then call `documents:list` (documents opened from the command line may
   already exist). The first IPC request marks the renderer as ready (pending files open then).
 - Prompts arrive as `{ type: 'prompt' }` events and must be answered with `documents:answerPrompt` (answers of the
   wrong kind are ignored). Pending prompts are re-sent after a renderer reload.
-- `documents:open`/`create`/`openDialog` reject with `errors.open.cancelled` when the user cancelled a prompt: show nothing.
+- `documents:open`/`create`/`openDialog` reject with `errors.open.cancelled` when the user cancelled a prompt: show
+  nothing.
 - Error/notice keys are `errors.*`/`compat.*` (namespaces `errors`/`compat`, files
   `src/renderer/i18n/locales/{tr,en}/errors.json` and `compat.json`); `detail` is extra, non-content information
   (file name, error code, count, ISO time).
 - `shellKey` events carry `Alt`/`F10` from the platform keyboard hook (only with `settings.ui.documentKeyTips`)
   while an office document is active.
 - `app:windowState` / `app:window:state` include `active` (see above): use it for the title bar's active look.
+- `app:fileTypes` reads Windows' state on every call (no cache): Options › File types asks again when the window
+  gets the focus back, e.g. from Settings. `app:openDefaultApps` answers false when Settings could not be opened on
+  Simpaper's page.
 - `documents:restartEngine { docId }` is the "restart" action for `errors.engine.notResponding` /
   `errors.engine.restartLimit` messages.
 - `pdf:print` takes the rendered `pages` (validated: PNG/JPEG bytes, 1 to 14 400 pt, at most 20 000 pages and
@@ -300,11 +350,12 @@ Renderer expectations:
 ## Thread pool
 
 `src/main/app/threadpool.ts` is the entry's first import and sets `UV_THREADPOOL_SIZE=16` unless the environment
-sets a value. koffi `.async` calls of the platform layer (window placement, PrintWindow, process-guard waits) run
-on libuv's pool, and a call into a LibreOffice window that stops pumping messages blocks its thread until the
-engine pumps again or ends; with the default 4 threads two such engines could stall every `fs.promises` call of
-the main process (saves, snapshots, settings). Checked with Electron 44 on this machine: with six pool tasks
-blocked, `fs.promises.stat` answered after 28 ms with the setting in the first imported module, 1512 ms without.
+sets a value. koffi `.async` calls of the platform layer (window placement, PrintWindow, process-guard waits,
+file-association lookups) run on libuv's pool, and a call into a LibreOffice window that stops pumping messages
+blocks its thread until the engine pumps again or ends; with the default 4 threads two such engines could stall
+every `fs.promises` call of the main process (saves, snapshots, settings). Checked with Electron 44 on this
+machine: with six pool tasks blocked, `fs.promises.stat` answered after 28 ms with the setting in the first
+imported module, 1512 ms without.
 
 ## Smoke boot (hidden window)
 
@@ -315,16 +366,18 @@ blocked, `fs.promises.stat` answered after 28 ms with the setting in the first i
   builds into `test-output/main-core/out` (`electron-vite build --outDir <absolute dir>`). The shared build is never
   run or written by the script.
 - Starts Electron (ELECTRON_RUN_AS_NODE removed) with `SIMPAPER_SMOKE=1`, `SIMPAPER_VIEW_MODE=hidden`,
-  `SIMPAPER_DATA_DIR=test-output/main-core/smoke/data-<pid>`, `SIMPAPER_SMOKE_REPORT=test-output/main-core/smoke/report.json`.
+  `SIMPAPER_DATA_DIR=test-output/main-core/smoke/data-<pid>`,
+  `SIMPAPER_SMOKE_REPORT=test-output/main-core/smoke/report.json`.
 - In the app (`src/main/app/smoke.ts`): the main window is created with `show: false` and never shown (no
   `ready-to-show` show, no fallback timer, no error dialog, no DevTools key, no shell-key hook, no command-line
   files); the engine runs `--headless` without a warm spare; documents get `hidden` views. After `did-finish-load`
   the script calls the real preload bridge through `webContents.executeJavaScript` (so contextBridge, ipcMain,
   sender check and validators are all exercised): `app:info` (engine available), `app:settings:get`,
-  `app:window:state`, `documents:list`, `documents:create` (engine instance, hidden view), `documents:list`,
-  `engine:query doc.info`, `documents:close`, `documents:list`. Renderer console errors, preload errors, renderer
-  crashes, load failures and main-process `error` log records fail the run. The app then shuts down through the
-  normal quit path (`QuitController.shutdown`) with exit code 0/1; a 5.5-minute safety timer exits with 1.
+  `app:window:state`, `app:fileTypes` (read only: `supported` on Windows, four groups), `documents:list`,
+  `documents:create` (engine instance, hidden view), `documents:list`, `engine:query doc.info`, `documents:close`,
+  `documents:list`. Renderer console errors, preload errors, renderer crashes, load failures and main-process
+  `error` log records fail the run. The app then shuts down through the normal quit path (`QuitController.shutdown`)
+  with exit code 0/1; a 5.5-minute safety timer exits with 1.
 - The runner kills the app after `--timeout` (default 420 s), then looks for processes whose command line contains
   the data folder (engine profiles live there): any survivor is killed and fails the run. The data folder is removed
   after a passing run and kept (with its log) otherwise.
@@ -332,12 +385,17 @@ blocked, `fs.promises.stat` answered after 28 ms with the setting in the first i
 ## Tests
 
 - `npx vitest run --project unit tests/unit/main` — safe-save fault injection (write/fsync/verify/replace, real
-  `ReplaceFileW` on Windows), compat analyzer with synthetic packages (incl. compound files with mini streams),
-  document service with fake engine/view host/dialogs (open→edit→save→risk→save a copy, passwords, CSV, crash →
-  restore, close prompts, intercepts, export), platform integration (view-mode override, focus, hang targets,
-  restart, closing hung documents, F10 de-duplication, active window state, test-mode switches, font folders),
-  recovery, IPC validation (incl. `pdf:print` pages, `pdf.errors.*` pass-through, `documents:restartEngine`),
-  settings, recent files, log rotation, quit flow, i18n key coverage. Review fixes of 2026-09-29: programDir over
+  `ReplaceFileW` on Windows; sibling names, `.~varak-` leftovers included), compat analyzer with synthetic packages
+  (incl. compound files with mini streams), document service with fake engine/view host/dialogs
+  (open→edit→save→risk→save a copy, passwords, CSV, crash → restore, close prompts, intercepts, export), platform
+  integration (view-mode override, focus, hang targets, restart, closing hung documents, F10 de-duplication, active
+  window state, test-mode switches, font folders), recovery, IPC validation (incl. `pdf:print` pages, `pdf.errors.*`
+  pass-through, `documents:restartEngine`, `app:fileTypes`/`app:openDefaultApps` without payload), settings, recent
+  files, log rotation, quit flow, i18n key coverage, file types (`fileTypes`: the status from a scripted association
+  query, the Settings links, `openDefaultApps` only for a registered copy; `fileAssociations`: the table against
+  `FORMATS`, the installer's table against it and the dialogs' type names, only three registry locations, quoted
+  paths, no `UserChoice`, the icons, electron-builder.yml/package.json against `BRAND`), the open queue (`openQueue`:
+  batches one after another, failures reported, cancelled opens quiet). Review fixes of 2026-09-29: programDir over
   IPC/schema/runtime (`ipc`, `settings`), no renderer-supplied target paths (`ipc`), dispatch argument allow-list
   (`ipc`), edits during save verification and `markSaved` (`documentService`), reload parameters after Save As
   (`documentService`), VBA passthrough (`savePlan`, `documentService`, `recovery`), whole-file encoding check
@@ -396,6 +454,8 @@ blocked, `fs.promises.stat` answered after 28 ms with the setting in the first i
   that loads a file and writes nothing (engine layer).
 - The PDF flush protocol (#10) depends on the renderer's answer (implemented: shell-ui.md §5, pdf.md); a renderer
   that does not answer makes a PDF save/close/quit wait for the 10 s timeout.
+- File types: not verified yet on an installed copy (the answers of `app:fileTypes` there, the Settings page that
+  `app:openDefaultApps` opens); this needs a real installation (ADR 0010, Consequences).
 
 ## Verified (review fixes, 2026-09-29, this machine)
 

@@ -31,7 +31,8 @@ Session 2 (2026-09-29), resuming after the interrupted first pass.
   `vendor/engine-dist`, `resources/bridge` = 15 `simpaper_bridge` modules only, koffi unpacked and loadable from the
   packaged `app.asar` path (Electron 44.4.5 in node mode, `GetCurrentProcessId` call), fuses as configured,
   LICENSE.txt + THIRD_PARTY_NOTICES.md next to Simpaper.exe. The build used the stale `out/` of 00:27 (layout check
-  only; the app was not started).
+  only; the app was not started). That build still had the names from before the rename (`varak_bridge`,
+  `Varak.exe`).
 - Engine fonts in dev mode: the PDF service also searches the admin image's `Fonts/` folder
   (`src/main/app/engineDirs.ts`); only the compatibility font check still reads `share/fonts/truetype` alone
   (main-core.md, Known limitations). Packaged builds have the fonts in `share/fonts/truetype` (prepare-engine moves
@@ -39,18 +40,30 @@ Session 2 (2026-09-29), resuming after the interrupted first pass.
 
 ### Maintainer TODOs (need the GitHub repository or a person)
 
+The repository https://github.com/ncreativestudios/Simpaper is public.
+
+- Enable **Discussions** (issue chooser, feature form and CONTRIBUTING link to `/discussions`; Settings → General →
+  Features).
+- Enable **Private vulnerability reporting**, which GitHub offers now that the repository is public: SECURITY.md, the
+  issue chooser and the CoC link to `/security/advisories/new`, and the CoC names it as the reporting channel until
+  its e-mail address is published.
+- Protect `main`, requiring the `CI` checks `Lint, type check, unit tests, build` and
+  `Engine tests (headless LibreOffice)`.
 - Replace the e-mail placeholder in `CODE_OF_CONDUCT.md` (Enforcement section).
-- Repository https://github.com/ncreativestudios/Simpaper (private): enable **Discussions** (issue chooser, feature form and
-  CONTRIBUTING link to `/discussions`; Settings → General → Features).
-- When the repository is made public (after the trademark search and the GitHub organisation of ADR 0007; a later
-  transfer to the organisation keeps the old links working through GitHub's redirects): enable **Private
-  vulnerability reporting** (SECURITY.md, issue chooser and CoC link to `/security/advisories/new`; GitHub offers it
-  only for public repositories) and protect `main`, requiring the `CI` checks `Lint, type check, unit tests, build`
-  and `Engine tests (headless LibreOffice)` (branch protection of a private repository needs a paid plan).
 - First CI run (started by the first push): lint, type check, unit and engine tests were clean locally on 2026-09-29
   ([STATUS.md](../STATUS.md), Test results); check the result under Actions and record it in STATUS.md.
+- Check the file types on a real installation ([ADR 0010](../adr/0010-file-associations.md), Consequences): icons
+  in Explorer, double-click, Windows' prompt, Simpaper's Default apps page and Options › File types. This needs an
+  install on a test PC with someone at the screen. A PC with the old Varak test installation keeps it next to
+  Simpaper (new application id): remove it through Settings › Apps.
+- Capture `docs/screenshots/` again (taken before the rename, the title bar still shows "Varak"):
+  `node scripts/gui/screenshots.mjs --lang both` with the packaged app, on an idle PC and with the owner's
+  permission; the images land in `test-output/screenshots`, review each one before it replaces the old one.
 - Before the first public release: mirror the engine source tarballs (PACKAGING.md, ADR 0008 §6), set up SignPath
   (PACKAGING.md, Signing plan), write the CHANGELOG section, run the release workflow on the tag.
+- Before a commercial launch ([ADR 0009](../adr/0009-product-name-simpaper.md), Consequences): file the name with
+  TÜRKPATENT in Nice classes 9 and 42, have a trademark attorney run a clearance search and register the wanted
+  domains. The name check of 2026-09-30 is no legal clearance.
 
 ### How to re-run the checks of this area
 

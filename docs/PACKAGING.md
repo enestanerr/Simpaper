@@ -216,9 +216,43 @@ office and PDF types there, and the user's own choices still decide for `.xlsx` 
 choice) and `.pdf` (Edge). `tests/unit/main/fileAssociations.test.ts` keeps the table in step with the app's formats
 and the type names of the file dialogs, and checks the icons.
 
-Not verified yet: a real installation, that is, that Explorer shows the icons, that a double-click opens the file in
-Simpaper, that Windows' prompt offers Simpaper, and how Settings presents Simpaper's page. This needs an install on a
-PC with someone at the screen.
+### Real installation
+
+`node scripts/installer/verify-install.mjs [--keep]` checks the built installer on the real system, so it **changes
+the computer**: it installs Simpaper silently for the current user, opens sample files through Windows' shell
+(Simpaper windows appear on screen), uninstalls it and, with `--keep`, installs it once more and leaves it installed.
+Run it only with the machine owner's permission while nobody uses the PC (it refuses to start unless keyboard and
+mouse have been idle for 60 s), and only where Simpaper is not installed. It backs up and restores the user's
+settings and recent files, works on copies of the generated corpus in `%PUBLIC%\Documents`, captures only
+Simpaper's own window and writes `test-output/install-check/report.json`. It checks:
+
+- the values the include writes to the real `HKCU` (ProgIDs, "Open with", Capabilities, RegisteredApplications) and
+  the type names;
+- which types Windows opens with Simpaper afterwards (`AssocQueryString`, so with the user's own choices applied,
+  and why not where it does not), and that plain text, CSV and TSV files did not move to Simpaper;
+- the icon Windows' shell associates with a file of each group, compared with the 32 px image of the ICO file;
+- a double-click (ShellExecute "open") of a .docx, then a .pptx, .odt and .ods one at a time, then a multiple
+  selection: every file must reach Simpaper, or Windows asks which app to use (the script then cancels its prompt);
+- File › Options › File types in the installed app (isolated data folder);
+- after the silent uninstall: no Simpaper entry left, and every type opens with the same app as before.
+
+Results on the development PC (Windows 11 Pro 25H2, 2026-09-30; other office apps and Store apps installed):
+
+- 23 of the 24 office and PDF types opened with Simpaper; `.pdf` stayed with Microsoft Edge, the user's own choice.
+- The shell's icons for .docx, .pptx, .odt and .ods were identical to Simpaper's ICO files.
+- A double-click on a .docx opened it in Simpaper, and .odt and .ods opened directly as well. For .pptx, which a Store
+  app on that PC had registered too, Windows asked once which app to use ("How do you want to open this file?"; the
+  script cancels that prompt and does not read it). A multiple selection of three files opened all three in the
+  running instance.
+- Plain text and CSV kept their apps (Notepad, VS Code). `.tsv` had one optional handler, a Store app; with Simpaper
+  as a second one Windows now asks. `.tab` had none and now opens with Simpaper.
+- Options › File types showed the four groups as registered and the "Choose default apps…" button.
+- The uninstall left nothing behind and every type opened with the same app as before.
+- A newer build installed over the installed one (the update path) kept all 194 registry values of the file types.
+
+Not verified yet: that Windows' prompt offers Simpaper (it is registered for the type, so it should), a PC without
+other office apps, a machine-wide installation (administrator), Windows 10, and how Settings presents Simpaper's page
+(the script does not open Settings).
 
 ## Signing plan
 

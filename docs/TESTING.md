@@ -31,7 +31,8 @@ contributor follows when reporting results. The compatibility claims that depend
 | Smoke boot | `node scripts/smoke-boot.mjs [--kind calc\|writer\|impress]` | The real app starts with a hidden window and creates, queries and closes a document through the preload bridge | `vendor/libreoffice` |
 | Packaged engine smoke test | `npm run engine:prepare -- --verify` or `node scripts/engine/verify-engine.mjs` | The prepared engine folder converts a Turkish test document to PDF and DOCX headlessly; the text is read back and the bundled fonts are embedded | `vendor/libreoffice` |
 | Installer file types | `node scripts/installer/check-associations.mjs` | The registry entries `build/installer.nsh` writes on install, keeps on an update and removes on uninstall, checked against a scratch key; the real associations are never written ([below](#file-types-and-the-installer)) | makensis from electron-builder's cache (run `npm run dist:win` once) or `SIMPAPER_MAKENSIS` |
-| GUI | plan and results in [docs/testing/GUI_SPIKE.md](testing/GUI_SPIKE.md); automated runs on the packaged app (`npm run dist:dir`): `node scripts/gui/gui-spike.mjs`, `node scripts/gui/screenshots.mjs`, `scripts/gui/checks/*.mjs` | Native document views on a real desktop: placement, focus and Turkish typing, shortcuts, popups, DPI | **Owner's permission**, a free desktop session |
+| GUI | plan and results in [docs/testing/GUI_SPIKE.md](testing/GUI_SPIKE.md); automated runs on the packaged app (`npm run dist:dir`): `node scripts/gui/gui-spike.mjs`, `node scripts/gui/screenshots.mjs`, `scripts/gui/checks/*.mjs` ([list](../scripts/gui/checks/README.md)) | Native document views on a real desktop: placement, focus and Turkish typing, shortcuts, popups and menus, theme colours and contrast, DPI | **Owner's permission**, a free desktop session |
+| Real installation | `node scripts/installer/verify-install.mjs [--keep]` (**changes the PC**) | Installs, opens files through Windows' shell, uninstalls ([below](#file-types-and-the-installer)) | **Owner's permission**, idle PC, Simpaper not installed, `npm run dist:win` first |
 | All | `npm run test:all` | Unit and engine projects together | as above |
 
 Test output (profiles, converted files, diffs) goes to `test-output/`, which is git-ignored. CI uploads it as an
@@ -89,8 +90,14 @@ makensis from electron-builder's download cache (run `npm run dist:win` once) or
 `makensis.exe`. The release workflow runs it right after building the installer (step "Check the file types the
 installer registers").
 
-Neither replaces a real installation: Explorer's icons, double-clicks, Windows' prompt and Simpaper's page in
-Settings need a check by hand (see [What is not verified](#what-is-not-verified)).
+Neither replaces a real installation. `node scripts/installer/verify-install.mjs [--keep]` does one on the real
+system and **changes the computer** (run it only with the machine owner's permission while nobody uses the PC, and
+only where Simpaper is not installed): it installs the built installer silently for the current user, checks the
+registry values, which types open with Simpaper, the icons Windows shows, a double-click and a multiple selection,
+Options › File types, then uninstalls and checks that every type opens as before; `--keep` installs it again at the
+end. It backs up and restores the user's settings and recent files; the report is
+`test-output/install-check/report.json` ([results](PACKAGING.md#real-installation)). Simpaper's page in Settings
+still needs a check by hand (see [What is not verified](#what-is-not-verified)).
 
 ## What is verified automatically
 
@@ -120,10 +127,11 @@ local run of the same commands, stated with its date.
   appearance. Schema validation and LibreOffice rendering are proxies, not proof.
 - **Display scaling:** 125/150/200 % and mixed-DPI setups (the development machine runs both monitors at 100 %).
 - **Anything that needs a desktop session** (the GUI plan) unless the owner has run it and recorded the results.
-- **A real installation of the file types:** that Explorer shows Simpaper's icons, a double-click opens the file,
-  Windows' "How do you want to open this file?" prompt offers Simpaper, Settings › Apps › Default apps shows
-  Simpaper's page, and what is left after uninstalling. The automated checks stop at the registry; the manual steps
-  are in [TEST_REHBERI.md](TEST_REHBERI.md) (Turkish, section 2).
+- **The parts of a real installation no script sees:** Simpaper's page under Settings › Apps › Default apps, the
+  finish-page box, choosing Simpaper in Windows' "How do you want to open this file?" prompt, an "all users"
+  installation, Windows 10 and a PC without other office apps. `verify-install.mjs` covered the icons, double-clicks,
+  updating and uninstalling on the development PC; the manual steps are in [TEST_REHBERI.md](TEST_REHBERI.md)
+  (Turkish, section 2).
 - **Other platforms:** macOS and Linux are not supported.
 - **Assistive technology:** NVDA and Narrator checks are planned for milestone M4.
 - **Printing** on physical printers.

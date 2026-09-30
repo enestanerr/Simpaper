@@ -24,10 +24,10 @@ rest of the project ([ADR 0006](docs/adr/0006-license.md)). There is no contribu
 
 ## Ways to contribute
 
-- **Report a bug** with the [bug report form](https://github.com/ncreativestudios/Simpaper/issues/new/choose). Never
+- **Report a bug** with the [bug report form](https://github.com/enestanerr/Simpaper/issues/new/choose). Never
   attach confidential documents; create a small file that shows the problem instead.
 - **Suggest a feature** with the feature request form, or start a
-  [discussion](https://github.com/ncreativestudios/Simpaper/discussions) when the idea is not concrete yet. Check the
+  [discussion](https://github.com/enestanerr/Simpaper/discussions) when the idea is not concrete yet. Check the
   [roadmap](docs/ROADMAP.md) first.
 - **Improve translations**: every user-facing text exists in Turkish and English (see [Translations](#translations)).
 - **Add test files**: small documents that exercise a feature, generated or under a permissive license (see
@@ -51,7 +51,7 @@ rest of the project ([ADR 0006](docs/adr/0006-license.md)). There is no contribu
 ### First build
 
 ```powershell
-git clone https://github.com/ncreativestudios/Simpaper.git
+git clone https://github.com/enestanerr/Simpaper.git
 cd Simpaper
 npm ci                  # exact dependency versions from package-lock.json
 npm run engine:fetch    # downloads LibreOffice 26.8.0.3, verifies SHA-256 and signature, extracts it to vendor/
@@ -75,6 +75,7 @@ Useful commands:
 | `npm run icons` | regenerates `build/icon.ico` and `icon.png`, `resources/icons/` and `resources/fileicons/` from `resources/brand/` and `scripts/brand/filetype-icons.mjs` (after artwork changes) |
 | `npm run dist:dir` / `npm run dist:win` | unpacked app / installer and ZIP in `release/` ([docs/PACKAGING.md](docs/PACKAGING.md)) |
 | `node scripts/installer/check-associations.mjs` | checks the file types that `build/installer.nsh` registers, against a scratch registry key (no windows; needs electron-builder's makensis: run `npm run dist:win` once, see [docs/PACKAGING.md](docs/PACKAGING.md#checking-the-registration)) |
+| `node scripts/installer/verify-install.mjs` | **changes your PC:** installs the built installer for the current user, opens files through Windows, uninstalls again (`--keep` leaves it installed); only on a PC where Simpaper is not installed and nobody works meanwhile ([docs/PACKAGING.md](docs/PACKAGING.md#real-installation)) |
 
 `npm run engine:fetch` writes only inside the repository (`vendor/`, git-ignored) and installs nothing on your
 system. To test with another LibreOffice `program` folder, for example the prepared engine in

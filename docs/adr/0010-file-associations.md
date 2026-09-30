@@ -104,5 +104,11 @@ measured read-only on the development PC, Windows 11 build 26200):
 - Templates (DOTX, XLTX, POTX …) open for editing, not as a new document based on the template, and slide shows
   (PPS, PPSX) open for editing; see [KNOWN_LIMITATIONS.md](../KNOWN_LIMITATIONS.md#distribution).
 - Type names are written in the installer's language and do not follow a later change of the app's language.
-- Not verified yet on a real installation: that Explorer shows the icons and Windows' prompt offers Simpaper, and
-  how Settings presents Simpaper's page. This needs an install on a test PC with someone at the screen.
+- A real installation on the development PC (2026-09-30, `scripts/installer/verify-install.mjs`) confirmed the
+  design: 23 of the 24 office and PDF types opened with Simpaper and showed its icons (`.pdf` stayed with Edge), a
+  double-click and a multiple selection opened the files, an update kept the registration and the uninstall
+  restored every type. Where another app had registered a type too (a Store app for `.pptx`), Windows asked once
+  which app to use; with a second optional handler for `.tsv`, Windows now asks for that type as well
+  ([PACKAGING.md](../PACKAGING.md#real-installation)).
+- Not verified yet: that Windows' prompt offers Simpaper, a PC without other office apps, a machine-wide
+  installation, Windows 10, and how Settings presents Simpaper's page.

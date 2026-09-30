@@ -4,7 +4,7 @@ _Last updated: 2026-09-30._ Simpaper is in early development (milestone v0.1 in 
 [STATUS.md](STATUS.md)). This list is honest on purpose: it names what does not work, what has not been verified
 and what is lost in certain file formats. Format-by-format details are in [COMPATIBILITY.md](COMPATIBILITY.md).
 If you hit a limitation that is not listed here, please
-[open an issue](https://github.com/ncreativestudios/Simpaper/issues).
+[open an issue](https://github.com/enestanerr/Simpaper/issues).
 
 ## General
 
@@ -129,9 +129,12 @@ If you hit a limitation that is not listed here, please
   types shows which types open with Simpaper and opens Windows Settings (Apps → Default apps). Plain text, CSV and TSV
   files are only offered (under "Open with" and on Simpaper's Default apps page), never made the default. The type
   names Explorer shows are in the installer's language and do not follow a later change of the app's language. The ZIP
-  archive registers no file types. The registration is checked automatically (install, update and uninstall against a
-  scratch registry key); Explorer's icons, Windows' prompt and Simpaper's page in Settings have not yet been checked
-  on a real installation.
+  archive registers no file types. Where another app has registered a type as well (on the development PC, a Store
+  app for `.pptx`), Windows asks once which app to use the first time such a file is opened; until you have chosen,
+  opening several of those files at once may show its prompt for only some of them (it closes when another window
+  comes to the front). `.tsv` files that another app also offers to open make Windows ask as well. The registration
+  was checked on a real installation on the development PC (icons, double-click, update, uninstall); Simpaper's page
+  in Settings has not been checked yet.
 - **Templates and slide shows open for editing.** Opening a template (DOTX, XLTX, POTX …) opens the template
   itself, not a new document based on it, and PPS, PPSX and PPSM files open for editing, not as a slide show.
 - **Download size.** The installer contains the LibreOffice engine (about 0.74 GB unpacked after removing unused

@@ -70,7 +70,7 @@ function findMakensis() {
 }
 
 /** Registry reads (Unicode-safe, unlike reg.exe's console output) and the scratch-key clean-up, through koffi. */
-function registry() {
+export function registry() {
   const koffi = createRequire(import.meta.url)('koffi');
   const advapi32 = koffi.load('advapi32.dll');
   const P = 'void *';

@@ -9,8 +9,14 @@
 
 ADR 0007 chose "Varak" as a working name and asked for a trademark search, a GitHub organisation and domains
 before the first public release. None of that had happened when the owner decided on a different name,
-**Simpaper**, and on the public repository https://github.com/ncreativestudios/Simpaper (2026-09-30). Nothing
+**Simpaper**, and on the public repository https://github.com/enestanerr/Simpaper (2026-09-30). Nothing
 had been released under the old name; the only installation was the owner's own test install.
+
+_Update 2026-09-30:_ the repository was first created under the GitHub account `ncreativestudios` by mistake, and
+the first push went there. The project lives at https://github.com/enestanerr/Simpaper; the application id below
+follows that account. Only the owner's own test installation used the earlier id
+(`io.github.ncreativestudios.simpaper`, installed the same day): it was uninstalled and replaced by a build with the
+new id. The data folders are named after the product, not the id, so its settings and recent files stayed.
 
 A read-only name check was run on 2026-09-30 (web, app stores, package registries and trademark registers, each
 with a control query that did return results). It is **not** a legal clearance:
@@ -33,7 +39,7 @@ with a control query that did return results). It is **not** a legal clearance:
   Simpaper'dan, Simpaper'la.
 - The identity stays in one place, `src/shared/brand.ts`; `electron-builder.yml` and `build/installer.nsh` mirror
   it and `tests/unit/main/fileAssociations.test.ts` checks that they match:
-  - application id (AppUserModelID, electron-builder `appId`): **`io.github.ncreativestudios.simpaper`**, which
+  - application id (AppUserModelID, electron-builder `appId`): **`io.github.enestanerr.simpaper`**, which
     uses the GitHub account the project lives under instead of a domain nobody owns;
   - data folders `%APPDATA%\Simpaper` and `%LOCALAPPDATA%\Simpaper` (development runs: `Simpaper-dev`);
   - `Simpaper.exe`, `Simpaper-Setup-<version>-x64.exe`, `Simpaper-<version>-x64.zip`, installed to
@@ -59,15 +65,15 @@ with a control query that did return results). It is **not** a legal clearance:
 | Keep "Varak" | The owner chose Simpaper; the formal search and the organisation of ADR 0007 had not been done yet |
 | "SimPaper" (camel case) | Used by two unrelated academic projects; "Simpaper" matches the repository |
 | Keep the old application id `org.varakoffice.varak` | Implies a domain nobody registered, and it would keep the old name in shortcuts and in the installer GUID |
-| `com.ncreativestudios.simpaper` | Implies a domain that is not registered either |
+| `com.enestanerr.simpaper` | Implies a domain that is not registered either |
+| `io.github.ncreativestudios.simpaper` | The account the repository had been created under by mistake (see Context) |
 | Migrate the settings from `%APPDATA%\Varak` | Nothing was released under the old name; only the owner's test installation has such a folder |
 
 ## Consequences
 
 - A new application id means a new installer product GUID: Simpaper installs next to an existing Varak test
   installation instead of replacing it. Varak is removed through Settings › Apps; its data folders are not read.
-- Screenshots in `docs/screenshots/` were taken before the rename and still show "Varak" in the title bar until
-  they are captured again.
+- The screenshots in `docs/screenshots/` were captured again with the new name on 2026-09-30.
 - The check above is no trademark clearance. Before a commercial launch: file the name with TÜRKPATENT in Nice
   classes 9 and 42, have a trademark attorney run a clearance search, and register the free domains that are
   wanted (for example simpaper.app and simpaper.com.tr). Indonesian registers were not searched (their public

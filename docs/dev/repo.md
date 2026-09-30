@@ -40,8 +40,10 @@ Session 2 (2026-09-29), resuming after the interrupted first pass.
 
 ### Maintainer TODOs (need the GitHub repository or a person)
 
-The repository https://github.com/ncreativestudios/Simpaper is public.
+The repository https://github.com/enestanerr/Simpaper is public.
 
+- Delete https://github.com/ncreativestudios/Simpaper (Settings → General → Danger Zone → Delete this repository):
+  it was created under the wrong account and holds the first push of 2026-09-30. Nothing links to it any more.
 - Enable **Discussions** (issue chooser, feature form and CONTRIBUTING link to `/discussions`; Settings → General →
   Features).
 - Enable **Private vulnerability reporting**, which GitHub offers now that the repository is public: SECURITY.md, the
@@ -55,9 +57,7 @@ The repository https://github.com/ncreativestudios/Simpaper is public.
   in Explorer, double-click, Windows' prompt, Simpaper's Default apps page and Options › File types. This needs an
   install on a test PC with someone at the screen. A PC with the old Varak test installation keeps it next to
   Simpaper (new application id): remove it through Settings › Apps.
-- Capture `docs/screenshots/` again (taken before the rename, the title bar still shows "Varak"):
-  `node scripts/gui/screenshots.mjs --lang both` with the packaged app, on an idle PC and with the owner's
-  permission; the images land in `test-output/screenshots`, review each one before it replaces the old one.
+
 - Before the first public release: mirror the engine source tarballs (PACKAGING.md, ADR 0008 §6), set up SignPath
   (PACKAGING.md, Signing plan), write the CHANGELOG section, run the release workflow on the tag.
 - Before a commercial launch ([ADR 0009](../adr/0009-product-name-simpaper.md), Consequences): file the name with

@@ -19,7 +19,7 @@ security fixes; a fix is always shipped as a new release, never as a patch to an
 **Please do not report security problems in public issues, discussions or pull requests.**
 
 Report them privately through GitHub: open the repository's **Security** tab and choose **Report a
-vulnerability**, or go directly to <https://github.com/ncreativestudios/Simpaper/security/advisories/new>. Only the
+vulnerability**, or go directly to <https://github.com/enestanerr/Simpaper/security/advisories/new>. Only the
 maintainers can see the report. If you cannot use that form, open a public issue that asks for a private contact,
 **without any details**.
 

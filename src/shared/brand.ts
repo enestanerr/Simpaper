@@ -6,7 +6,7 @@
 export const BRAND = {
   productName: 'Simpaper',
   /** Windows AppUserModelID / electron-builder appId (also decides the installer's product GUID). */
-  appId: 'io.github.ncreativestudios.simpaper',
+  appId: 'io.github.enestanerr.simpaper',
   vendor: 'Simpaper contributors',
   /** Folder name used under %APPDATA% / %LOCALAPPDATA%. */
   dataFolder: 'Simpaper',
@@ -15,8 +15,8 @@ export const BRAND = {
    * opens Simpaper's page with `ms-settings:defaultapps?registeredAppUser=<name>`. Never change it.
    */
   registeredAppName: 'Simpaper',
-  repositoryUrl: 'https://github.com/ncreativestudios/Simpaper',
-  issuesUrl: 'https://github.com/ncreativestudios/Simpaper/issues',
+  repositoryUrl: 'https://github.com/enestanerr/Simpaper',
+  issuesUrl: 'https://github.com/enestanerr/Simpaper/issues',
   /** Engine attribution shown in About and docs (TDF trademark policy: text form only). */
   engineAttribution: 'Includes LibreOffice® (The Document Foundation), unmodified.',
   colors: {

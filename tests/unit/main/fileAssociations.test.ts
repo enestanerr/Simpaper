@@ -100,6 +100,6 @@ describe('product identity', () => {
     expect(pkg.productName).toBe(BRAND.productName);
     expect(pkg.name).toBe(BRAND.productName.toLowerCase());
     expect(pkg.author).toBe(BRAND.vendor);
-    expect(BRAND.repositoryUrl).toBe('https://github.com/ncreativestudios/Simpaper');
+    expect(BRAND.repositoryUrl).toBe('https://github.com/enestanerr/Simpaper');
   });
 });

@@ -3,7 +3,7 @@
 # Prerequisites: npm run build, npm run engine:fetch, npm run engine:prepare (creates vendor/engine-dist).
 # Code signing is not configured yet (planned: SignPath Foundation), so the output is unsigned.
 
-appId: io.github.ncreativestudios.simpaper
+appId: io.github.enestanerr.simpaper
 productName: Simpaper
 copyright: Copyright © 2026 Simpaper contributors
 # Used by the ZIP target (Simpaper-<version>-x64.zip); the installer has its own name below.

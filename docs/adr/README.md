@@ -14,7 +14,7 @@ decisions, with sources, is in [docs/research](../research/README.md).
 | [0006](0006-license.md) | Mozilla Public License 2.0 | Accepted |
 | [0007](0007-product-name.md) | Working name "Varak" | Superseded by ADR 0009 |
 | [0008](0008-packaging.md) | Pinned, verified engine; per-user NSIS installer and ZIP with electron-builder | Accepted for v0.1 (amended by ADR 0010) |
-| [0009](0009-product-name-simpaper.md) | Product name "Simpaper", application id `io.github.ncreativestudios.simpaper` | Accepted |
+| [0009](0009-product-name-simpaper.md) | Product name "Simpaper", application id `io.github.enestanerr.simpaper` | Accepted |
 | [0010](0010-file-associations.md) | File types, icons and Default apps registration through an own NSIS include; the user's default-app choice stays with Windows | Accepted |
 
 ## Writing a new ADR

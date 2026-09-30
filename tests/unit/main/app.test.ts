@@ -159,14 +159,16 @@ describe('command line and paths', () => {
 
 describe('security and window chrome', () => {
   it('allows only listed https URLs to open externally', () => {
-    expect(isAllowedExternalUrl('https://github.com/ncreativestudios/Simpaper/issues/12')).toBe(true);
-    expect(isAllowedExternalUrl('https://github.com/ncreativestudios/Simpaper/blob/main/THIRD_PARTY_NOTICES.md')).toBe(true);
+    expect(isAllowedExternalUrl('https://github.com/enestanerr/Simpaper/issues/12')).toBe(true);
+    expect(isAllowedExternalUrl('https://github.com/enestanerr/Simpaper/blob/main/THIRD_PARTY_NOTICES.md')).toBe(true);
     expect(isAllowedExternalUrl('https://www.mozilla.org/en-US/MPL/2.0/')).toBe(true);
-    expect(isAllowedExternalUrl('http://github.com/ncreativestudios/Simpaper')).toBe(false);
-    expect(isAllowedExternalUrl('https://github.com/ncreativestudios/Simpaperx')).toBe(false);
-    expect(isAllowedExternalUrl('https://github.com/ncreativestudios/other-repo')).toBe(false);
-    expect(isAllowedExternalUrl('https://github.com/ncreativestudios')).toBe(false);
-    expect(isAllowedExternalUrl('https://user:pw@github.com/ncreativestudios/Simpaper')).toBe(false);
+    expect(isAllowedExternalUrl('http://github.com/enestanerr/Simpaper')).toBe(false);
+    expect(isAllowedExternalUrl('https://github.com/enestanerr/Simpaperx')).toBe(false);
+    expect(isAllowedExternalUrl('https://github.com/enestanerr/other-repo')).toBe(false);
+    expect(isAllowedExternalUrl('https://github.com/enestanerr')).toBe(false);
+    expect(isAllowedExternalUrl('https://user:pw@github.com/enestanerr/Simpaper')).toBe(false);
+    // The repository first created under the wrong account is not ours any more.
+    expect(isAllowedExternalUrl('https://github.com/ncreativestudios/Simpaper/issues')).toBe(false);
     expect(isAllowedExternalUrl('file:///C:/Windows/System32/calc.exe')).toBe(false);
     expect(isAllowedExternalUrl('javascript:alert(1)')).toBe(false);
     // Settings pages only through app:openDefaultApps, whose target is fixed in the main process.

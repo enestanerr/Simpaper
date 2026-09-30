@@ -13,10 +13,10 @@ body:
         > **Issues are public.** Never attach confidential, personal or business documents, not even "anonymised"
         > ones. If a file is needed, create a new file that shows the problem, or describe its content.
         > **Security problems** (for example a document that makes Simpaper run code or read other files) must be
-        > reported privately, see [SECURITY.md](https://github.com/ncreativestudios/Simpaper/blob/main/SECURITY.md).
+        > reported privately, see [SECURITY.md](https://github.com/enestanerr/Simpaper/blob/main/SECURITY.md).
 
-        Please check [known limitations](https://github.com/ncreativestudios/Simpaper/blob/main/docs/KNOWN_LIMITATIONS.md)
-        and the [compatibility matrix](https://github.com/ncreativestudios/Simpaper/blob/main/docs/COMPATIBILITY.md) first:
+        Please check [known limitations](https://github.com/enestanerr/Simpaper/blob/main/docs/KNOWN_LIMITATIONS.md)
+        and the [compatibility matrix](https://github.com/enestanerr/Simpaper/blob/main/docs/COMPATIBILITY.md) first:
         some losses are expected in certain formats.
   - type: input
     id: version

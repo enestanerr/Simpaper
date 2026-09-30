@@ -1,5 +1,5 @@
 import { readFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import fontkit from '@cantoo/fontkit';
 import { PDFDocument } from '@cantoo/pdf-lib';
 import { beforeAll, describe, expect, it } from 'vitest';
@@ -100,8 +100,9 @@ describe('pdf-lib round trip (library used by the PDF service)', () => {
     const bytes = await readFile(corpus.path('pdf-form'));
     const doc = await PDFDocument.load(bytes, { updateMetadata: false });
     doc.registerFontkit(fontkit);
-    // The same Unicode font the generator embedded (path recorded relative to the repository).
-    const font = await doc.embedFont(await readFile(join(REPO_ROOT, corpus.facts<PdfTextFacts>('pdf-text').font)));
+    // The same Unicode font the generator embedded. Its path is recorded relative to the repository, or absolute
+    // when the font is on another drive (CI: repository on D:, system font on C:), so resolve, not join.
+    const font = await doc.embedFont(await readFile(resolve(REPO_ROOT, corpus.facts<PdfTextFacts>('pdf-text').font)));
     const form = doc.getForm();
     form.getTextField('not').setText('Çok önemli: ığüşöç İĞÜŞÖÇ');
     form.getCheckBox('onay').uncheck();

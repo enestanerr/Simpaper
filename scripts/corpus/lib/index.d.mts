@@ -88,6 +88,7 @@ export interface PdfTextFacts {
   title: string;
   author: string;
   pageCount: number;
+  /** Font file embedded by the generator: relative to the repository root, or absolute on another drive. */
   font: string;
 }
 

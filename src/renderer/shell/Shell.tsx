@@ -1,5 +1,5 @@
 /** Application shell layout: title bar, document tabs, ribbon, toolstrip, message bars, workspaces, status bar. */
-import { useEffect, useMemo } from 'react';
+import { useEffect, useLayoutEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getModule } from '../modules/registry';
 import { Ribbon } from '../ribbon/Ribbon';
@@ -28,10 +28,19 @@ export function Shell() {
   const backstageOpen = useApp((s) => s.backstage.open);
   const showStatus = useApp((s) => s.settings.ui.showStatusBar);
   const module = doc ? getModule(doc.kind) : undefined;
+  const kind = doc?.kind ?? 'home';
 
   useEffect(() => installGlobalKeyboard(), []);
   useEffect(() => installKeyboardClaims(), []);
   useEffect(() => trackWindowFocus(), []);
+  // Dialogs, menus and screen tips render into <body>: <html> carries the module too, so they share its accent.
+  useLayoutEffect(() => {
+    const root = document.documentElement;
+    root.dataset['module'] = kind;
+    return () => {
+      delete root.dataset['module'];
+    };
+  }, [kind]);
 
   const extraCommands = useMemo(() => {
     const views = (module?.statusViews ?? []).map((v) => stateCommandOf(v)).filter((c): c is string => !!c);
@@ -42,7 +51,7 @@ export function Shell() {
 
   const Toolstrip = module?.Toolstrip;
   return (
-    <div className="vr-app" data-module={doc?.kind ?? 'home'}>
+    <div className="vr-app" data-module={kind}>
       <TitleBar />
       {docCount > 1 && <DocumentTabs />}
       <div className="vr-body">

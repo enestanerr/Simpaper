@@ -153,9 +153,18 @@
   --accent-contrast: #ffffff;
 }
 
-/* Module accents: the app root carries data-module of the active document. */
+/*
+ * Module accents: the app root and <html> carry data-module of the active document (Shell.tsx; <html> for the
+ * dialogs, menus and screen tips rendered into <body>). The derived tokens are declared on the same elements as
+ * --accent: a custom property resolves var() where it is declared, so declared on :root alone they would never
+ * see a module's accent.
+ */
+:root,
 [data-module] {
   --accent: var(--c-ink);
+  --accent-text: color-mix(in oklab, var(--accent) 88%, black);
+  --accent-soft: color-mix(in oklab, var(--accent) 12%, transparent);
+  --accent-softer: color-mix(in oklab, var(--accent) 6%, transparent);
 }
 [data-module='writer'] {
   --accent: var(--c-writer);
@@ -169,12 +178,14 @@
 [data-module='pdf'] {
   --accent: var(--c-pdf);
 }
-:root {
-  --accent-text: color-mix(in oklab, var(--accent) 88%, black);
-  --accent-soft: color-mix(in oklab, var(--accent) 12%, transparent);
-  --accent-softer: color-mix(in oklab, var(--accent) 6%, transparent);
+/* Ink is too dark to read on dark surfaces: without an open document the dark theme highlights with gold, like its
+   focus ring and primary buttons. */
+:root[data-theme='dark'][data-module='home'],
+:root[data-theme='dark'] [data-module='home'] {
+  --accent: var(--c-gold-light);
 }
-:root[data-theme='dark'] {
+:root[data-theme='dark'],
+:root[data-theme='dark'] [data-module] {
   --accent-text: color-mix(in oklab, var(--accent) 55%, white);
   --accent-soft: color-mix(in oklab, var(--accent) 24%, transparent);
   --accent-softer: color-mix(in oklab, var(--accent) 12%, transparent);
@@ -232,10 +243,16 @@
     --info-bg: Canvas;
     --keytip-bg: CanvasText;
     --keytip-fg: Canvas;
+    --accent-contrast: HighlightText;
+  }
+  :root,
+  :root[data-theme='dark'],
+  :root[data-theme='dark'][data-module],
+  [data-module],
+  :root[data-theme='dark'] [data-module] {
     --accent: Highlight;
     --accent-text: CanvasText;
     --accent-soft: Canvas;
     --accent-softer: Canvas;
-    --accent-contrast: HighlightText;
   }
 }

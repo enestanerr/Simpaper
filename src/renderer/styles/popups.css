@@ -313,6 +313,12 @@
   font-size: var(--fs);
   color: var(--fg-muted);
 }
+/* A checkbox with the field spacing keeps its box beside the label. */
+.vr-field.vr-checkbox {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
 .vr-radios {
   border: 0;
   padding: 0;

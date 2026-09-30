@@ -178,6 +178,25 @@ describe('document tabs', () => {
     expect(useApp.getState().documents.map((d) => d.docId)).toEqual(['p1', 'w1']);
   });
 
+  it('puts the active module on <html> too, so dialogs and menus rendered into <body> share its accent', async () => {
+    open(descriptor('w1', 'writer'));
+    open(descriptor('c1', 'calc'));
+    const view = await renderShell();
+    const html = document.documentElement;
+    expect(html.dataset['module']).toBe('calc');
+    act(() => setActiveDocId('w1'));
+    await act(flush);
+    expect(html.dataset['module']).toBe('writer');
+    act(() => {
+      handleDocumentEvent({ type: 'closed', docId: 'w1' });
+      handleDocumentEvent({ type: 'closed', docId: 'c1' });
+    });
+    await act(flush);
+    expect(html.dataset['module']).toBe('home');
+    view.unmount();
+    expect(html.dataset['module']).toBeUndefined();
+  });
+
   it('removes a tab when the main process reports the document closed', async () => {
     open(descriptor('w1', 'writer'));
     open(descriptor('c1', 'calc'));

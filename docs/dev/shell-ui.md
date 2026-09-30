@@ -196,7 +196,12 @@ buttons are painted by Windows (`titleBarOverlay`) and follow the BrowserWindow'
 `theme.ts` from `settings.theme`, following the OS for `system`) and maps them to system colours in forced-colours
 mode. Brand colours come from `src/shared/brand.ts`, title bar colours from `WINDOW_CHROME` (`src/shared/api/app.ts`),
 which the main process also uses for the window background and the caption-button overlay, so they always match.
-Contextual tabs use `--ctx-table|picture|drawing|chart`; each module has an accent (`data-module` on the app root).
+Contextual tabs use `--ctx-table|picture|drawing|chart`; each module has an accent (`data-module` on the app root,
+mirrored on `<html>` by `Shell` for dialogs, menus and screen tips, which render into `<body>`). The derived
+tokens (`--accent-text`, `--accent-soft`, `--accent-softer`) are declared on the same elements as `--accent`: a
+custom property resolves `var()` where it is declared, so on `:root` alone they resolved to nothing (fixed
+2026-09-30; `tests/unit/renderer/styles.test.ts`, GUI check `themecheck.mjs` for contrast ≥ 4.5:1). Without an
+open document the dark theme uses gold as the accent.
 
 ## 11. i18n rules
 

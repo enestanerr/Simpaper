@@ -230,6 +230,9 @@
 .vr-options-page .vr-field {
   max-width: 360px;
 }
+.vr-options-page .vr-field.vr-checkbox {
+  max-width: 640px;
+}
 .vr-qat-list {
   list-style: none;
   margin: 6px 0 0;

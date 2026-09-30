@@ -13,7 +13,7 @@ from .errors import RpcError
 from .protocol import ErrorCode
 from .values import property_value
 
-log = logging.getLogger('varak.ops')
+log = logging.getLogger('simpaper.ops')
 
 _FORMULA_RESULT_VALUE = 1  # css::sheet::FormulaResult::VALUE
 _FORMULA_RESULT_STRING = 2

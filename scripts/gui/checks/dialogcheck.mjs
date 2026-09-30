@@ -3,7 +3,7 @@
 import { copyFileSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import * as W from '../win32.mjs';
-import { launchVarak, repo, requireIdle, settingsPreset, sleep } from '../harness.mjs';
+import { launchSimpaper, repo, requireIdle, settingsPreset, sleep } from '../harness.mjs';
 
 requireIdle(60_000, 'dialog');
 const out = join(repo, 'test-output/gui/dialogcheck');
@@ -15,7 +15,7 @@ const visible = (hwnd) => W.isWindow(hwnd) && W.windowInfo(hwnd).visible;
 const boldDisabled = (s) => s.cdp.eval(`document.querySelector('[data-control-id="bold"]')?.getAttribute('aria-disabled') === 'true'`);
 
 const report = { attempts: [] };
-const s = await launchVarak({ out, port: 9360, settings: settingsPreset({ language: 'tr' }), tag: 'dialog' });
+const s = await launchSimpaper({ out, port: 9360, settings: settingsPreset({ language: 'tr' }), tag: 'dialog' });
 try {
   await s.open(docx, 'writer');
   await sleep(2500);

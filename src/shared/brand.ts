@@ -1,17 +1,16 @@
 /**
- * Single source of truth for the product identity.
- * "Varak" (Ottoman Turkish: a leaf/sheet of paper, also gold leaf) is the working name;
- * see docs/adr/0007-product-name.md before changing it.
+ * Single source of truth for the product identity (docs/adr/0009-product-name-simpaper.md).
+ * electron-builder.yml mirrors appId, productName and vendor.
  */
 export const BRAND = {
-  productName: 'Varak',
-  /** Windows AppUserModelID / electron-builder appId. */
-  appId: 'org.varakoffice.varak',
-  vendor: 'Varak contributors',
+  productName: 'Simpaper',
+  /** Windows AppUserModelID / electron-builder appId (also decides the installer's product GUID). */
+  appId: 'io.github.ncreativestudios.simpaper',
+  vendor: 'Simpaper contributors',
   /** Folder name used under %APPDATA% / %LOCALAPPDATA%. */
-  dataFolder: 'Varak',
-  repositoryUrl: 'https://github.com/enestanerr/varak',
-  issuesUrl: 'https://github.com/enestanerr/varak/issues',
+  dataFolder: 'Simpaper',
+  repositoryUrl: 'https://github.com/ncreativestudios/Simpaper',
+  issuesUrl: 'https://github.com/ncreativestudios/Simpaper/issues',
   /** Engine attribution shown in About and docs (TDF trademark policy: text form only). */
   engineAttribution: 'Includes LibreOffice® (The Document Foundation), unmodified.',
   colors: {

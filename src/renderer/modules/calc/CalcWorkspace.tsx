@@ -1,5 +1,5 @@
 /**
- * Calc workspace. Varak shows its own formula bar, so LibreOffice's input line is switched off once per
+ * Calc workspace. Simpaper shows its own formula bar, so LibreOffice's input line is switched off once per
  * engine instance (only if the engine reports it visible — `.uno:InputLineVisible` is a toggle). A crash
  * restore or an engine restart loads the document into a fresh engine whose input line is visible again.
  */

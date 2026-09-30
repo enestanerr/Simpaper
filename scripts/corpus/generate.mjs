@@ -8,7 +8,7 @@
  *   --large            also write the large fixtures (100k-row XLSX, 300-page DOCX, 200-slide PPTX)
  *   --derived          require LibreOffice and produce the derived formats (default: only when found)
  *   --no-derived       skip the LibreOffice conversions
- *   --engine <dir>     LibreOffice `program` directory (default: VARAK_ENGINE_DIR or vendor/libreoffice/program)
+ *   --engine <dir>     LibreOffice `program` directory (default: SIMPAPER_ENGINE_DIR or vendor/libreoffice/program)
  */
 import { parseArgs } from 'node:util';
 import { generateCorpus } from './lib/index.mjs';

@@ -231,7 +231,7 @@
     "link": {
       "title": "Dış bağlantı",
       "copy": "Bağlantıyı kopyala",
-      "message": "Bu PDF bir web adresine bağlantı içeriyor. Güvenliğiniz için Varak bağlantıları açmaz; adresi kopyalayıp tarayıcınızda açabilirsiniz.",
+      "message": "Bu PDF bir web adresine bağlantı içeriyor. Güvenliğiniz için Simpaper bağlantıları açmaz; adresi kopyalayıp tarayıcınızda açabilirsiniz.",
       "address": "Bağlantı adresi",
       "copied": "Bağlantı panoya kopyalandı."
     }

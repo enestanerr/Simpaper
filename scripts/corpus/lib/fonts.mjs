@@ -23,7 +23,7 @@ const SYSTEM = {
 export function findUnicodeFont({ repoRoot, programDir, weight = 'regular' }) {
   const roots = [];
   if (programDir) roots.push(join(programDir, '..'));
-  if (process.env.VARAK_ENGINE_DIR) roots.push(process.env.VARAK_ENGINE_DIR, join(process.env.VARAK_ENGINE_DIR, '..'));
+  if (process.env.SIMPAPER_ENGINE_DIR) roots.push(process.env.SIMPAPER_ENGINE_DIR, join(process.env.SIMPAPER_ENGINE_DIR, '..'));
   roots.push(join(repoRoot, 'vendor', 'libreoffice'));
   const dirs = roots.flatMap((r) => [join(r, 'share', 'fonts', 'truetype'), join(r, 'Fonts')]);
   for (const name of NAMES[weight]) for (const dir of dirs) if (existsSync(join(dir, name))) return join(dir, name);

@@ -8,7 +8,7 @@
 
 ## Context
 
-Varak is free and open source. The license must:
+Simpaper is free and open source. The license must:
 
 - be approved by the OSI and accepted by code-signing programmes for open-source projects
   (SignPath Foundation requires an OSI license and no proprietary components);
@@ -16,8 +16,8 @@ Varak is free and open source. The license must:
   third-party components under GPL, LGPL, Apache, BSD, MIT, OFL and others, shipped as separate programs and
   libraries), **pdf.js** (Apache-2.0), npm packages under MIT/ISC/BSD/Apache/0BSD/Zlib terms, and
   **Electron/Chromium** (MIT and BSD-style licenses);
-- keep improvements to Varak itself open, without forcing a license on documents or on software that merely
-  sits next to Varak.
+- keep improvements to Simpaper itself open, without forcing a license on documents or on software that merely
+  sits next to Simpaper.
 
 MPL-2.0 facts that matter here: its copyleft applies **per file** (§3.1–3.2); a "Larger Work" combining MPL
 files with other code may be distributed under other terms (§3.3); license and copyright notices must not be
@@ -27,7 +27,7 @@ the source (§3.2(a)).
 
 ## Decision
 
-- Varak's own code, documentation and artwork are licensed under the **Mozilla Public License 2.0**
+- Simpaper's own code, documentation and artwork are licensed under the **Mozilla Public License 2.0**
   ([LICENSE](../../LICENSE) contains the exact text published by Mozilla). Exhibit B ("Incompatible With
   Secondary Licenses") is **not** used.
 - The root `LICENSE` file applies to every file of the repository unless a file states otherwise; per-file
@@ -56,7 +56,7 @@ the source (§3.2(a)).
 
 ## Consequences
 
-- Modified Varak files must be made available under MPL-2.0 when they are distributed; new files in a larger
+- Modified Simpaper files must be made available under MPL-2.0 when they are distributed; new files in a larger
   work may use other licenses.
 - The same license as the engine's core simplifies the story for users and reviewers.
 - Every release must ship `LICENSE`, `THIRD_PARTY_NOTICES.md` and LibreOffice's own license files, and must say

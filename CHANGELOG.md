@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to Varak are documented in this file.
+All notable changes to Simpaper are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Before version 1.0, minor versions may contain
@@ -18,24 +18,24 @@ Nothing has been released yet. This section collects the work towards **v0.1.0**
   license-clean test corpus ([docs/research/](docs/research/README.md)).
 - Initial architecture ([docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)) and decision records ADR 0001–0008: unmodified
   LibreOffice 26.8 as the document engine with one process per document, Electron + React + TypeScript shell,
-  LibreOffice's editing window hosted in the Varak window, pdf.js + @cantoo/pdf-lib for PDF, safe save and loss-risk
-  warnings, MPL-2.0, the working name "Varak", per-user installer.
+  LibreOffice's editing window hosted in the Simpaper window, pdf.js + @cantoo/pdf-lib for PDF, safe save and loss-risk
+  warnings, MPL-2.0, the working name "Simpaper", per-user installer.
 - Engine pinned to LibreOffice 26.8.0.3 with scripts that download it, verify its SHA-256 digest and OpenPGP
   signature, extract it without installing anything, build a trimmed copy for packaging (byte-identical files,
   English and Turkish only) and smoke-test it headlessly.
 - Main process *(in progress)*: document lifecycle on working copies, safe save (temporary file, verification,
   atomic replace), loss-risk analysis with "save a copy", password prompts, CSV import with preview, autosave
   snapshots and crash recovery, settings, recent files, allow-listed and validated IPC.
-- Windows platform layer: hosting of LibreOffice's editing window as a child window of the Varak window (an owned
+- Windows platform layer: hosting of LibreOffice's editing window as a child window of the Simpaper window (an owned
   overlay window remains for development), still image of the document while menus overlap it, process guard that
   ends engine processes with the app, hang detection. Used on screen by the automated GUI spike at 100 % scaling.
 - GUI spike (`scripts/gui/gui-spike.mjs`) and screenshot script (`scripts/gui/screenshots.mjs`): drive the packaged
-  app with real mouse and keyboard input, check saved files on disk, watch for hangs and capture only Varak's window;
+  app with real mouse and keyboard input, check saved files on disk, watch for hangs and capture only Simpaper's window;
   they wait for an idle PC and never type into another window. Real screenshots in Turkish and English are in
   `docs/screenshots/`.
 - PDF module *(in progress)*: pdf.js viewer with thumbnails and search that treats İ/ı correctly, highlight, free
   text, ink, images, comments, form filling, page operations, merge and extract, adding text and images, printing,
-  verified saving, and Varak's own appearance streams for Turkish free text and form values.
+  verified saving, and Simpaper's own appearance streams for Turkish free text and form values.
 - User interface *(in progress)*: Office-style ribbons for the four modules, File backstage, document tabs, status
   bar, KeyTips, Turkish and English, light and dark theme.
 - Test tooling: independent readers for OOXML, ODF and PDF, VBA extraction, visual comparison, a generated corpus
@@ -59,15 +59,15 @@ Nothing has been released yet. This section collects the work towards **v0.1.0**
 - While such a dialog was open, the Quick Access Toolbar and the File tab still worked, so a save or close could run
   inside the dialog; both are now disabled like the ribbon.
 - Closing a changed document whose engine hangs or has crashed (or quitting with one open) discarded its unsaved
-  changes without asking. Varak now asks first, names the time of the last autosave (kept under File → Recover)
+  changes without asking. Simpaper now asks first, names the time of the last autosave (kept under File → Recover)
   and makes Cancel the default.
-- After a click into the document, keys typed into Varak's own text boxes (for example the font box), the File view
-  and prompts went into the document: Windows kept the keyboard focus in LibreOffice's window. Varak now takes it
+- After a click into the document, keys typed into Simpaper's own text boxes (for example the font box), the File view
+  and prompts went into the document: Windows kept the keyboard focus in LibreOffice's window. Simpaper now takes it
   for its text boxes and modal views and gives it back afterwards; switching ribbon tabs still leaves the keyboard
   in the document, as in Office.
-- While a document's engine hung, the Varak window did not react to the mouse or keyboard (Windows shares its input
+- While a document's engine hung, the Simpaper window did not react to the mouse or keyboard (Windows shares its input
   queue with LibreOffice's window), so "Restart engine" could not be clicked. About 8 seconds after the "not
-  responding" bar appears, Varak now offers the restart in a separate message box; a hung engine is ended before its
+  responding" bar appears, Simpaper now offers the restart in a separate message box; a hung engine is ended before its
   view is removed (removing it first could
   block the app); the "not responding" bar disappears once the document responds again or is restarted.
 - CSV import: a separator typed under "Other" was shown in the preview but the import used the default separator;
@@ -91,4 +91,4 @@ Nothing has been released yet. This section collects the work towards **v0.1.0**
 - The renderer can no longer change the folder engines are started from, choose save targets without a dialog,
   or pass arguments to engine commands beyond an allow-list.
 
-[Unreleased]: https://github.com/enestanerr/varak/commits/main
+[Unreleased]: https://github.com/ncreativestudios/Simpaper/commits/main

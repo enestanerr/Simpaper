@@ -65,8 +65,8 @@ describe('FreeText appearance fix', () => {
     expect(Buffer.from(result.bytes.subarray(0, input.length)).equals(Buffer.from(input))).toBe(true);
     const { doc, annot } = await firstAnnot(result.bytes);
     const stream = apStream(doc, annot);
-    expect(stream?.dict.get(PDFName.of('VarakAP'))).toBeInstanceOf(PDFString);
-    expect(stream?.dict.lookup(PDFName.of('Resources'), PDFDict).lookup(PDFName.of('Font'), PDFDict).has(PDFName.of('VarakF1'))).toBe(true);
+    expect(stream?.dict.get(PDFName.of('SimpaperAP'))).toBeInstanceOf(PDFString);
+    expect(stream?.dict.lookup(PDFName.of('Resources'), PDFDict).lookup(PDFName.of('Font'), PDFDict).has(PDFName.of('SimpaperF1'))).toBe(true);
     // The annotation's own data is untouched.
     expect(annot.lookup(PDFName.of('Contents'), PDFHexString).decodeText()).toBe(`Not: ${TURKISH}`);
     expect(await darkPixelRatio(result.bytes, 0, rect)).toBeGreaterThan(0.01);
@@ -84,6 +84,21 @@ describe('FreeText appearance fix', () => {
     annots.lookup(0, PDFDict).set(PDFName.of('Contents'), PDFHexString.fromText('Değişti İĞÜŞ'));
     const third = await fixUnicodeAppearances(await edited.save(), fonts, log);
     expect(third.freeTexts).toBe(1);
+  });
+
+  it('recognises appearances written before the rename (/VarakAP) as its own', async () => {
+    const first = await fixUnicodeAppearances(await freeTextPdf(`Eski ${TURKISH}`, rect), fonts, log);
+    const legacy = await PDFDocument.load(first.bytes, { forIncrementalUpdate: true });
+    const annots = legacy.getPage(0).node.lookup(PDFName.of('Annots'), PDFArray);
+    const stream = apStream(legacy, annots.lookup(0, PDFDict))!;
+    stream.dict.set(PDFName.of('VarakAP'), stream.dict.get(PDFName.of('SimpaperAP'))!);
+    stream.dict.delete(PDFName.of('SimpaperAP'));
+    const old = await legacy.save();
+    // Up to date: left alone. Edited afterwards: redrawn (an unknown marker would be kept as someone else's).
+    expect((await fixUnicodeAppearances(old, fonts, log)).freeTexts).toBe(0);
+    const edited = await PDFDocument.load(old, { forIncrementalUpdate: true });
+    edited.getPage(0).node.lookup(PDFName.of('Annots'), PDFArray).lookup(0, PDFDict).set(PDFName.of('Contents'), PDFHexString.fromText('Yeni metin İĞÜŞ'));
+    expect((await fixUnicodeAppearances(await edited.save(), fonts, log)).freeTexts).toBe(1);
   });
 
   it('honours the annotation rotation', async () => {

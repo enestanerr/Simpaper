@@ -24,7 +24,7 @@ export function resolveAppEntry(mainDir: string, devUrl = process.env['ELECTRON_
 
 export interface MainWindowOptions {
   /**
-   * Show the window once it has painted (default true). The smoke run (VARAK_SMOKE) passes false: the window
+   * Show the window once it has painted (default true). The smoke run (SIMPAPER_SMOKE) passes false: the window
    * then stays hidden for its whole life.
    */
   show?: boolean;

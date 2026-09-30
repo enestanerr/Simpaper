@@ -142,7 +142,7 @@ describe('SettingsStore', () => {
     expect(reloaded.get().theme).toBe('dark');
     expect(reloaded.get().csv.exportSeparator).toBe(';');
     expect(reloaded.needsWrite).toBe(false);
-    expect((await readdir(dir)).filter((n) => n.includes('varak'))).toEqual([]);
+    expect((await readdir(dir)).filter((n) => n.includes('simpaper'))).toEqual([]);
   });
 
   it('rejects invalid patches without changing anything', async () => {

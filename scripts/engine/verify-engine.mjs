@@ -151,13 +151,13 @@ async function docxText(file) {
 export async function verifyEngine({ engineDir, workDir, keep = false, timeoutMs = CONVERSION_TIMEOUT_MS, log = console.log }) {
   const soffice = path.join(engineDir, 'program', process.platform === 'win32' ? 'soffice.exe' : 'soffice');
   if (!fs.existsSync(soffice)) throw new Error(`soffice not found: ${soffice}`);
-  const token = `varak-verify-${randomBytes(6).toString('hex')}`;
+  const token = `simpaper-verify-${randomBytes(6).toString('hex')}`;
   const runDir = path.join(workDir, token);
   const profileDir = path.join(runDir, 'profile');
   const outDir = path.join(runDir, 'out');
   fs.mkdirSync(profileDir, { recursive: true });
   fs.mkdirSync(outDir, { recursive: true });
-  const input = path.join(runDir, 'varak-smoke.fodt');
+  const input = path.join(runDir, 'simpaper-smoke.fodt');
   fs.writeFileSync(input, SAMPLE_FODT, 'utf8');
   const before = listFiles(engineDir);
 
@@ -187,7 +187,7 @@ export async function verifyEngine({ engineDir, workDir, keep = false, timeoutMs
     ]) {
       // --outdir is only accepted after --convert-to; placed before it, soffice waits on an invisible error box.
       const r = await runSoffice(soffice, [...common, '--convert-to', `${ext}:${filter}`, '--outdir', outDir, input], timeoutMs);
-      const target = path.join(outDir, `varak-smoke.${ext}`);
+      const target = path.join(outDir, `simpaper-smoke.${ext}`);
       const produced = fs.existsSync(target) && fs.statSync(target).size > 0;
       const status = r.timedOut ? `timed out after ${r.ms} ms` : `exit code ${r.code}, ${r.ms} ms`;
       record(`convert to ${ext}`, !r.timedOut && r.code === 0 && produced, `${status}${produced ? `, ${fs.statSync(target).size} bytes` : ', no output'}`);

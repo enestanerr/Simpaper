@@ -27,7 +27,7 @@ PROG = os.path.join(ROOT, 'vendor', 'libreoffice', 'program')
 REGISTRY = os.path.join(ROOT, 'vendor', 'libreoffice', 'share', 'registry')
 OUT = os.path.join(ROOT, 'test-output', 'shell-ui')
 PROFILE = os.path.join(OUT, 'lo-profile-probe')
-PIPE = 'varak_shellui_probe_' + uuid.uuid4().hex[:12]
+PIPE = 'simpaper_shellui_probe_' + uuid.uuid4().hex[:12]
 T0 = time.time()
 PROC = None
 try:
@@ -208,7 +208,7 @@ def main_probe():
 
     def writer_checks(ctx, doc, frame, r):
         text = on_main(lambda: doc.getText())
-        on_main(lambda: text.insertString(text.getEnd(), 'Varak deneme ıİşğ', False))
+        on_main(lambda: text.insertString(text.getEnd(), 'Simpaper deneme ıİşğ', False))
 
         def para(name):
             def get():

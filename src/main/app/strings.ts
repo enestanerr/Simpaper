@@ -57,7 +57,7 @@ export type RescueLoss = 'none' | 'sinceSnapshot' | 'sinceSave' | 'all';
 const RESCUE = {
   tr: {
     message: (name: string) => `“${name}” belgesinin motoru yanıt vermiyor.`,
-    input: 'Bu sırada Varak penceresi fare ve klavyeye yanıt vermeyebilir.',
+    input: 'Bu sırada Simpaper penceresi fare ve klavyeye yanıt vermeyebilir.',
     none: 'Motoru yeniden başlatırsanız belge yeniden açılır; kaydedilmemiş değişiklik yok.',
     sinceSnapshot: (time: string) => `Motoru yeniden başlatırsanız belge saat ${time} otomatik kaydından yeniden açılır; sonraki değişiklikler kaybolur.`,
     sinceSave: 'Motoru yeniden başlatırsanız belge son kaydedilen hâliyle yeniden açılır; kaydedilmemiş değişiklikler kaybolur.',
@@ -68,7 +68,7 @@ const RESCUE = {
   },
   en: {
     message: (name: string) => `The engine of “${name}” is not responding.`,
-    input: 'Meanwhile the Varak window may not respond to the mouse and keyboard.',
+    input: 'Meanwhile the Simpaper window may not respond to the mouse and keyboard.',
     none: 'If you restart the engine, the document is reopened; it has no unsaved changes.',
     sinceSnapshot: (time: string) => `If you restart the engine, the document is reopened from the automatic save of ${time}; later changes are lost.`,
     sinceSave: 'If you restart the engine, the document is reopened as last saved; unsaved changes are lost.',

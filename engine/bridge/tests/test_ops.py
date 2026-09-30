@@ -1,12 +1,12 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-"""varak_bridge.ops without soffice: doc.info must never make Writer lay out the whole document."""
+"""simpaper_bridge.ops without soffice: doc.info must never make Writer lay out the whole document."""
 import unittest
 
 import uno
 
-from varak_bridge.ops import doc_info, writer_page_count
+from simpaper_bridge.ops import doc_info, writer_page_count
 
 
 def named(name, value):

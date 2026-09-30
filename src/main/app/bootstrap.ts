@@ -67,8 +67,8 @@ export interface Factories {
 }
 
 const STARTUP_FAILED: Record<UiLanguage, [string, string]> = {
-  tr: ['Varak başlatılamadı', 'Uygulama başlatılırken beklenmeyen bir hata oluştu. Ayrıntılar günlük dosyasındadır:'],
-  en: ['Varak could not start', 'An unexpected error occurred while starting. Details are in the log file:'],
+  tr: ['Simpaper başlatılamadı', 'Uygulama başlatılırken beklenmeyen bir hata oluştu. Ayrıntılar günlük dosyasındadır:'],
+  en: ['Simpaper could not start', 'An unexpected error occurred while starting. Details are in the log file:'],
 };
 
 /** UI language for a first run, from the OS locale (Turkish systems get Turkish, others English). */
@@ -118,7 +118,7 @@ export function bootstrap(factories: Factories): void {
   app.setPath('userData', paths.userData);
   app.setPath('sessionData', paths.sessionData);
 
-  const fileLog = createRotatingFileSink({ dir: paths.logs, minLevel: process.env['VARAK_DEBUG'] ? 'debug' : 'info', mirrorToConsole: !app.isPackaged });
+  const fileLog = createRotatingFileSink({ dir: paths.logs, minLevel: process.env['SIMPAPER_DEBUG'] ? 'debug' : 'info', mirrorToConsole: !app.isPackaged });
   const smokeErrors = testMode.smoke ? new SmokeErrorCollector() : null;
   setLogSink(
     smokeErrors
@@ -229,7 +229,7 @@ export function bootstrap(factories: Factories): void {
       // Restarting a hung engine: kill soffice at once (LibreOffice's own helpers go with it; programs it
       // opened for the user, outside its program folder, survive).
       killProcessTree: (pid) => platform.processGuard.killTree(pid, { ...(engineProgramDir ? { imageDir: engineProgramDir } : {}), timeoutMs: 5_000 }),
-      // A hung LibreOffice window holds back input for the whole Varak window (attached input queues). A message box
+      // A hung LibreOffice window holds back input for the whole Simpaper window (attached input queues). A message box
       // without a parent window runs on a thread of its own and still gets the user's click.
       offerEngineRescue: async ({ fileName, loss, snapshotAt }, signal) => {
         const lang = settings.get().language;
@@ -498,7 +498,7 @@ export function bootstrap(factories: Factories): void {
     .catch((err: unknown) => {
       log.error('startup failed', { error: err });
       if (testMode.smoke) {
-        console.log(`[varak-smoke] FAILED: startup failed: ${err instanceof Error ? err.message : String(err)}`);
+        console.log(`[simpaper-smoke] FAILED: startup failed: ${err instanceof Error ? err.message : String(err)}`);
         app.exit(1);
         return;
       }

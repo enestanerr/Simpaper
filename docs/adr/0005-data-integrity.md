@@ -18,12 +18,12 @@ Stability and data integrity are the second priority, directly after compatibili
 - Engine processes can crash (open upstream bugs when LibreOffice is driven externally), be killed, or hang.
 - A save interrupted half-way (power loss, full disk, cloud-sync lock) must never destroy the user's file.
 - Documents can contain macros; running them is a security risk.
-- LibreOffice's own save path would show its own dialogs ("keep current format") and bypass Varak's checks.
+- LibreOffice's own save path would show its own dialogs ("keep current format") and bypass Simpaper's checks.
 
 ## Decision
 
 1. **Working copy.** When a file is opened, the engine edits a working copy under the user's local app data
-   folder; the user's file is only read. All engine save commands are intercepted and routed to Varak.
+   folder; the user's file is only read. All engine save commands are intercepted and routed to Simpaper.
 2. **Safe save pipeline** (`SafeWriter`):
    write to a temporary file in the **same folder** as the target → flush to disk → **verify** (package/zip
    integrity for OOXML and ODF, structure check for PDF, optional re-open in the conversion instance) →
@@ -35,7 +35,7 @@ Stability and data integrity are the second priority, directly after compatibili
    SmartArt, chartex, slicers, Power Query, pivot caches, ink, 3D models, legacy binary formats …) and shows what
    is at risk. The user can **save a copy** in a safe format instead of overwriting the original.
 4. **Autosave and crash recovery.** Modified documents are snapshotted as ODF recovery files at an interval;
-   after an engine crash or an app crash Varak offers to restore them. Killing the engine during editing loses
+   after an engine crash or an app crash Simpaper offers to restore them. Killing the engine during editing loses
    at most the autosave interval (acceptance criterion of M1).
 5. **Macros are never executed.** Engine profiles set `DisableMacrosExecution=true` and the highest macro
    security level; documents are loaded with macro execution disabled. VBA code is still **loaded and saved** so
@@ -58,6 +58,6 @@ Stability and data integrity are the second priority, directly after compatibili
 - Negative: saves take longer (verification) and use more disk space (working copies, snapshots, temporary
   files). Very large files need progress reporting and cancellation (M3).
 - Negative: folders synchronised by cloud clients or files locked by other programs can make the atomic
-  replace fail; Varak must report this clearly and keep the working copy.
+  replace fail; Simpaper must report this clearly and keep the working copy.
 - Negative: the loss-risk rules must be kept in sync with engine updates and verified with the test corpus;
   a rule that is missing means a missing warning, never a changed file.

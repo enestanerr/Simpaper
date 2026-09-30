@@ -91,7 +91,7 @@
     "crashedBody": "You can restore your work from the latest automatic recovery copy. Other open documents are not affected.",
     "recover": "Recover",
     "closeDocument": "Close document",
-    "moduleLoadFailed": "The component that shows this type of document could not be loaded. The Varak installation may be damaged; restart or reinstall the application."
+    "moduleLoadFailed": "The component that shows this type of document could not be loaded. The Simpaper installation may be damaged; restart or reinstall the application."
   },
   "status": {
     "label": "Status bar",
@@ -178,7 +178,7 @@
     "intro": "Creates a PDF copy of the document; the document itself does not change.",
     "options": "Options",
     "openAfter": "Open the PDF after exporting",
-    "openAfterHint": "The PDF opens in a new tab in Varak's PDF module.",
+    "openAfterHint": "The PDF opens in a new tab in Simpaper's PDF module.",
     "tagged": "Tagged PDF (accessibility)",
     "taggedHint": "Adds the document structure for screen readers.",
     "bookmarks": "Create bookmarks from headings",
@@ -228,7 +228,7 @@
     "showStatusBar": "Show the status bar",
     "ribbonCollapsed": "Show the ribbon collapsed (Ctrl+F1)",
     "documentKeyTips": "KeyTips while working in a document (Alt or F10) — experimental",
-    "documentKeyTipsHint": "Pressing Alt or F10 while the document window is active shows the ribbon KeyTips. This uses a keyboard hook while Varak is in the foreground; keys are never stored or sent anywhere.",
+    "documentKeyTipsHint": "Pressing Alt or F10 while the document window is active shows the ribbon KeyTips. This uses a keyboard hook while Simpaper is in the foreground; keys are never stored or sent anywhere.",
     "qat": "Quick Access Toolbar",
     "qatHint": "Choose and order the commands shown in the title bar.",
     "moveUp": "Move {{name}} up",
@@ -236,20 +236,20 @@
   },
   "about": {
     "version": "Version {{version}}",
-    "description": "Varak is an open-source office suite for documents, spreadsheets, presentations and PDF files. It works offline with your local files.",
+    "description": "Simpaper is an open-source office suite for documents, spreadsheets, presentations and PDF files. It works offline with your local files.",
     "engine": "Document engine",
     "engineVersion": "LibreOffice {{version}}",
     "engineMissing": "Not found {{error}}",
     "platform": "Platform",
     "licenseTitle": "License",
-    "license": "Varak is free software licensed under the Mozilla Public License 2.0 (MPL-2.0).",
+    "license": "Simpaper is free software licensed under the Mozilla Public License 2.0 (MPL-2.0).",
     "engineLicense": "The document engine is distributed unmodified; its own license texts and notices ship with the installation.",
     "linkLicense": "MPL-2.0 license text",
     "linkNotices": "Third-party notices",
     "linkEngineSource": "Source code of the document engine",
     "linkRepository": "Project page",
     "linkIssues": "Report a problem",
-    "privacy": "Varak collects no telemetry or usage data and never sends your files anywhere.",
+    "privacy": "Simpaper collects no telemetry or usage data and never sends your files anywhere.",
     "trademarks": "Product and format names mentioned may be trademarks of their owners; they are used only to describe compatibility."
   },
   "messages": {

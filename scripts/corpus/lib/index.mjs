@@ -47,7 +47,7 @@ export async function generateCorpus(opts = {}) {
   const programDir = opts.programDir === null ? null : findProgramDir({ explicit: opts.programDir ?? undefined, repoRoot: REPO_ROOT });
   const workDir = resolve(opts.workDir ?? join(REPO_ROOT, 'test-output', 'corpus'));
   const derivedMode = opts.derived ?? 'auto';
-  if (derivedMode === true && !programDir) throw new Error('LibreOffice not found: set VARAK_ENGINE_DIR or run npm run engine:fetch (or use --no-derived)');
+  if (derivedMode === true && !programDir) throw new Error('LibreOffice not found: set SIMPAPER_ENGINE_DIR or run npm run engine:fetch (or use --no-derived)');
   mkdirSync(outDir, { recursive: true });
 
   const fontPath = findUnicodeFont({ repoRoot: REPO_ROOT, programDir });
@@ -113,7 +113,7 @@ export async function generateCorpus(opts = {}) {
       add({ id: spec.id, path: spec.file, format: spec.format, kind: files.find((f) => f.id === spec.from).kind, origin: 'derived', derivedFrom: spec.from, target: spec.target, locale: spec.locale, deterministic: false, features: spec.features });
     }
   } else if (derivedMode === 'auto') {
-    log('LibreOffice not found: derived formats skipped (set VARAK_ENGINE_DIR or run npm run engine:fetch)');
+    log('LibreOffice not found: derived formats skipped (set SIMPAPER_ENGINE_DIR or run npm run engine:fetch)');
   }
 
   const manifest = {

@@ -39,12 +39,12 @@ describe('descendantsLeavesFirst', () => {
 
   it('neither returns nor walks children rejected by the filter', () => {
     const entries = [
-      p(200, 1, 1, 'C:\\Varak\\engine\\program\\soffice.exe'),
-      p(300, 200, 2, 'C:\\Varak\\engine\\program\\soffice.bin'),
+      p(200, 1, 1, 'C:\\Simpaper\\engine\\program\\soffice.exe'),
+      p(300, 200, 2, 'C:\\Simpaper\\engine\\program\\soffice.bin'),
       p(310, 300, 3, 'C:\\Program Files\\Browser\\browser.exe'), // opened from a hyperlink
       p(320, 310, 4, 'C:\\Program Files\\Browser\\browser.exe'),
     ];
-    const accept = (e: ProcessEntry) => isPathInside(e.imagePath, 'C:\\Varak\\engine\\program');
+    const accept = (e: ProcessEntry) => isPathInside(e.imagePath, 'C:\\Simpaper\\engine\\program');
     expect(descendantsLeavesFirst(200, entries, { accept }).map((e) => e.pid)).toEqual([300]);
   });
 
@@ -65,10 +65,10 @@ describe('descendantsLeavesFirst', () => {
 
 describe('isPathInside', () => {
   it('compares directories case-insensitively and separator-agnostically', () => {
-    expect(isPathInside('C:\\Varak\\Engine\\program\\soffice.bin', 'c:/varak/engine/program')).toBe(true);
-    expect(isPathInside('C:\\Varak\\engine\\program\\python-core-3.13.15\\bin\\python.exe', 'C:\\Varak\\engine\\program\\')).toBe(true);
-    expect(isPathInside('C:\\Varak\\engine\\programs\\x.exe', 'C:\\Varak\\engine\\program')).toBe(false);
-    expect(isPathInside('C:\\Varak\\engine\\program', 'C:\\Varak\\engine\\program')).toBe(false);
+    expect(isPathInside('C:\\Simpaper\\Engine\\program\\soffice.bin', 'c:/simpaper/engine/program')).toBe(true);
+    expect(isPathInside('C:\\Simpaper\\engine\\program\\python-core-3.13.15\\bin\\python.exe', 'C:\\Simpaper\\engine\\program\\')).toBe(true);
+    expect(isPathInside('C:\\Simpaper\\engine\\programs\\x.exe', 'C:\\Simpaper\\engine\\program')).toBe(false);
+    expect(isPathInside('C:\\Simpaper\\engine\\program', 'C:\\Simpaper\\engine\\program')).toBe(false);
     expect(isPathInside(undefined, 'C:\\x')).toBe(false);
     expect(isPathInside('C:\\x\\y.exe', '')).toBe(false);
   });

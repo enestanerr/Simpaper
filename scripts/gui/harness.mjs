@@ -48,7 +48,7 @@ export class Session {
   }
 
   /**
-   * Captures Varak's visible window frame into `dir/name.png`, 1 px inside it: the 1 px window border lets the
+   * Captures Simpaper's visible window frame into `dir/name.png`, 1 px inside it: the 1 px window border lets the
    * desktop behind the window show through.
    */
   async shot(dir, name) {
@@ -87,10 +87,10 @@ export class Session {
     return r && { x: Math.round(o.x + r.x), y: Math.round(o.y + r.y), width: Math.round(r.width), height: Math.round(r.height) };
   }
 
-  /** Real input only while Varak is the foreground window. */
+  /** Real input only while Simpaper is the foreground window. */
   assertForeground() {
     const fg = W.foreground();
-    if (fg !== this.appHwnd && W.windowInfo(fg).owner !== this.appHwnd) throw new Error(`foreground is not Varak (${JSON.stringify(W.windowRef(fg))})`);
+    if (fg !== this.appHwnd && W.windowInfo(fg).owner !== this.appHwnd) throw new Error(`foreground is not Simpaper (${JSON.stringify(W.windowRef(fg))})`);
   }
 
   async clickInDocument(fx = 0.5, fy = 0.35) {
@@ -115,11 +115,11 @@ export class Session {
     }
   }
 
-  /** Waits until Varak's window answers again; throws when it stays hung. */
+  /** Waits until Simpaper's window answers again; throws when it stays hung. */
   async alive(step, graceMs = 8000) {
     const until = Date.now() + graceMs;
     while (W.isHung(this.appHwnd)) {
-      if (Date.now() > until) throw new Error(`Varak stopped responding after: ${step}`);
+      if (Date.now() > until) throw new Error(`Simpaper stopped responding after: ${step}`);
       await sleep(500);
     }
   }
@@ -143,11 +143,11 @@ export class Session {
  * Starts the packaged app with an isolated data folder (`out/data`) and the given settings, places its window at
  * 60,40 with 1600 × 1000 and connects to its renderer.
  */
-export async function launchVarak({ out, port, settings, files = [], exe = 'release/win-unpacked/Varak.exe', tag = 'gui' }) {
+export async function launchSimpaper({ out, port, settings, files = [], exe = 'release/win-unpacked/Simpaper.exe', tag = 'gui' }) {
   const dataDir = join(out, 'data');
-  mkdirSync(join(dataDir, 'Varak'), { recursive: true });
-  writeFileSync(join(dataDir, 'Varak', 'settings.json'), JSON.stringify(settings));
-  const env = { ...process.env, VARAK_DATA_DIR: dataDir, VARAK_DEBUG: '1' };
+  mkdirSync(join(dataDir, 'Simpaper'), { recursive: true });
+  writeFileSync(join(dataDir, 'Simpaper', 'settings.json'), JSON.stringify(settings));
+  const env = { ...process.env, SIMPAPER_DATA_DIR: dataDir, SIMPAPER_DEBUG: '1' };
   delete env.ELECTRON_RUN_AS_NODE;
   const app = spawn(resolve(repo, exe), [`--remote-debugging-port=${port}`, ...files], { env, stdio: 'ignore' });
   let appHwnd = 0;
@@ -162,7 +162,7 @@ export async function launchVarak({ out, port, settings, files = [], exe = 'rele
     } catch {
       // gone
     }
-    throw new Error('the Varak window did not appear');
+    throw new Error('the Simpaper window did not appear');
   }
   W.setWindowRect(appHwnd, 60, 40, 1600, 1000);
   const cdp = await Cdp.connect(port);

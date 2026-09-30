@@ -5,7 +5,7 @@
     "risk": "Kayıp riski"
   },
   "finding": {
-    "macros": "Makro (VBA) içeriyor. Varak makroları hiçbir zaman çalıştırmaz. Makrolar yalnızca makro destekli bir biçimde (DOCM, XLSM, PPTM) kaydedilirse korunur; Excel makroları kaydederken yeniden oluşturulur ve imzalarını kaybeder.",
+    "macros": "Makro (VBA) içeriyor. Simpaper makroları hiçbir zaman çalıştırmaz. Makrolar yalnızca makro destekli bir biçimde (DOCM, XLSM, PPTM) kaydedilirse korunur; Excel makroları kaydederken yeniden oluşturulur ve imzalarını kaybeder.",
     "activeX": "ActiveX denetimleri içeriyor. Word ve Excel dosyalarında form denetimlerine dönüştürülür; PowerPoint dosyalarında kaydederken kaybolur.",
     "embeddedObjects": "Gömülü nesneler (OLE) içeriyor. Office nesneleri korunur; Visio ve PDF nesneleri çizime dönüştürülür ve artık özgün uygulamalarında düzenlenemez.",
     "smartArt": "SmartArt grafikleri içeriyor. Görünümleri korunur ancak düzenlenemezler; bazı SmartArt grafikleri kaydettikten sonra farklı görünebilir.",

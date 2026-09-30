@@ -72,7 +72,7 @@ describe('DocumentService — open / edit / save', () => {
     expect((await readFile(copyPath)).subarray(0, 2).toString()).toBe('PK');
     const store = inst.callsOf('doc.store')[0]?.params ?? {};
     expect(store['filter']).toBe('MS Word 2007 XML');
-    expect(String(store['url'])).toMatch(/\/\.%7Evarak-[0-9a-f]{12}-Rapor%20\(kopya\)\.docx\.tmp$/);
+    expect(String(store['url'])).toMatch(/\/\.%7Esimpaper-[0-9a-f]{12}-Rapor%20\(kopya\)\.docx\.tmp$/);
     expect(h.service.get(doc.docId)?.descriptor).toMatchObject({ path: copyPath, title: 'Rapor (kopya).docx', modified: false });
     // The engine clears its modified flag in the store job (markSaved); nothing forces it afterwards.
     expect(store['markSaved']).toBe(true);
@@ -167,7 +167,7 @@ describe('DocumentService — open / edit / save', () => {
     const failed = await h.service.save(doc.docId);
     expect(failed).toMatchObject({ outcome: 'failed', errorKey: 'errors.save.verifyFailed' });
     expect(Buffer.compare(await readFile(src), original)).toBe(0);
-    expect((await readdir(h.docsDir)).filter((n) => n.startsWith('.~varak'))).toEqual([]);
+    expect((await readdir(h.docsDir)).filter((n) => n.startsWith('.~simpaper'))).toEqual([]);
   });
 
   it('maps engine store failures to a key and keeps the original', async () => {

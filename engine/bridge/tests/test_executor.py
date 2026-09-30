@@ -1,14 +1,14 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-"""Main-thread marshalling (varak_bridge.office.MainThreadExecutor) with a fake AsyncCallback."""
+"""Main-thread marshalling (simpaper_bridge.office.MainThreadExecutor) with a fake AsyncCallback."""
 import threading
 import time
 import unittest
 
-from varak_bridge.errors import RpcError
-from varak_bridge.office import MainThreadExecutor
-from varak_bridge.protocol import ErrorCode
+from simpaper_bridge.errors import RpcError
+from simpaper_bridge.office import MainThreadExecutor
+from simpaper_bridge.protocol import ErrorCode
 
 
 class FakeAsyncCallback:

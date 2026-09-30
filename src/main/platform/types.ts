@@ -81,7 +81,7 @@ export interface Platform {
    */
   allowForeground(pid: number): void;
   /**
-   * Gives the keyboard focus to `win` itself (Varak's own controls) when a LibreOffice window inside it has it:
+   * Gives the keyboard focus to `win` itself (Simpaper's own controls) when a LibreOffice window inside it has it:
    * Windows leaves it there when the user clicks the web content. Resolves true when it was taken from a
    * LibreOffice window; left alone (false) for LibreOffice dialogs and for a window that does not answer.
    */

@@ -2,7 +2,7 @@
 
 Real screenshots of the running application, captured as described in [docs/DEMO.md](../DEMO.md) with
 `node scripts/gui/screenshots.mjs` (packaged app, window 1600 × 1000 at 100 % scaling, light theme unless noted,
-sample documents from `tests/corpus/generated/` copied to `C:\Users\Public\Documents`). Only Varak's own window is
+sample documents from `tests/corpus/generated/` copied to `C:\Users\Public\Documents`). Only Simpaper's own window is
 captured, and every image was reviewed before it was added. No image in this repository is a mock-up or retouched.
 
 | File | Content | Language | Captured on | Build | Windows |

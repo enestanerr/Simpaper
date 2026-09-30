@@ -206,7 +206,7 @@ export class PdfController {
     if (!this.#worker) {
       const port = createWorkerPort();
       // The typings declare `port`/`name` as null-only (JSDoc defaults); any MessagePort-like object is accepted.
-      const options = { port, name: `varak-pdf-${this.docId}` } as unknown as ConstructorParameters<typeof pdfjsLib.PDFWorker>[0];
+      const options = { port, name: `simpaper-pdf-${this.docId}` } as unknown as ConstructorParameters<typeof pdfjsLib.PDFWorker>[0];
       const pdf = new pdfjsLib.PDFWorker(options);
       this.#worker = { port, pdf };
     }
@@ -775,7 +775,7 @@ export class PdfController {
   // ------------------------------------------------------------------ forms
 
   setFieldHighlight(on: boolean): void {
-    this.#container.classList.toggle('varak-pdf-fields-plain', !on);
+    this.#container.classList.toggle('simpaper-pdf-fields-plain', !on);
     patchDoc(this.docId, { highlightFields: on });
   }
 

@@ -12,7 +12,7 @@ session 2: the default **child** hosting mode passes; the **owned** mode is kept
 installed the 0.1.0 installer on this PC and used it (per user, no administrator rights). What still needs a person
 at the screen is listed under "Not verified yet".
 
-The repository's home is https://github.com/enestanerr/varak (**private**, branch `main`; the local remote `origin`
+The repository's home is https://github.com/ncreativestudios/Simpaper (**private**, branch `main`; the local remote `origin`
 points there). Making it public is the owner's decision; what has to come first is listed under "Maintainer TODOs"
 in [dev/repo.md](dev/repo.md).
 
@@ -22,7 +22,7 @@ in [dev/repo.md](dev/repo.md).
 |---|---|---|
 | Engine | Python UNO bridge on LibreOffice's bundled Python, NDJSON JSON-RPC, main-thread execution via AsyncCallback, dispatch interception, state/context/selection/dialog events, process-per-document, conversion instance, profile template (macros off, updaters off, Office-like shortcuts) | [dev/engine.md](dev/engine.md) |
 | Main process | Composition root, IPC router with sender/payload validation and a UNO command allow-list, DocumentService (open/new/save/save as/export PDF/print/close), SafeWriter (temp → verify → ReplaceFileW), compatibility analyzer (macros, SmartArt, chartex, pivots, fonts …), save-risk prompt with "save a copy", autosave + crash recovery (also for encrypted documents), hang watchdog with a restart offer in its own message box, settings, logs without document content | [dev/main-core.md](dev/main-core.md) |
-| Windows platform | Child (default) and owned (experimental) hosting of the LibreOffice window, DPI mapping, freeze-frame (PrintWindow), Job Object process guard, hang detector, keyboard focus hand-over between Varak and LibreOffice (`view:focusShell`), optional Alt/F10 keyboard hook | [dev/platform.md](dev/platform.md), [ADR 0003](adr/0003-document-surface.md) |
+| Windows platform | Child (default) and owned (experimental) hosting of the LibreOffice window, DPI mapping, freeze-frame (PrintWindow), Job Object process guard, hang detector, keyboard focus hand-over between Simpaper and LibreOffice (`view:focusShell`), optional Alt/F10 keyboard hook | [dev/platform.md](dev/platform.md), [ADR 0003](adr/0003-document-surface.md) |
 | Renderer | Title bar with QAT, document tabs, start screen, File backstage, ribbons for Writer (202 commands), Calc (225), Impress (164) and PDF, contextual tabs, KeyTips, adaptive ribbon layout, formula bar, status bars with zoom, prompts, message bars, TR/EN (9 namespaces), light/dark/high contrast | [dev/shell-ui.md](dev/shell-ui.md) |
 | PDF | pdf.js 6.3 viewer (thumbnails, zoom, rotate view, Turkish-aware search, text selection), annotation editors, forms, page operations, merge/extract, add text/image as page content (Unicode font), incremental saves, own appearance streams for Turkish FreeText/form values, printing | [dev/pdf.md](dev/pdf.md) |
 | Tests & corpus | Generated DOCX/XLSX/PPTX/PDF corpus + license-clean third-party samples, independent OOXML/VBA/PDF readers, visual regression with documented known changes | [dev/testing-corpus.md](dev/testing-corpus.md) |
@@ -41,12 +41,12 @@ in [dev/repo.md](dev/repo.md).
 ### GUI spike (session 2, 2026-09-29, 100 % scaling)
 
 `node scripts/gui/gui-spike.mjs --view-mode child|owned` drives the packaged app with real mouse and keyboard input
-and the DevTools protocol, checks the saved files independently and takes screenshots (Varak's window only). It
+and the DevTools protocol, checks the saved files independently and takes screenshots (Simpaper's window only). It
 refuses to start unless the PC has been idle for 60 s and never sends input when another window is in front.
 
 - **child:** passed — placement, ribbon Bold, Ctrl+S with the DOCX checked on disk, backstage, a Calc formula typed
   in Turkish syntax (`=TOPLA(1,5;2,25)` → 3,75), a new Impress slide, text and form PDFs, window moves, themes.
-- **owned:** Varak stopped responding ~3 s after the first document appeared (UI thread blocked in
+- **owned:** Simpaper stopped responding ~3 s after the first document appeared (UI thread blocked in
   `NtUserPeekMessage`, soffice idle). Fixed in code (the engine owns the frame before loading into it); the default
   is now **child** ([ADR 0003](adr/0003-document-surface.md), amendment). Settings v2 moves the old default.
 - Found and fixed from the screenshots, then confirmed on screen in the later runs: Impress showed no slide pane
@@ -56,19 +56,19 @@ refuses to start unless the PC has been idle for 60 s and never sends input when
   disk). Keys injected within milliseconds right after a document's first modification are lost inside
   LibreOffice (a harness artefact no keyboard produces; docs/dev/platform.md §10). Separately fixed: `doc.info`
   no longer forces a full Writer layout with a progress bar (Writer ignores keys while a progress runs).
-- Owned mode, second run: Varak stayed responsive, but soffice stopped responding after the first click into the
+- Owned mode, second run: Simpaper stayed responsive, but soffice stopped responding after the first click into the
   document → removed from Options (settings.json only).
 - Later runs (`scripts/gui/screenshots.mjs`, `scripts/gui/checks/`): PDF highlight (Highlight tool, drag) and
   free-text note saved and read back with pdf-lib; closing the window with unsaved changes asks once per document and
   "Don't save" leaves the files untouched; KeyTips appear on Alt; the loss warning appears for Ctrl+S on a .doc.
   Found and fixed: LibreOffice dialogs opened from the ribbon (Paragraph, Font) came up without the keyboard focus,
-  because soffice is not the foreground process — Varak now calls `AllowSetForegroundWindow` for the engine before
+  because soffice is not the foreground process — Simpaper now calls `AllowSetForegroundWindow` for the engine before
   every command; on screen the dialog then has the focus, a real Esc closes it, and the ribbon is disabled meanwhile.
 - README screenshots (Turkish and English, light theme, plus dark theme) are in `docs/screenshots/`.
 - End of session 2 (`scripts/gui/checks/`, runs 10–13 in [testing/GUI_SPIKE.md](testing/GUI_SPIKE.md)): a background
   document whose engine was killed restarts hidden behind the active one. Found and fixed: (1) after a click into
   the document, keys for the ribbon's text boxes, the File view and prompts went into the document (the keyboard
-  focus stayed in LibreOffice's window) → `view:focusShell`; (2) while an engine hangs, the Varak window gets no
+  focus stayed in LibreOffice's window) → `view:focusShell`; (2) while an engine hangs, the Simpaper window gets no
   mouse or keyboard input (shared input queue), so the bar's "Restart engine" could not be clicked → rescue
   message box without a parent window after 8 s, and a hung engine is killed before its view is detached. Both
   confirmed on screen after the fix.
@@ -94,7 +94,7 @@ Before the first push, five read-only auditors checked the repository, each find
 - **Secrets and personal data** (all tracked files, the whole history, every image and document's metadata): none.
   Removed from the history: the local Obsidian settings in `docs/.obsidian/` (now ignored). Commit author e-mail:
   the GitHub noreply address.
-- **Links:** all operational links point to https://github.com/enestanerr/varak (the `varak-office` organisation of
+- **Links:** all operational links point to https://github.com/ncreativestudios/Simpaper (the `simpaper-office` organisation of
   ADR 0007 does not exist yet); the About page and the external-URL allow-list follow `src/shared/brand.ts`.
 - **Licences:** the notices now include the Apache-2.0 parts of brotli and pdf-lib, the licence files of vendored
   code and MIT texts for packages without one; the installer no longer ships `elevate.exe`, the app no longer ships
@@ -114,7 +114,7 @@ shows it, look for a transient file lock on the working copy.
 
 - **Start-up hang on Turkish Windows (fixed).** LibreOffice's in-process Python (loaded for the Lightproof grammar
   checker when a text document is created) switched the C runtime locale to `Turkish_Türkiye.utf8`; the runtime
-  raised an invalid-parameter error and LibreOffice's crash handler deadlocked. Varak now starts the engine without
+  raised an invalid-parameter error and LibreOffice's crash handler deadlocked. Simpaper now starts the engine without
   the in-process Python loader. Upstream bug, not yet reported to TDF. Details and evidence: [dev/engine.md](dev/engine.md).
 - **Release-after-close crash (fixed in the bridge)** with a release barrier before closing documents.
 - **Chromium ≥ 139 hides GDI child windows** of Electron windows (`WS_EX_NOREDIRECTIONBITMAP`) → owned-overlay
@@ -146,13 +146,13 @@ npm run test:engine         # engine integration tests (headless, no windows)
 node scripts/smoke-boot.mjs # real app with a hidden window
 npm run dev                 # starts the app (opens windows!)
 npm run dist:win            # installer + ZIP in release/
-git log --oneline           # history; remote origin = https://github.com/enestanerr/varak (private)
+git log --oneline           # history; remote origin = https://github.com/ncreativestudios/Simpaper (private)
 ```
 
 Machine notes: C: had about 4.5 GB free at the end of session 2 (a full working copy with a packaged build needs
 about 6 GB; `vendor/downloads` (0.39 GB) can be deleted once the engine is extracted). Editors built on Electron
-(VS Code) export `ELECTRON_RUN_AS_NODE=1`; the npm scripts remove it. The owner's installed Varak uses the normal
-data folders (`%APPDATA%\Varak`, `%LOCALAPPDATA%\Varak`); automated runs always use `VARAK_DATA_DIR` under
+(VS Code) export `ELECTRON_RUN_AS_NODE=1`; the npm scripts remove it. The owner's installed Simpaper uses the normal
+data folders (`%APPDATA%\Simpaper`, `%LOCALAPPDATA%\Simpaper`); automated runs always use `SIMPAPER_DATA_DIR` under
 `test-output/` and never touch them.
 
 ## Next steps

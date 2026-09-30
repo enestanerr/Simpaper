@@ -45,7 +45,7 @@ const [kind, parent] = process.argv.slice(1);
 // No WS_VISIBLE anywhere: these windows are never shown.
 const hwnd = kind === 'child'
   ? CreateWindowExW(0x4 /* WS_EX_NOPARENTNOTIFY */, 'STATIC', '', 0x40000000 | 0x04000000 /* WS_CHILD | WS_CLIPSIBLINGS */, 0, 0, 200, 100, BigInt(parent), null, GetModuleHandleW(null), null)
-  : CreateWindowExW(0x40000 /* WS_EX_APPWINDOW */, 'STATIC', 'Varak platform test', 0x00CF0000 | 0x02000000 /* WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN */, 100, 100, 400, 300, null, null, GetModuleHandleW(null), null);
+  : CreateWindowExW(0x40000 /* WS_EX_APPWINDOW */, 'STATIC', 'Simpaper platform test', 0x00CF0000 | 0x02000000 /* WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN */, 100, 100, 400, 300, null, null, GetModuleHandleW(null), null);
 if (!hwnd) { fs.writeSync(1, 'ERROR\\n'); process.exit(1); }
 fs.writeSync(1, 'HWND ' + BigInt.asUintN(32, BigInt(hwnd)) + '\\n');
 const msg = {};

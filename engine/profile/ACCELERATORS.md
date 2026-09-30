@@ -1,7 +1,7 @@
 # Office-like keyboard shortcuts of the engine
 
 LibreOffice handles the keyboard while a document has the focus, so the shortcuts users know from
-Microsoft Office must be LibreOffice's own accelerators. This file documents the overrides Varak applies
+Microsoft Office must be LibreOffice's own accelerators. This file documents the overrides Simpaper applies
 to the engine profile.
 
 **Source of truth:** [`accelerators.json`](accelerators.json). The tables below are generated from it
@@ -29,9 +29,9 @@ to the engine profile.
    also set in the module keeps the module's new command (Writer's Ctrl+Shift+M is Decrease indent although
    the global `.uno:EditDoc` binding is removed); other modules fall back to their own module binding, if
    any (Impress keeps `.uno:SetDefault` on Ctrl+Shift+M).
-4. File commands that Varak handles itself (`.uno:Save`, `.uno:SaveAs`, `.uno:Open` …) are intercepted by
+4. File commands that Simpaper handles itself (`.uno:Save`, `.uno:SaveAs`, `.uno:Open` …) are intercepted by
    the bridge's dispatch interceptor (`INTERCEPTED_COMMANDS` in `src/shared/engine-protocol.ts`) and
-   reported as `intercept` events, so F12 opens Varak's Save As, not LibreOffice's. `.uno:Print` is not
+   reported as `intercept` events, so F12 opens Simpaper's Save As, not LibreOffice's. `.uno:Print` is not
    intercepted: office documents are printed by the engine (its print dialog).
 
 Key names are LibreOffice's accelerator names (`framework/source/accelerators/keymapping.cxx`): the key,
@@ -158,11 +158,11 @@ file lists every key of the JSON.
 | global | Ctrl+Shift+M | `M_SHIFT_MOD1` | `.uno:EditDoc` | Toggles read-only mode behind the shell's back (Writer maps the key to Decrease indent). |
 | global | Ctrl+Alt+E | `E_MOD1_MOD2` | `.uno:ExtensionManager` | Opens the extension manager (installs code into the engine). |
 | global | Shift+Esc | `ESCAPE_SHIFT` | `.uno:CommandPopup` | LibreOffice command search built on the hidden menu bar. |
-| global | Alt+1 | `1_MOD2` | `.uno:SidebarDeck.PropertyDeck` | Shows LibreOffice's sidebar, which Varak hides. |
+| global | Alt+1 | `1_MOD2` | `.uno:SidebarDeck.PropertyDeck` | Shows LibreOffice's sidebar, which Simpaper hides. |
 | writer | Ctrl+Shift+J | `J_SHIFT_MOD1` | `.uno:FullScreen` | Full-screen mode of the engine frame breaks the embedded layout. |
 | calc | Ctrl+Shift+J | `J_SHIFT_MOD1` | `.uno:FullScreen` | Full-screen mode of the engine frame breaks the embedded layout. |
-| writer | Ctrl+F5 | `F5_MOD1` | `.uno:Sidebar` | Toggles LibreOffice's sidebar, which Varak hides. |
-| calc | Ctrl+F5 | `F5_MOD1` | `.uno:Sidebar` | Toggles LibreOffice's sidebar, which Varak hides. |
-| impress | Ctrl+F5 | `F5_MOD1` | `.uno:Sidebar` | Toggles LibreOffice's sidebar, which Varak hides. |
+| writer | Ctrl+F5 | `F5_MOD1` | `.uno:Sidebar` | Toggles LibreOffice's sidebar, which Simpaper hides. |
+| calc | Ctrl+F5 | `F5_MOD1` | `.uno:Sidebar` | Toggles LibreOffice's sidebar, which Simpaper hides. |
+| impress | Ctrl+F5 | `F5_MOD1` | `.uno:Sidebar` | Toggles LibreOffice's sidebar, which Simpaper hides. |
 | writer | F11 | `F11` | `.uno:DesignerDialog` | Opens the styles deck of LibreOffice's hidden sidebar. |
 | impress | F11 | `F11` | `.uno:DesignerDialog` | Opens the styles deck of LibreOffice's hidden sidebar. |

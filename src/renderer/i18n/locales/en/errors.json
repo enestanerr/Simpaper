@@ -26,7 +26,7 @@
     "formatNotWritable": "This format cannot be saved. Choose another format.",
     "wrongKind": "This document cannot be saved as the selected file type.",
     "usePdfExport": "Use \"Export as PDF\" to create a PDF.",
-    "targetOpen": "This file is open in another Varak tab. Close that tab first or choose a different name.",
+    "targetOpen": "This file is open in another Simpaper tab. Close that tab first or choose a different name.",
     "notFound": "The document is no longer open.",
     "notReady": "The document is not ready yet. Try again in a few seconds."
   },
@@ -53,8 +53,8 @@
     "restartNotNeeded": "The document engine is running; it does not need to be restarted."
   },
   "command": {
-    "unavailable": "This command is not available in Varak.",
-    "macrosDisabled": "For your security, Varak never runs macros.",
+    "unavailable": "This command is not available in Simpaper.",
+    "macrosDisabled": "For your security, Simpaper never runs macros.",
     "notAllowed": "This command is not allowed.",
     "remoteUnsupported": "Remote files are not supported. Save the file to your computer and open it."
   },

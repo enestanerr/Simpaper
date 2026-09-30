@@ -9,7 +9,7 @@
 
 ## Context
 
-Varak must open, edit and save real DOCX, XLSX and PPTX files offline, without paid APIs or accounts.
+Simpaper must open, edit and save real DOCX, XLSX and PPTX files offline, without paid APIs or accounts.
 The project priorities are, in order: (1) real editing and file compatibility, (2) stability and data
 integrity, (3) distributability and license compliance, (4) user experience and performance, (5) ease of
 development.
@@ -44,13 +44,13 @@ Findings from the research (September 2026):
    headless instance for conversions, PDF export and save verification. Every instance has its own user
    profile and a random named pipe; no TCP listener is ever opened. Processes are tied to the app with a
    Windows Job Object.
-3. Control path: the bridge (`engine/bridge/varak_bridge`) runs on LibreOffice's bundled Python and talks
+3. Control path: the bridge (`engine/bridge/simpaper_bridge`) runs on LibreOffice's bundled Python and talks
    UNO to its `soffice.bin` over the named pipe; the Electron main process talks to the bridge with
    newline-delimited JSON-RPC over stdio (`src/shared/engine-protocol.ts`). UNO calls that touch documents
    or views are marshalled to LibreOffice's main thread.
 4. Engine profiles are pre-seeded (`engine/profile`): macro execution disabled, VBA kept, update checks and
    the MAR updater off, first-start and donation dialogs off, crash-report dialog off, "keep format"
-   warning off (Varak shows its own loss-risk warning, see [ADR 0005](0005-data-integrity.md)).
+   warning off (Simpaper shows its own loss-risk warning, see [ADR 0005](0005-data-integrity.md)).
 5. Save and export always pass an explicit filter name; the filter used at load time is reused to keep the
    OOXML flavour (ECMA vs ISO) of the original file (`src/shared/formats.ts`).
 6. Engine updates follow the 26.8 bug-fix releases: a new version is pinned by URL and hash, verified,

@@ -21,7 +21,7 @@ export default defineConfig({
       {
         resolve: { alias },
         test: {
-          // Real LibreOffice engine, headless (no windows). Needs vendor/libreoffice or VARAK_ENGINE_DIR.
+          // Real LibreOffice engine, headless (no windows). Needs vendor/libreoffice or SIMPAPER_ENGINE_DIR.
           name: 'engine',
           include: ['tests/engine/**/*.test.ts'],
           environment: 'node',

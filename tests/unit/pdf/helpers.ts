@@ -256,7 +256,7 @@ export class FakeDialogs {
   }
 }
 
-export async function makeTempDir(prefix = 'varak-pdf-test-'): Promise<{ dir: string; cleanup: () => Promise<void> }> {
+export async function makeTempDir(prefix = 'simpaper-pdf-test-'): Promise<{ dir: string; cleanup: () => Promise<void> }> {
   const base = join(REPO_ROOT, 'test-output', 'pdf');
   await mkdir(base, { recursive: true });
   const dir = await mkdtemp(join(base, prefix));

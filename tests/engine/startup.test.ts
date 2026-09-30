@@ -5,7 +5,7 @@
  * the fix: soffice.bin never loads an embedded Python interpreter (python313.dll).
  *
  * The short version (3 sessions) always runs. The long loop (a fresh profile plus 10 reused sessions for
- * each module order, ~35 sessions) runs with VARAK_ENGINE_LONG=1.
+ * each module order, ~35 sessions) runs with SIMPAPER_ENGINE_LONG=1.
  */
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -14,8 +14,8 @@ import type { OfficeKind } from '@shared/modules';
 import type { EngineInstance, EngineManager } from '../../src/main/engine/types';
 import { crashDumps, engineAvailable, isModuleLoaded, makeManager, OUT, PROFILES } from './helpers';
 
-const LONG = process.env['VARAK_ENGINE_LONG'] === '1';
-const LONG_SESSIONS = Number(process.env['VARAK_ENGINE_LONG_SESSIONS'] ?? 10);
+const LONG = process.env['SIMPAPER_ENGINE_LONG'] === '1';
+const LONG_SESSIONS = Number(process.env['SIMPAPER_ENGINE_LONG_SESSIONS'] ?? 10);
 /** A healthy engine creates a document in well under a second; a hang never ends. */
 const DOC_TIMEOUT_MS = 60_000;
 
@@ -127,7 +127,7 @@ describe.skipIf(!engineAvailable)('engine start-up (regression: no hang in fresh
   });
 });
 
-describe.skipIf(!engineAvailable || !LONG)(`engine start-up loop (VARAK_ENGINE_LONG=1, ${LONG_SESSIONS} reused sessions per order)`, () => {
+describe.skipIf(!engineAvailable || !LONG)(`engine start-up loop (SIMPAPER_ENGINE_LONG=1, ${LONG_SESSIONS} reused sessions per order)`, () => {
   for (const [name, order] of Object.entries(ORDERS)) {
     it(
       `${name}: fresh profile, then ${LONG_SESSIONS} sessions on the reused profile`,

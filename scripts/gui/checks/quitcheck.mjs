@@ -1,9 +1,9 @@
 // On-screen check: PDF highlight by dragging with the Highlight tool (saved and read back), then closing the window
-// with unsaved changes in a PDF and a Writer document — does Varak ask before discarding them?
+// with unsaved changes in a PDF and a Writer document — does Simpaper ask before discarding them?
 import { copyFileSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { PDFDocument, PDFName } from '@cantoo/pdf-lib';
-import { launchVarak, repo, requireIdle, settingsPreset, sleep } from '../harness.mjs';
+import { launchSimpaper, repo, requireIdle, settingsPreset, sleep } from '../harness.mjs';
 
 requireIdle(60_000, 'quit');
 const out = join(repo, 'test-output/gui/quitcheck');
@@ -21,7 +21,7 @@ const subtypes = async (path) => {
   return annots ? annots.asArray().map((ref) => pdf.context.lookup(ref).get(PDFName.of('Subtype'))?.toString()) : [];
 };
 const report = {};
-const s = await launchVarak({ out, port: 9350, settings: settingsPreset({ language: 'tr', theme: 'light' }), tag: 'quit' });
+const s = await launchSimpaper({ out, port: 9350, settings: settingsPreset({ language: 'tr', theme: 'light' }), tag: 'quit' });
 try {
   const pdf = await s.open(pdfPath, 'pdf');
   await sleep(2500);

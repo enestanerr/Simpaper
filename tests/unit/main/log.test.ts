@@ -39,8 +39,8 @@ describe('log', () => {
     for (let i = 0; i < 400; i++) sink.sink('info', 'test', `message ${i} ${'y'.repeat(40)}`);
     sink.close();
     const files = (await readdir(dir)).sort();
-    expect(files).toEqual(['varak.1.log', 'varak.2.log', 'varak.log']);
-    const current = await readFile(join(dir, 'varak.log'), 'utf8');
+    expect(files).toEqual(['simpaper.1.log', 'simpaper.2.log', 'simpaper.log']);
+    const current = await readFile(join(dir, 'simpaper.log'), 'utf8');
     expect(current).toContain('message 399');
     expect(Buffer.byteLength(current)).toBeLessThanOrEqual(4096);
   });

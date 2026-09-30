@@ -11,7 +11,7 @@ const externalReq = obj({ url: req(str({ min: 8, max: 2048 })) });
  * `engine.programDir` names the folder soffice.exe and python.exe are started from, so it is read-only over IPC:
  * the renderer is untrusted and must never choose executables. The unchanged value is accepted because the shell
  * sends the whole `engine` group back when it changes `viewMode`. The folder can only be set in settings.json
- * (or with VARAK_ENGINE_DIR) and takes effect at the next start.
+ * (or with SIMPAPER_ENGINE_DIR) and takes effect at the next start.
  */
 export function assertProgramDirUnchanged(patch: unknown, current: string): void {
   if (!isRecord(patch)) return; // the settings store rejects it

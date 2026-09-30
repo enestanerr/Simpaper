@@ -27,13 +27,13 @@ const EXE = IS_WINDOWS ? 'soffice.exe' : 'soffice';
 export const DEFAULT_TIMEOUT_MS = 180_000;
 
 /**
- * Locates LibreOffice's `program` directory: explicit argument, then VARAK_ENGINE_DIR (program dir or
+ * Locates LibreOffice's `program` directory: explicit argument, then SIMPAPER_ENGINE_DIR (program dir or
  * installation root), then `<repoRoot>/vendor/libreoffice/program`. Returns null when none contains soffice.
  */
 export function findProgramDir({ explicit, repoRoot, env = process.env } = {}) {
   const candidates = [];
   if (explicit) candidates.push(explicit);
-  if (env.VARAK_ENGINE_DIR) candidates.push(env.VARAK_ENGINE_DIR, join(env.VARAK_ENGINE_DIR, 'program'));
+  if (env.SIMPAPER_ENGINE_DIR) candidates.push(env.SIMPAPER_ENGINE_DIR, join(env.SIMPAPER_ENGINE_DIR, 'program'));
   if (repoRoot) candidates.push(join(repoRoot, 'vendor', 'libreoffice', 'program'));
   for (const dir of candidates) {
     const abs = resolve(dir);

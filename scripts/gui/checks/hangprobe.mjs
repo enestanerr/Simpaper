@@ -1,13 +1,13 @@
 // On-screen probe (opens windows and sends real input: only with the owner's permission, on an idle PC).
 // The engine of the active document hangs (soffice.bin suspended) while its view has the keyboard focus.
-// 1. Does a real click on "Motoru yeniden başlat" in the message bar reach Varak?
-// 2. If not: does detaching the input queues (AttachThreadInput(varak UI thread, engine UI thread, FALSE)) help?
-// Only this script's own Varak instance (isolated data folder) and its engine are touched.
+// 1. Does a real click on "Motoru yeniden başlat" in the message bar reach Simpaper?
+// 2. If not: does detaching the input queues (AttachThreadInput(simpaper UI thread, engine UI thread, FALSE)) help?
+// Only this script's own Simpaper instance (isolated data folder) and its engine are touched.
 import { copyFileSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import koffi from 'koffi';
 import * as W from '../win32.mjs';
-import { launchVarak, repo, requireIdle, settingsPreset, sleep } from '../harness.mjs';
+import { launchSimpaper, repo, requireIdle, settingsPreset, sleep } from '../harness.mjs';
 
 requireIdle(60_000, 'probe');
 const detachFirst = process.argv.includes('--detach-first');
@@ -56,7 +56,7 @@ const shots = join(out, 'shots');
 const docx = join(out, 'files', 'Kilit.docx');
 copyFileSync(join(repo, 'tests/corpus/generated/docx-basic.docx'), docx);
 const report = { detachFirst };
-const s = await launchVarak({ out, port: 9370, settings: settingsPreset({ language: 'tr', theme: 'light' }), tag: 'probe' });
+const s = await launchSimpaper({ out, port: 9370, settings: settingsPreset({ language: 'tr', theme: 'light' }), tag: 'probe' });
 
 const images = new Map();
 const isEngine = (pid) => {
@@ -109,8 +109,8 @@ try {
   if (!view) throw new Error('no visible engine view');
   const pid = view.pid;
   const engineTid = GetWindowThreadProcessId(view.hwnd, [0]);
-  const varakTid = GetWindowThreadProcessId(s.appHwnd, [0]);
-  Object.assign(report, { pid, engineTid, varakTid });
+  const simpaperTid = GetWindowThreadProcessId(s.appHwnd, [0]);
+  Object.assign(report, { pid, engineTid, simpaperTid });
   await s.clickInDocument(0.5, 0.3);
   await s.typeHuman('ab');
   await sleep(600);
@@ -119,7 +119,7 @@ try {
   report.busy = Boolean(await waitFor(async () => (await within(s.docs(), 2000, [])).find((d) => d.docId === doc.docId && d.state === 'busy'), 25_000, 500));
   await s.shot(shots, '1-hang-bar');
   if (detachFirst) {
-    report.detach = { ok: AttachThreadInput(varakTid, engineTid, false), error: GetLastError() };
+    report.detach = { ok: AttachThreadInput(simpaperTid, engineTid, false), error: GetLastError() };
     s.log('detached input queues', report.detach);
     await sleep(300);
   }
@@ -127,7 +127,7 @@ try {
   report.firstClick = { engineEnded: Boolean(await waitFor(() => !processAlive(pid), 8000, 250)) };
   s.log('first click', report.firstClick);
   if (!report.firstClick.engineEnded && !detachFirst) {
-    report.detach = { ok: AttachThreadInput(varakTid, engineTid, false), error: GetLastError() };
+    report.detach = { ok: AttachThreadInput(simpaperTid, engineTid, false), error: GetLastError() };
     s.log('detached input queues', report.detach);
     await sleep(500);
     report.afterDetach = { engineEnded: Boolean(await waitFor(() => !processAlive(pid), 4000, 250)) };

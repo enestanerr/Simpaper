@@ -63,7 +63,7 @@ class ChunkBoundary extends Component<{ docId: string; children: ReactNode }, { 
 
   override componentDidCatch(error: unknown, info: ErrorInfo): void {
     // No document content here: the error comes from loading program code.
-    console.error('[varak] PDF workspace failed to load', error instanceof Error ? error.message : error, info.componentStack);
+    console.error('[simpaper] PDF workspace failed to load', error instanceof Error ? error.message : error, info.componentStack);
   }
 
   override render(): ReactNode {

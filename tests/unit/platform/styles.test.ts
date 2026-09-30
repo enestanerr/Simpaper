@@ -53,7 +53,7 @@ describe('owned popup styles', () => {
   });
 
   it('owned styles match the engine bridge (engine/bridge/tests/test_owned.py uses the same vectors)', () => {
-    // The bridge owns the frame before loading (varak_bridge/owned.py); makeOwned then only compares.
+    // The bridge owns the frame before loading (simpaper_bridge/owned.py); makeOwned then only compares.
     const styles: [number, number][] = [
       [0x16cf_0000, 0x9600_0000],
       [0x02cf_0000, 0x8600_0000],

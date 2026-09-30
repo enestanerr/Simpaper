@@ -1,6 +1,6 @@
 # Testing
 
-This document explains how Varak is tested, what the automated tests can and cannot prove, and the rules every
+This document explains how Simpaper is tested, what the automated tests can and cannot prove, and the rules every
 contributor follows when reporting results. The compatibility claims that depend on these tests are in
 [COMPATIBILITY.md](COMPATIBILITY.md).
 
@@ -26,7 +26,7 @@ contributor follows when reporting results. The compatibility claims that depend
 | Lint | `npm run lint` | ESLint rules for TypeScript, React hooks and scripts | — |
 | Types | `npm run typecheck` | Strict TypeScript for the main/preload (`tsconfig.node.json`) and renderer (`tsconfig.web.json`) projects | — |
 | Unit | `npm test` (Vitest project `unit`) | `src/**/*.test.ts(x)` and `tests/unit/**`: services, IPC validation, safe save with fault injection, compatibility analyzer, recovery, settings, ribbon definitions (every control has a real action, i18n keys exist in Turkish and English, KeyTips are unique), PDF logic, platform helpers | — |
-| Engine | `npm run test:engine` (Vitest project `engine`) | `tests/engine/**`: real LibreOffice instances, headless, one at a time: lifecycle, open → edit → save → close → reopen round trips, results checked by the engine **and** by independent parsers | `vendor/libreoffice` (`npm run engine:fetch`) or `VARAK_ENGINE_DIR` pointing to a LibreOffice `program` folder |
+| Engine | `npm run test:engine` (Vitest project `engine`) | `tests/engine/**`: real LibreOffice instances, headless, one at a time: lifecycle, open → edit → save → close → reopen round trips, results checked by the engine **and** by independent parsers | `vendor/libreoffice` (`npm run engine:fetch`) or `SIMPAPER_ENGINE_DIR` pointing to a LibreOffice `program` folder |
 | Bridge (Python) | `vendor/libreoffice/program/python.exe -m unittest discover -s engine/bridge/tests -t engine/bridge` | `engine/bridge/tests`: framing, protocol, values, listeners, documents, owned windows, connection loss with a real URP peer (CI: job `engine-tests`) | `vendor/libreoffice` |
 | Smoke boot | `node scripts/smoke-boot.mjs [--kind calc\|writer\|impress]` | The real app starts with a hidden window and creates, queries and closes a document through the preload bridge | `vendor/libreoffice` |
 | Packaged engine smoke test | `npm run engine:prepare -- --verify` or `node scripts/engine/verify-engine.mjs` | The prepared engine folder converts a Turkish test document to PDF and DOCX headlessly; the text is read back and the bundled fonts are embedded | `vendor/libreoffice` |
@@ -69,7 +69,7 @@ local run of the same commands, stated with its date.
 
 ## What is not verified
 
-- **Microsoft Office:** how Word, Excel and PowerPoint open, lay out or recalculate files saved by Varak; whether
+- **Microsoft Office:** how Word, Excel and PowerPoint open, lay out or recalculate files saved by Simpaper; whether
   Office shows a repair prompt; VBA behaviour; acceptance of passwords and signatures; SmartArt and chart
   appearance. Schema validation and LibreOffice rendering are proxies, not proof.
 - **Display scaling:** 125/150/200 % and mixed-DPI setups (the development machine runs both monitors at 100 %).

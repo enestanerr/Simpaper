@@ -68,7 +68,7 @@ describe('pdf.js saveDocument output', () => {
         pageIndex: 0,
         rect,
         rotation: 0,
-        user: 'Varak',
+        user: 'Simpaper',
       });
       return pdf.saveDocument();
     });

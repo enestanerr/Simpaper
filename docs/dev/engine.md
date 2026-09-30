@@ -1,6 +1,6 @@
 # Engine layer: developer notes
 
-Code: `engine/bridge/varak_bridge` (Python, runs on LibreOffice's bundled interpreter), `engine/profile`
+Code: `engine/bridge/simpaper_bridge` (Python, runs on LibreOffice's bundled interpreter), `engine/profile`
 (profile template, keyboard shortcuts), `src/main/engine` (EngineManager, EngineInstance, RPC client,
 profiles, start-up overrides). Tests: `tests/engine/**` (real headless LibreOffice), `engine/bridge/tests`
 (Python unit tests), `src/main/engine/*.test.ts` (TypeScript unit tests). Diagnostics:
@@ -16,7 +16,7 @@ headless and with hidden views. Visible child views (painting, focus, typing) pa
       harness: `test-output/engine/hang/` (git-ignored: `repro.py`, `acp_repro.py`, `acp_probe*.py`,
       `release_race.py`, `logs/`).
 - [x] Second bug found by the start-up loop: soffice.bin crash "release after close" (§9), fixed in the bridge.
-- [x] Regression test `tests/engine/startup.test.ts` (short version always on; `VARAK_ENGINE_LONG=1` loop).
+- [x] Regression test `tests/engine/startup.test.ts` (short version always on; `SIMPAPER_ENGINE_LONG=1` loop).
 - [x] Platform integration: `ProcessGuard.adopt` after every spawn, `killTree(pid, { imageDir, timeoutMs })`,
       `officePid` for orphans; owned/child view creation verified on a real, never-shown soffice (§10).
 - [x] Integration tests: round trips, formulas tr/en, stale caches, CSV, PDF, password, performance (§12).
@@ -42,17 +42,17 @@ Review 2026-09-29 (notes kept outside the repository, see STATUS.md), engine par
 
 Lead follow-ups 2026-09-29 (after the first GUI spike):
 
-- [x] Owned views are owned **before** the load shows them (§10, `varak_bridge/owned.py`): the GUI spike showed
-      Varak's UI thread hung in `PeekMessage` after the host converted an already shown, foreground frame.
+- [x] Owned views are owned **before** the load shows them (§10, `simpaper_bridge/owned.py`): the GUI spike showed
+      Simpaper's UI thread hung in `PeekMessage` after the host converted an already shown, foreground frame.
       Tests: `engine/bridge/tests/test_owned.py` (style vectors shared with `tests/unit/platform/styles.test.ts`,
       real hidden windows, guard paths, job order; 4 flow tests fail against the old single-job flow),
       `tests/unit/platform/win32-view-ops.test.ts` (makeOwned makes no hide/restyle/owner call on an engine-owned
       frame; fails without the early return), `tests/engine/views.test.ts` (real soffice). On screen (GUI run 4)
-      Varak stayed responsive, but soffice stopped responding after the first click: docs/dev/platform.md §10.
+      Simpaper stayed responsive, but soffice stopped responding after the first click: docs/dev/platform.md §10.
 - [x] Lone UTF-16 surrogates are replaced with U+FFFD right after decoding a request
       (`framing.scrub_surrogates`, §14): `test_framing.py` and `lifecycle.test.ts` 'replaces lone UTF-16
       surrogates…' (fails without the scrub: the connection drops). The lost-connection test now uses the
-      test-only method `debug.dropConnection`, registered only when `VARAK_BRIDGE_TEST_HOOKS=1`.
+      test-only method `debug.dropConnection`, registered only when `SIMPAPER_BRIDGE_TEST_HOOKS=1`.
 - [x] Impress slide pane (missing in the GUI spike): sfx2's work window hides all its child windows while the
       layout manager is invisible (`LayoutManagerListener`, sfx2/source/appl/workwin.cxx), and the slide pane is
       one of them. Impress now keeps the layout manager visible; every toolbar of the module and its status bar
@@ -82,13 +82,13 @@ Lead follow-ups 2026-09-29 (after the first GUI spike):
 | `src/main/engine/rpc.ts` | NDJSON JSON-RPC client (`EngineRpcError`, timeouts, abort, log forwarding) |
 | `src/main/engine/profiles.ts` | profile slots, template rendering, accelerators, crash-dump cleanup |
 | `src/main/engine/locate.ts`, `version.ts`, `fallbackGuard.ts` | engine discovery, PE version read, taskkill guard for tests |
-| `engine/bridge/varak_bridge/main.py`, `server.py`, `framing.py` | entry point, request loop, NDJSON framing |
-| `engine/bridge/varak_bridge/methods.py` | the RPC methods (`EngineMethods` of `src/shared/engine-protocol.ts`) |
-| `engine/bridge/varak_bridge/office.py` | UNO connection, main-thread executor, release barrier |
-| `engine/bridge/varak_bridge/documents.py` | loading into hidden/owned/child views, listeners, two-phase close |
-| `engine/bridge/varak_bridge/listeners.py` | dispatch interceptor, status/modify/close/context/selection/key listeners, interaction handler |
-| `engine/bridge/varak_bridge/ops.py` | Writer/Calc/Impress operations and `doc.info` |
-| `engine/bridge/varak_bridge/values.py`, `errors.py`, `addresses.py`, `keys.py`, `protocol.py` | pure helpers |
+| `engine/bridge/simpaper_bridge/main.py`, `server.py`, `framing.py` | entry point, request loop, NDJSON framing |
+| `engine/bridge/simpaper_bridge/methods.py` | the RPC methods (`EngineMethods` of `src/shared/engine-protocol.ts`) |
+| `engine/bridge/simpaper_bridge/office.py` | UNO connection, main-thread executor, release barrier |
+| `engine/bridge/simpaper_bridge/documents.py` | loading into hidden/owned/child views, listeners, two-phase close |
+| `engine/bridge/simpaper_bridge/listeners.py` | dispatch interceptor, status/modify/close/context/selection/key listeners, interaction handler |
+| `engine/bridge/simpaper_bridge/ops.py` | Writer/Calc/Impress operations and `doc.info` |
+| `engine/bridge/simpaper_bridge/values.py`, `errors.py`, `addresses.py`, `keys.py`, `protocol.py` | pure helpers |
 | `engine/profile/registrymodifications.xcu.template`, `accelerators.json`, `ACCELERATORS.md` | engine profile |
 
 ## 2. Process model and lifecycle
@@ -98,9 +98,9 @@ Lead follow-ups 2026-09-29 (after the first GUI spike):
   save verification). Process trees on Windows: `soffice.exe` (launcher) → `soffice.bin`; `python.exe`
   (launcher) → `python-core-3.13.15/bin/python.exe` (the bridge).
 - **Start** (`OfficeInstance.start`): render the profile slot (§7) → spawn soffice with
-  `-env:UserInstallation=<slot> --accept=pipe,name=varak_<random>;urp;StarOffice.ComponentContext
+  `-env:UserInstallation=<slot> --accept=pipe,name=simpaper_<random>;urp;StarOffice.ComponentContext
   --norestore --nologo --nodefault --nolockcheck --pidfile=<slot>/soffice.pid [--headless]` plus the
-  start-up overrides of §8 → spawn the bridge (`python.exe -m varak_bridge --pipe … --office-pid-file …`)
+  start-up overrides of §8 → spawn the bridge (`python.exe -m simpaper_bridge --pipe … --office-pid-file …`)
   → `engine.hello` (connects to the pipe with retries; returns `officeVersion`, `officePid` = soffice.bin's
   PID from the pid file, `bridgePid`). Two attempts per start; a slot whose soffice exits with 0 during
   start-up (another soffice owns the profile) is retired.
@@ -258,7 +258,7 @@ the bridge uses 120 s per main-thread job and 900 s for load/store/convert.
   A changed **program folder** is applied lazily and never starts an engine by itself: cached paths, start-up
   overrides and probe are dropped, the idle spare and conversion instance (old engine) end, and the new
   folder is used by the next instance a request needs (next document opened or created, next conversion).
-  The folder is meant to come only from `settings.json` / `VARAK_ENGINE_DIR`, read at start-up: the shipped
+  The folder is meant to come only from `settings.json` / `SIMPAPER_ENGINE_DIR`, read at start-up: the shipped
   UI never changes it and the main process is to reject renderer changes (review #2, main-process side), so
   in practice a changed folder takes effect after an explicit restart of the app. This manager rule is the
   defence in depth: a value that still reaches it at runtime never launches a program on its own.
@@ -353,14 +353,14 @@ What is lost: Lightproof grammar checking (English, Hungarian, Portuguese, Russi
 are disabled anyway), mail-merge e-mail and the Python wizards (not exposed). Spell checking (hunspell,
 C++) is unaffected: verified Turkish "merhaba" ✓ / "merhabaa" ✗ / "Çağrı" ✓ and English "hello" ✓ /
 "helo" ✗ with the fix active, and `getAvailableServices(Proofreader, en-US)` is empty instead of Lightproof.
-`VARAK_ENGINE_KEEP_PYTHON=1` restores the upstream behaviour for diagnostics only.
+`SIMPAPER_ENGINE_KEEP_PYTHON=1` restores the upstream behaviour for diagnostics only.
 
 **Proof.** Same harness with the override: 6/6 sessions (fresh + reused, every module first), Writer
 0.14–0.29 s, no `python313.dll` in soffice.bin. Through the product path: `tests/engine/startup.test.ts` with
-`VARAK_ENGINE_LONG=1` — for each module order a fresh profile plus 10 sessions on the reused profile —
+`SIMPAPER_ENGINE_LONG=1` — for each module order a fresh profile plus 10 sessions on the reused profile —
 passed three complete runs (36 sessions each, 108 + 9 short sessions in total), every session asserting that
 soffice.bin has not loaded `python313.dll` (`tasklist /M`), so the regression is caught even on an English
-CI runner. Control: the same short test with `VARAK_ENGINE_KEEP_PYTHON=1` (fix off) fails — `doc.new` of the
+CI runner. Control: the same short test with `SIMPAPER_ENGINE_KEEP_PYTHON=1` (fix off) fails — `doc.new` of the
 first Writer document in the fresh profile times out after 60 s, `engine.shutdown` times out and the
 processes are killed.
 
@@ -404,7 +404,7 @@ long runs). Jobs also no longer let tracebacks carry proxies beyond the job (§4
   `src/main/platform/win32/styles.ts`, then `GWLP_HWNDPARENT` and `SWP_FRAMECHANGED`); the Win32 calls wait for
   soffice's main thread, which would deadlock inside a job, so they run on a helper thread with a 10 s limit.
   A second job loads into the frame; LibreOffice then shows it and brings it to the front itself
-  (`LoadEnv`, `ShowFlags::ForegroundTask`) — as an owned window of Varak. The view host's `makeOwned` finds
+  (`LoadEnv`, `ShowFlags::ForegroundTask`) — as an owned window of Simpaper. The view host's `makeOwned` finds
   nothing to change and only places the window. Before, the host converted the frame after the load, when it
   was already shown and the foreground window; hiding, restyling and owning it from a koffi worker left
   Electron's UI thread hung inside `PeekMessage` while soffice idled in `GetMessage` (GUI spike, stacks in
@@ -452,7 +452,7 @@ vendor\libreoffice\program\python.exe -m unittest discover -s engine/bridge/test
 npx vitest run --project engine tests/engine/startup.test.ts tests/engine/lifecycle.test.ts `
   tests/engine/roundtrip.test.ts tests/engine/calc.test.ts tests/engine/export.test.ts `
   tests/engine/store.test.ts tests/engine/views.test.ts tests/engine/profile.test.ts --silent=false   # real engine (~2 min)
-$env:VARAK_ENGINE_LONG='1'; npx vitest run --project engine tests/engine/startup.test.ts   # loop, ~170 s
+$env:SIMPAPER_ENGINE_LONG='1'; npx vitest run --project engine tests/engine/startup.test.ts   # loop, ~170 s
 ```
 
 The Python suite needs no soffice; `test_connection.py` starts a URP peer in a second bundled-Python
@@ -482,7 +482,7 @@ All suites skip cleanly without an engine and dispose their managers (all proces
   is the §8 deadlock.
 - Crash: soffice.bin exits with code 0 (Breakpad) and leaves `<slot>/crash/*.dmp` until the slot's next start;
   `python tests/engine/diagnostics/minidump.py <dmp> --scan` shows the faulting call chain.
-- More log: `VARAK_TEST_VERBOSE=1` for engine tests; the bridge log level is `info` (`--log-level debug`
+- More log: `SIMPAPER_TEST_VERBOSE=1` for engine tests; the bridge log level is `info` (`--log-level debug`
   when started by hand).
 
 ## 14. Known issues and follow-ups

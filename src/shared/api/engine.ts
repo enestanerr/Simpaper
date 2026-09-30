@@ -31,7 +31,7 @@ export interface EngineChannels {
   'view:setVisible': { req: { docId: string; visible: boolean }; res: void };
   'view:focus': { req: { docId: string }; res: void };
   /**
-   * Varak's own controls need the keyboard (a text box was clicked, a prompt or the File backstage opened): Windows
+   * Simpaper's own controls need the keyboard (a text box was clicked, a prompt or the File backstage opened): Windows
    * leaves the focus in LibreOffice's window when the web content is clicked. True when it was taken from there.
    */
   'view:focusShell': { req: void; res: boolean };

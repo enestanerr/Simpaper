@@ -1,7 +1,7 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-"""Mapping of Python/UNO exceptions to protocol errors (varak_bridge.errors). Needs `uno`, no soffice."""
+"""Mapping of Python/UNO exceptions to protocol errors (simpaper_bridge.errors). Needs `uno`, no soffice."""
 import unittest
 
 import uno  # noqa: F401  (registers the com.sun.star import hook)
@@ -11,8 +11,8 @@ from com.sun.star.io import IOException
 from com.sun.star.lang import DisposedException, IllegalArgumentException
 from com.sun.star.uno import RuntimeException
 
-from varak_bridge.errors import RpcError, detached_error, is_connection_lost, to_error_object, uno_type_name
-from varak_bridge.protocol import ErrorCode
+from simpaper_bridge.errors import RpcError, detached_error, is_connection_lost, to_error_object, uno_type_name
+from simpaper_bridge.protocol import ErrorCode
 
 
 def _raised(exc):

@@ -1,7 +1,7 @@
-// GUI spike (docs/testing/GUI_SPIKE.md): starts the packaged Varak on the visible desktop, drives it with real mouse
+// GUI spike (docs/testing/GUI_SPIKE.md): starts the packaged Simpaper on the visible desktop, drives it with real mouse
 // and keyboard input plus the renderer's DevTools protocol, and records screenshots and measurements.
 // OPENS WINDOWS AND SENDS INPUT — run only with the machine owner's permission, while nobody uses the PC.
-//   node scripts/gui/gui-spike.mjs [--exe release/win-unpacked/Varak.exe] [--out test-output/gui]
+//   node scripts/gui/gui-spike.mjs [--exe release/win-unpacked/Simpaper.exe] [--out test-output/gui]
 import { spawn, execFileSync } from 'node:child_process';
 import { copyFileSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
@@ -14,7 +14,7 @@ const arg = (name, def) => {
   const i = process.argv.indexOf(name);
   return i > 0 ? process.argv[i + 1] : def;
 };
-const exe = resolve(repo, arg('--exe', 'release/win-unpacked/Varak.exe'));
+const exe = resolve(repo, arg('--exe', 'release/win-unpacked/Simpaper.exe'));
 const out = resolve(repo, arg('--out', 'test-output/gui'));
 const PORT = 9333;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -43,7 +43,7 @@ const pptx = doc('Sunu.pptx', 'pptx-basic.pptx');
 const pdfText = doc('Metin.pdf', 'pdf-text.pdf');
 const pdfForm = doc('Form.pdf', 'pdf-form.pdf');
 /** Typed into Writer with real keys (every character exists on a Turkish Q keyboard). */
-const TYPED = 'Varak GUI testi: çğıİöşü ÇĞIİÖŞÜ - klavyeyle yazıldı.';
+const TYPED = 'Simpaper GUI testi: çğıİöşü ÇĞIİÖŞÜ - klavyeyle yazıldı.';
 
 const report = { startedAt: new Date().toISOString(), exe, steps: [] };
 const log = (msg, extra) => {
@@ -52,14 +52,14 @@ const log = (msg, extra) => {
   report.steps.push({ at: new Date().toISOString(), msg, ...(extra ? { extra } : {}) });
 };
 
-const env = { ...process.env, VARAK_DATA_DIR: join(out, 'data'), VARAK_DEBUG: '1' };
+const env = { ...process.env, SIMPAPER_DATA_DIR: join(out, 'data'), SIMPAPER_DEBUG: '1' };
 delete env.ELECTRON_RUN_AS_NODE;
 // Optional hosting mode preset (--view-mode owned|child), written as the isolated profile's settings.
 const viewMode = arg('--view-mode', '');
 if (viewMode) {
-  mkdirSync(join(out, 'data', 'Varak'), { recursive: true });
+  mkdirSync(join(out, 'data', 'Simpaper'), { recursive: true });
   writeFileSync(
-    join(out, 'data', 'Varak', 'settings.json'),
+    join(out, 'data', 'Simpaper', 'settings.json'),
     JSON.stringify({
       version: 2,
       language: 'tr',
@@ -85,7 +85,7 @@ const shot = async (name) => {
   writeFileSync(join(shots, `${name}.png`), W.captureScreen(r));
   log(`screenshot ${name}.png`);
 };
-/** Varak's owned LibreOffice windows (top-level, owner = app window). */
+/** Simpaper's owned LibreOffice windows (top-level, owner = app window). */
 const ownedViews = () => W.topLevelWindows().filter((w) => w.owner === appHwnd && w.visible && w.pid !== app.pid);
 const docs = () => cdp.invoke('documents:list');
 async function waitDoc(pred, what, timeoutMs = 90_000) {
@@ -103,17 +103,17 @@ async function surfaceScreenRect() {
   const o = W.clientOrigin(appHwnd);
   return r && { x: Math.round(o.x + r.x), y: Math.round(o.y + r.y), width: Math.round(r.width), height: Math.round(r.height) };
 }
-/** Real input only while Varak (or one of its document windows) is in the foreground. */
+/** Real input only while Simpaper (or one of its document windows) is in the foreground. */
 function assertForeground() {
   const fg = W.foreground();
   const owned = ownedViews().map((w) => w.hwnd);
-  if (fg !== appHwnd && !owned.includes(fg)) throw new Error(`foreground is not Varak (${JSON.stringify(W.windowRef(fg))})`);
+  if (fg !== appHwnd && !owned.includes(fg)) throw new Error(`foreground is not Simpaper (${JSON.stringify(W.windowRef(fg))})`);
 }
-/** soffice.bin processes that own a top-level window (Varak's engines with a view). */
+/** soffice.bin processes that own a top-level window (Simpaper's engines with a view). */
 const sofficePids = () => [...new Set(W.topLevelWindows().filter((w) => /soffice\.bin$/i.test(W.processImage(w.pid))).map((w) => w.pid))];
 /**
- * Hang watchdog: Windows flags a window whose thread has not pumped messages for 5 s. Waits until Varak's
- * window is responsive again; if it stays hung, dumps the native stacks of Varak and its engines and throws.
+ * Hang watchdog: Windows flags a window whose thread has not pumped messages for 5 s. Waits until Simpaper's
+ * window is responsive again; if it stays hung, dumps the native stacks of Simpaper and its engines and throws.
  */
 async function alive(step, graceMs = 8000) {
   const until = Date.now() + graceMs;
@@ -129,7 +129,7 @@ async function alive(step, graceMs = 8000) {
           report.hang.stacks.push(`${pid}: ${e.message}`);
         }
       }
-      throw new Error(`Varak stopped responding after: ${step}`);
+      throw new Error(`Simpaper stopped responding after: ${step}`);
     }
     await sleep(500);
   }

@@ -1,4 +1,4 @@
-# ADR 0003: Document surface — LibreOffice's editing window hosted in the Varak window
+# ADR 0003: Document surface — LibreOffice's editing window hosted in the Simpaper window
 
 - **Status:** Accepted, amended 2026-09-29 after the first GUI spike: the **child** embedding (in a layered
   container) is the default for M1; the owned overlay is kept as an experimental option (see the amendment
@@ -11,7 +11,7 @@
 ## Context
 
 LibreOffice's editing view is a native Win32 window in another process (`soffice.bin`). It has to appear
-inside the Varak window, exactly in the document area below the ribbon, and follow moves, resizes,
+inside the Simpaper window, exactly in the document area below the ribbon, and follow moves, resizes,
 minimise/maximise and DPI changes.
 
 Findings from the research and from a feasibility prototype (September 2026, LibreOffice 26.2/26.8,
@@ -35,9 +35,9 @@ Electron 44):
 All hosting goes through the `ViewHost` interface (`src/main/platform/types.ts`), implemented for Windows in
 `src/main/platform/win32/`, with three modes (`ViewMode` in `src/shared/engine-protocol.ts`):
 
-1. **`owned` (default):** LibreOffice's frame is a borderless top-level window **owned** by the Varak window
+1. **`owned` (default):** LibreOffice's frame is a borderless top-level window **owned** by the Simpaper window
    and positioned in screen coordinates exactly over the document area. Being a top-level window it has its
-   own redirection surface (visible) and its own DPI context. Varak re-applies the position after every move,
+   own redirection surface (visible) and its own DPI context. Simpaper re-applies the position after every move,
    resize, maximise, restore and DPI change of the host (`syncAll`).
 2. **`child`:** the classic `createSystemChild` `WS_CHILD` embedding, kept for comparison and for hosts that
    do not have the Chromium limitation.
@@ -51,7 +51,7 @@ Supporting rules:
 - **Never block the UI thread:** Win32 calls on LibreOffice windows run asynchronously (koffi `.async` or a
   worker); a watchdog uses `SendMessageTimeout(WM_NULL, SMTO_ABORTIFHUNG)` from a worker thread to detect a
   hung engine (`HangDetector`) and offers recovery.
-- **Commands go through Varak:** file commands (New, Open, Save, Save As, Print, Close, Quit, Options,
+- **Commands go through Simpaper:** file commands (New, Open, Save, Save As, Print, Close, Quit, Options,
   Macros, Help) are intercepted in the engine with a dispatch interceptor and routed to the shell; LibreOffice's
   menus, toolbars and status bar are hidden.
 - **Closing:** documents are closed through UNO before their window is destroyed; closing a document ends its
@@ -84,7 +84,7 @@ Supporting rules:
 
 The GUI spike (`scripts/gui/gui-spike.mjs`, packaged app, real mouse and keyboard, this PC at 100 %) showed:
 
-- **owned:** Varak stopped responding about 3 s after the first Writer document appeared, in the spike and in a
+- **owned:** Simpaper stopped responding about 3 s after the first Writer document appeared, in the spike and in a
   run without any input. Electron's UI thread was blocked inside `NtUserPeekMessage` while soffice's main
   thread idled in `GetMessage` (stacks in `test-output/gui/*-stacks.txt`). At that moment LibreOffice had
   shown the frame and made it the foreground window itself (`LoadEnv`, `ShowFlags::ForegroundTask`), and the
@@ -99,8 +99,8 @@ Decision:
 1. **child is the default** (settings v2 migrates the old default `owned` to `child`). The view mode is read
    once at start-up, because the Chromium switch it needs can only be set then.
 2. **owned is kept for development only.** The first trigger is removed — the engine now owns the frame
-   *before* loading into it, while it is hidden and inactive (`engine/bridge/varak_bridge/owned.py`), so the host
-   never converts a shown or active window (`makeOwned` changes nothing). In the second GUI run Varak stayed
+   *before* loading into it, while it is hidden and inactive (`engine/bridge/simpaper_bridge/owned.py`), so the host
+   never converts a shown or active window (`makeOwned` changes nothing). In the second GUI run Simpaper stayed
    responsive, but **soffice** stopped responding about 4 s after the first click into the document. Owned mode is
    therefore not offered in Options; `settings.json` can still select it for further investigation.
 
@@ -117,10 +117,10 @@ cross-process children, docs/dev/engine.md §10).
 Later runs the same day (runs 10–13 of docs/testing/GUI_SPIKE.md) measured two consequences of the shared input
 queue of the child hosting and changed the code accordingly:
 
-- The keyboard focus stays in the LibreOffice child when the user clicks Varak's web content. The shell now asks
+- The keyboard focus stays in the LibreOffice child when the user clicks Simpaper's web content. The shell now asks
   for it (`view:focusShell`) for its own text boxes, dialogs, the File view and PDFs, and gives it back to the
   document; ribbon tabs and commands leave it in the document as before.
-- While soffice hangs, the Varak window gets no mouse or keyboard input at all (its UI thread keeps running). A hang
+- While soffice hangs, the Simpaper window gets no mouse or keyboard input at all (its UI thread keeps running). A hang
   that lasts 8 s therefore brings a message box without a parent window (its own input queue) that offers to
   restart the engine, and a hung engine is killed before its view is detached. Isolating the input completely
   would need a different surface (for example rendering the document off-screen), which is out of scope for M1.

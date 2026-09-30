@@ -86,7 +86,7 @@ export async function runShellAction(id: string, payload?: unknown, doc: Documen
   }
   const b = BUILTINS[id];
   if (!b) {
-    console.warn(`[varak] unknown shell action ${id}`);
+    console.warn(`[simpaper] unknown shell action ${id}`);
     return;
   }
   if (!b.available(doc)) return;

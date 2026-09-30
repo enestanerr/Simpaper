@@ -1,17 +1,18 @@
 /**
- * Smoke boot (VARAK_SMOKE=1, see testMode.ts and scripts/smoke-boot.mjs): the real app starts with a main
+ * Smoke boot (SIMPAPER_SMOKE=1, see testMode.ts and scripts/smoke-boot.mjs): the real app starts with a main
  * window that is never shown, loads the renderer, and a script drives it through the real preload bridge
- * (`window.varakIpc`, i.e. contextBridge → ipcMain → sender check → validators → services):
+ * (`window.simpaperIpc`, i.e. contextBridge → ipcMain → sender check → validators → services):
  * app:info, app:settings:get, app:window:state, documents:list, documents:create (engine instance with a hidden
  * view), engine:query doc.info, documents:close. Renderer console errors, renderer/preload failures and
  * main-process error log records are collected. The run ends the app through the normal quit flow with exit
  * code 0 (everything passed) or 1, after writing a JSON report.
  *
- * Nothing here runs unless VARAK_SMOKE is set.
+ * Nothing here runs unless SIMPAPER_SMOKE is set.
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import type { BrowserWindow } from 'electron';
+import { BRAND } from '@shared/brand';
 import type { OfficeKind } from '@shared/modules';
 import type { Logger } from '../log';
 import type { SmokeOptions } from './testMode';
@@ -115,7 +116,7 @@ export function startSmoke(deps: SmokeDeps): Promise<SmokeReport> {
 
   /** Calls the IPC bridge exactly like the renderer does. */
   const invoke = async (channel: string, payload?: unknown): Promise<unknown> => {
-    const code = `window.varakIpc.invoke(${JSON.stringify(channel)}, ${payload === undefined ? 'undefined' : JSON.stringify(payload)}).then(
+    const code = `window.simpaperIpc.invoke(${JSON.stringify(channel)}, ${payload === undefined ? 'undefined' : JSON.stringify(payload)}).then(
       (value) => ({ ok: true, value }),
       (error) => ({ ok: false, error: String((error && error.message) || error) }))`;
     const out = (await wc.executeJavaScript(code, false)) as InvokeOutcome;
@@ -126,11 +127,11 @@ export function startSmoke(deps: SmokeDeps): Promise<SmokeReport> {
   const script = async (): Promise<void> => {
     await step('renderer loaded (did-finish-load)', () => Promise.race([loaded, delay(90_000).then(() => Promise.reject(new Error('no did-finish-load within 90 s')))]));
     if (!steps.at(-1)?.ok) return;
-    const bridge = await step('preload bridge (window.varakIpc)', () => wc.executeJavaScript('typeof window.varakIpc', false) as Promise<string>, (t) => (t === 'object' ? null : `typeof window.varakIpc = ${t}`));
+    const bridge = await step('preload bridge (window.simpaperIpc)', () => wc.executeJavaScript('typeof window.simpaperIpc', false) as Promise<string>, (t) => (t === 'object' ? null : `typeof window.simpaperIpc = ${t}`));
     if (bridge === undefined) return;
     await step('app:info', () => invoke('app:info'), (v) => {
       const info = v as { productName?: string; engine?: { available?: boolean; officeVersion?: string | null; error?: string } };
-      if (info.productName !== 'Varak') return `productName ${String(info.productName)}`;
+      if (info.productName !== BRAND.productName) return `productName ${String(info.productName)}`;
       if (!info.engine?.available) return `engine unavailable: ${info.engine?.error ?? 'unknown'}`;
       return null;
     });
@@ -193,9 +194,9 @@ export function startSmoke(deps: SmokeDeps): Promise<SmokeReport> {
     }
     const summary = steps.map((s) => `${s.ok ? 'PASS' : 'FAIL'} ${s.name} (${s.ms} ms)${s.detail ? ` — ${s.detail}` : ''}`).join('\n');
     // stdout is read by scripts/smoke-boot.mjs; this is the only place the app prints on purpose.
-    console.log(`[varak-smoke] ${report.ok ? 'PASSED' : 'FAILED'} in ${report.durationMs} ms\n${summary}`);
-    for (const e of rendererErrors) console.log(`[varak-smoke] renderer error: ${e}`);
-    for (const e of report.mainErrors) console.log(`[varak-smoke] main error: ${e}`);
+    console.log(`[simpaper-smoke] ${report.ok ? 'PASSED' : 'FAILED'} in ${report.durationMs} ms\n${summary}`);
+    for (const e of rendererErrors) console.log(`[simpaper-smoke] renderer error: ${e}`);
+    for (const e of report.mainErrors) console.log(`[simpaper-smoke] main error: ${e}`);
     deps.finish(report.ok ? 0 : 1);
     return report;
   })();

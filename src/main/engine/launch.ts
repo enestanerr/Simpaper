@@ -17,7 +17,7 @@
  *    a later std::locale construction then makes the UCRT raise an invalid parameter inside setlocale and
  *    LibreOffice's crash handler deadlocks on the CRT locale lock: soffice.bin hangs for good.
  *    Our bridge runs in its own python.exe process and is not affected.
- * 2. SAL_DISABLE_OPENCL=1: Varak never uses OpenCL formula offloading; this keeps GPU driver DLLs out of
+ * 2. SAL_DISABLE_OPENCL=1: Simpaper never uses OpenCL formula offloading; this keeps GPU driver DLLs out of
  *    soffice.bin even if the profile setting (UseOpenCL=false) were lost.
  */
 import { readdirSync, readFileSync } from 'node:fs';
@@ -102,8 +102,8 @@ export function servicesWithoutPython(
 /** Computes the overrides for the engine in `programDir` (reads fundamental.ini and lists program/services). */
 export function resolveLaunchOptions(programDir: string, env: NodeJS.ProcessEnv = process.env): EngineLaunchOptions {
   const options: EngineLaunchOptions = { args: [], env: { SAL_DISABLE_OPENCL: '1' }, notes: [] };
-  if (env['VARAK_ENGINE_KEEP_PYTHON'] === '1') {
-    options.notes.push('in-process Python left enabled (VARAK_ENGINE_KEEP_PYTHON=1, diagnostics only)');
+  if (env['SIMPAPER_ENGINE_KEEP_PYTHON'] === '1') {
+    options.notes.push('in-process Python left enabled (SIMPAPER_ENGINE_KEEP_PYTHON=1, diagnostics only)');
     return options;
   }
   let value: string | undefined;

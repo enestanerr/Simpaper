@@ -12,8 +12,8 @@ import { createTaskkillProcessGuard } from '../../src/main/engine/fallbackGuard'
 import type { EngineExitInfo, EngineInstance, EngineManager } from '../../src/main/engine/types';
 import { crashDumps, engineAvailable, EventLog, fileUrl, isProcessAlive, makeManager, outDir, printTimings, timed } from './helpers';
 
-// Bridges started by this file offer the test-only 'debug.dropConnection' (varak_bridge/methods.py).
-process.env['VARAK_BRIDGE_TEST_HOOKS'] = '1';
+// Bridges started by this file offer the test-only 'debug.dropConnection' (simpaper_bridge/methods.py).
+process.env['SIMPAPER_BRIDGE_TEST_HOOKS'] = '1';
 const dropConnection = (instance: EngineInstance): Promise<unknown> =>
   (instance.call as unknown as (method: string, params: object) => Promise<unknown>)('debug.dropConnection', {});
 

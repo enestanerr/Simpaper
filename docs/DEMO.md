@@ -21,8 +21,8 @@ explains how to capture them and how to name the files in [`docs/screenshots/`](
 
 `node scripts/gui/screenshots.mjs --lang both` produces every required shot below from the packaged app
 (`release/win-unpacked`): light theme, window 1600 × 1000, the corpus documents copied to
-`%PUBLIC%\Documents\Varak Örnekleri` / `Varak Samples` (no user name in any path; the folder is removed
-afterwards), an isolated data folder, and captures of Varak's window only, 1 px inside its frame. It also checks on
+`%PUBLIC%\Documents\Simpaper Örnekleri` / `Simpaper Samples` (no user name in any path; the folder is removed
+afterwards), an isolated data folder, and captures of Simpaper's window only, 1 px inside its frame. It also checks on
 screen that the PDF annotations are saved, that KeyTips and a LibreOffice dialog work and that quitting with
 unsaved changes asks first. It opens windows and sends real input, so it refuses to start unless the PC has been
 idle for a minute. The images land in `test-output/screenshots/<lang>/shots/`: look at every one before copying it
@@ -30,7 +30,7 @@ into `docs/screenshots/`.
 
 ## Capturing screenshots by hand
 
-- Use **Snipping Tool → Window mode** (Win+Shift+S, then click the Varak window) so only the Varak window is captured,
+- Use **Snipping Tool → Window mode** (Win+Shift+S, then click the Simpaper window) so only the Simpaper window is captured,
   or Alt+PrtScn.
 - Save as **PNG**. Do not crop into the window chrome and do not retouch content. Resizing the whole image down is
   fine.
@@ -65,7 +65,7 @@ A short (30–60 s) recording showing: opening a DOCX → typing Turkish text an
 formula in an XLSX; adding a slide in a PPTX; highlighting text in a PDF.
 
 - Record with the Snipping Tool's **video** mode (Windows 11) or [ScreenToGif](https://www.screentogif.com/)
-  (open source). Record the Varak window only, at 1600 × 1000, 15 fps is enough.
+  (open source). Record the Simpaper window only, at 1600 × 1000, 15 fps is enough.
 - Export as **MP4** (H.264) for the release page and as an optimised **GIF** (≤ 8 MB, ≤ 960 px wide) for the README.
 - Name the files `demo-v<version>-<lang>.mp4` / `demo-v<version>-<lang>.gif`, for example `demo-v0.1.0-tr.gif`.
 - No audio, no personal data, no notifications.

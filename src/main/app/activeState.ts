@@ -1,7 +1,7 @@
 /**
  * `WindowState` updates for the renderer (`app:windowState`), including `active`: in `owned` mode typing in a
  * document activates the LibreOffice window, so the BrowserWindow reports `blur` although the user is still
- * working in Varak. `ViewHost.isForeground` tells whether the foreground window is ours (the host, one of its
+ * working in Simpaper. `ViewHost.isForeground` tells whether the foreground window is ours (the host, one of its
  * document windows or their dialogs).
  *
  * Windows sends no event to the BrowserWindow when the foreground moves between a document window and another

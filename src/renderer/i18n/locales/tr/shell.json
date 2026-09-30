@@ -91,7 +91,7 @@
     "crashedBody": "Son otomatik kurtarma kopyasından çalışmanızı geri yükleyebilirsiniz. Diğer açık belgeler etkilenmedi.",
     "recover": "Kurtar",
     "closeDocument": "Belgeyi kapat",
-    "moduleLoadFailed": "Bu belge türünü gösteren bileşen yüklenemedi. Varak kurulumu hasar görmüş olabilir; uygulamayı yeniden başlatın veya yeniden kurun."
+    "moduleLoadFailed": "Bu belge türünü gösteren bileşen yüklenemedi. Simpaper kurulumu hasar görmüş olabilir; uygulamayı yeniden başlatın veya yeniden kurun."
   },
   "status": {
     "label": "Durum çubuğu",
@@ -178,7 +178,7 @@
     "intro": "Belgenin bir PDF kopyasını oluşturur; belge değişmez.",
     "options": "Seçenekler",
     "openAfter": "Dışa aktardıktan sonra PDF'yi aç",
-    "openAfterHint": "PDF, Varak'ın PDF modülünde yeni bir sekmede açılır.",
+    "openAfterHint": "PDF, Simpaper'ın PDF modülünde yeni bir sekmede açılır.",
     "tagged": "Etiketli PDF (erişilebilirlik)",
     "taggedHint": "Ekran okuyucular için belge yapısını ekler.",
     "bookmarks": "Başlıklardan yer işaretleri oluştur",
@@ -228,7 +228,7 @@
     "showStatusBar": "Durum çubuğunu göster",
     "ribbonCollapsed": "Şeridi daraltılmış göster (Ctrl+F1)",
     "documentKeyTips": "Belgede çalışırken tuş ipuçları (Alt veya F10) — deneysel",
-    "documentKeyTipsHint": "Belge penceresi etkinken Alt veya F10 tuşuna basınca şerit tuş ipuçları gösterilir. Bunun için Varak öndeyken bir klavye kancası kullanılır; tuşlar hiçbir yere kaydedilmez veya gönderilmez.",
+    "documentKeyTipsHint": "Belge penceresi etkinken Alt veya F10 tuşuna basınca şerit tuş ipuçları gösterilir. Bunun için Simpaper öndeyken bir klavye kancası kullanılır; tuşlar hiçbir yere kaydedilmez veya gönderilmez.",
     "qat": "Hızlı Erişim Araç Çubuğu",
     "qatHint": "Başlık çubuğunda görünecek komutları seçin ve sıralayın.",
     "moveUp": "{{name}} komutunu yukarı taşı",
@@ -236,20 +236,20 @@
   },
   "about": {
     "version": "Sürüm {{version}}",
-    "description": "Varak; belgeler, hesap tabloları, sunular ve PDF dosyaları için açık kaynaklı bir ofis paketidir. Dosyalarınızla çevrimdışı çalışır.",
+    "description": "Simpaper; belgeler, hesap tabloları, sunular ve PDF dosyaları için açık kaynaklı bir ofis paketidir. Dosyalarınızla çevrimdışı çalışır.",
     "engine": "Belge motoru",
     "engineVersion": "LibreOffice {{version}}",
     "engineMissing": "Bulunamadı {{error}}",
     "platform": "Platform",
     "licenseTitle": "Lisans",
-    "license": "Varak, Mozilla Kamu Lisansı 2.0 (MPL-2.0) ile lisanslanmış özgür yazılımdır.",
+    "license": "Simpaper, Mozilla Kamu Lisansı 2.0 (MPL-2.0) ile lisanslanmış özgür yazılımdır.",
     "engineLicense": "Belge motoru değiştirilmeden dağıtılır; kendi lisans metinleri ve bildirimleri kurulumla birlikte gelir.",
     "linkLicense": "MPL-2.0 lisans metni",
     "linkNotices": "Üçüncü taraf bildirimleri",
     "linkEngineSource": "Belge motorunun kaynak kodu",
     "linkRepository": "Proje sayfası",
     "linkIssues": "Sorun bildir",
-    "privacy": "Varak telemetri veya kullanım verisi toplamaz ve dosyalarınızı hiçbir yere göndermez.",
+    "privacy": "Simpaper telemetri veya kullanım verisi toplamaz ve dosyalarınızı hiçbir yere göndermez.",
     "trademarks": "Adı geçen ürün ve biçim adları, sahiplerinin ticari markaları olabilir; yalnızca uyumluluğu belirtmek için kullanılır."
   },
   "messages": {

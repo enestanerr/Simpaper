@@ -5,7 +5,7 @@
     "risk": "Risk of loss"
   },
   "finding": {
-    "macros": "Contains macros (VBA). Varak never runs macros. They are kept only when you save in a macro-enabled format (DOCM, XLSM, PPTM); Excel macros are rebuilt on save and lose their signatures.",
+    "macros": "Contains macros (VBA). Simpaper never runs macros. They are kept only when you save in a macro-enabled format (DOCM, XLSM, PPTM); Excel macros are rebuilt on save and lose their signatures.",
     "activeX": "Contains ActiveX controls. In Word and Excel files they become form controls; in PowerPoint files they are lost when you save.",
     "embeddedObjects": "Contains embedded objects (OLE). Office objects are kept; Visio and PDF objects are converted to drawings and can no longer be edited in their original programs.",
     "smartArt": "Contains SmartArt graphics. They are shown and kept but cannot be edited; some may look different after saving.",

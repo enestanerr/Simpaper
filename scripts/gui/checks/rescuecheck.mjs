@@ -1,15 +1,15 @@
 // On-screen check (opens windows and sends real input: only with the owner's permission, on an idle PC).
 // The engine of the active, changed document hangs (soffice.bin suspended) while its view has the keyboard focus,
-// which holds back input for the Varak window. Expected:
+// which holds back input for the Simpaper window. Expected:
 // 1. a message box of its own offers "Motoru yeniden başlat" / "Bekle" (Bekle focused); choosing restart with real
-//    keys ends the engine, the document comes back from the autosave, and Varak takes input again;
+//    keys ends the engine, the document comes back from the autosave, and Simpaper takes input again;
 // 2. hanging again, the box closes by itself when the engine answers again (resumed without an answer).
-// Only this script's own Varak instance (isolated data folder) and its engines are touched.
+// Only this script's own Simpaper instance (isolated data folder) and its engines are touched.
 import { copyFileSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import koffi from 'koffi';
 import * as W from '../win32.mjs';
-import { launchVarak, repo, requireIdle, settingsPreset, sleep } from '../harness.mjs';
+import { launchSimpaper, repo, requireIdle, settingsPreset, sleep } from '../harness.mjs';
 
 requireIdle(60_000, 'rescue');
 
@@ -56,7 +56,7 @@ const docx = join(out, 'files', 'Kilit.docx');
 copyFileSync(join(repo, 'tests/corpus/generated/docx-basic.docx'), docx);
 const report = {};
 const settings = { ...settingsPreset({ language: 'tr', theme: 'light' }), autosaveMinutes: 1 };
-const s = await launchVarak({ out, port: 9380, settings, tag: 'rescue' });
+const s = await launchSimpaper({ out, port: 9380, settings, tag: 'rescue' });
 
 const images = new Map();
 const isEngine = (pid) => {
@@ -73,7 +73,7 @@ function viewPid() {
   koffi.unregister(cb);
   return hwnds.map((h) => W.windowRef(h)).find((w) => w.pid !== s.app.pid && isEngine(w.pid) && w.visible && w.rect.width > 200)?.pid ?? null;
 }
-/** The rescue box: a visible dialog window (#32770) of Varak's own process without an owner. */
+/** The rescue box: a visible dialog window (#32770) of Simpaper's own process without an owner. */
 const rescueBox = () => W.topLevelWindows().find((w) => w.pid === s.app.pid && w.visible && w.cls === '#32770' && !w.owner) ?? null;
 const within = (p, ms, fallback) => Promise.race([p.catch(() => fallback), sleep(ms).then(() => fallback)]);
 async function waitFor(pred, ms, step = 300) {
@@ -89,7 +89,7 @@ const focusOwner = () => {
   const h = W.keyboardFocus();
   if (!h) return 'none';
   const pid = W.windowInfo(h).pid;
-  return pid === s.app.pid ? 'varak:' + W.windowInfo(h).cls : W.processImage(pid).toLowerCase().endsWith('soffice.bin') ? 'engine' : 'other';
+  return pid === s.app.pid ? 'simpaper:' + W.windowInfo(h).cls : W.processImage(pid).toLowerCase().endsWith('soffice.bin') ? 'engine' : 'other';
 };
 const docState = async (docId) => (await within(s.docs(), 2000, [])).find((d) => d.docId === docId) ?? null;
 function shotOf(win, name) {
@@ -142,9 +142,9 @@ try {
   const pid2 = viewPid();
   report.newEnginePid = pid2;
   report.focusAfterRestore = focusOwner();
-  report.foregroundAfterRestore = W.foreground() === s.appHwnd ? 'varak' : 'other';
+  report.foregroundAfterRestore = W.foreground() === s.appHwnd ? 'simpaper' : 'other';
   await s.shot(shots, '2-restored');
-  // Varak takes input again: the File tab opens the backstage, Esc goes back.
+  // Simpaper takes input again: the File tab opens the backstage, Esc goes back.
   const fileTab = await s.cdp.rectOf('.rb-filetab');
   const o = W.clientOrigin(s.appHwnd);
   W.bringToFront(s.appHwnd);

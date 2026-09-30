@@ -28,9 +28,9 @@ Session 2 (2026-09-29), resuming after the interrupted first pass.
   Authenticode signatures would be replaced and the engine would no longer be byte-identical. Fixed with
   `win.signExecutable: false`; signing is planned outside electron-builder (PACKAGING.md, Signing plan).
 - The dir build check (`test-output/repo/inspect-package.mjs`): 6,713 engine files byte-identical to
-  `vendor/engine-dist`, `resources/bridge` = 15 `varak_bridge` modules only, koffi unpacked and loadable from the
+  `vendor/engine-dist`, `resources/bridge` = 15 `simpaper_bridge` modules only, koffi unpacked and loadable from the
   packaged `app.asar` path (Electron 44.4.5 in node mode, `GetCurrentProcessId` call), fuses as configured,
-  LICENSE.txt + THIRD_PARTY_NOTICES.md next to Varak.exe. The build used the stale `out/` of 00:27 (layout check
+  LICENSE.txt + THIRD_PARTY_NOTICES.md next to Simpaper.exe. The build used the stale `out/` of 00:27 (layout check
   only; the app was not started).
 - Engine fonts in dev mode: the PDF service also searches the admin image's `Fonts/` folder
   (`src/main/app/engineDirs.ts`); only the compatibility font check still reads `share/fonts/truetype` alone
@@ -40,7 +40,7 @@ Session 2 (2026-09-29), resuming after the interrupted first pass.
 ### Maintainer TODOs (need the GitHub repository or a person)
 
 - Replace the e-mail placeholder in `CODE_OF_CONDUCT.md` (Enforcement section).
-- Repository https://github.com/enestanerr/varak (private): enable **Discussions** (issue chooser, feature form and
+- Repository https://github.com/ncreativestudios/Simpaper (private): enable **Discussions** (issue chooser, feature form and
   CONTRIBUTING link to `/discussions`; Settings → General → Features).
 - When the repository is made public (after the trademark search and the GitHub organisation of ADR 0007; a later
   transfer to the organisation keeps the old links working through GitHub's redirects): enable **Private

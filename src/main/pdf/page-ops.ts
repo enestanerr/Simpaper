@@ -12,7 +12,7 @@ import { pruneUnreachable, registerCopiedFields, removePageCompletely } from './
 /** A4 portrait in points, used when there is no neighbour page to copy the size from. */
 export const A4: [number, number] = [595.28, 841.89];
 
-const PRODUCER = 'Varak';
+const PRODUCER = 'Simpaper';
 
 function assertIndex(index: number, count: number, allowEnd = false): void {
   const max = allowEnd ? count : count - 1;

@@ -53,7 +53,7 @@ export interface EngineProbe {
 export interface EngineManagerOptions {
   /** Explicit LibreOffice `program` directory (settings.engine.programDir); empty = auto-detect. */
   programDir?: string;
-  /** Root for engine user profiles, e.g. %LOCALAPPDATA%/Varak/engine. */
+  /** Root for engine user profiles, e.g. %LOCALAPPDATA%/Simpaper/engine. */
   profilesRoot: string;
   /** UI language / document locale / theme applied to new profiles. */
   uiLanguage: 'tr' | 'en';

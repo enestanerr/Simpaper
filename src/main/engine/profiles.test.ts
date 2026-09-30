@@ -114,7 +114,7 @@ describe('ProfileStore', () => {
   });
 
   it('prepares a slot: fresh configuration, no stale pid file, no crash dumps', async () => {
-    const root = mkdtempSync(join(tmpdir(), 'varak-profiles-'));
+    const root = mkdtempSync(join(tmpdir(), 'simpaper-profiles-'));
     roots.push(root);
     const store = new ProfileStore(root, PROFILE_DIR);
     const slot = store.acquire('document');
@@ -130,7 +130,7 @@ describe('ProfileStore', () => {
   });
 
   it.skipIf(process.platform !== 'win32')('builds UserInstallation URLs that survive spaces and Turkish letters', () => {
-    const url = profileUrl('C:\\Users\\Çağrı İşçi\\AppData\\Local\\Varak\\engine\\doc-0');
-    expect(url).toBe('file:///C:/Users/%C3%87a%C4%9Fr%C4%B1%20%C4%B0%C5%9F%C3%A7i/AppData/Local/Varak/engine/doc-0');
+    const url = profileUrl('C:\\Users\\Çağrı İşçi\\AppData\\Local\\Simpaper\\engine\\doc-0');
+    expect(url).toBe('file:///C:/Users/%C3%87a%C4%9Fr%C4%B1%20%C4%B0%C5%9F%C3%A7i/AppData/Local/Simpaper/engine/doc-0');
   });
 });

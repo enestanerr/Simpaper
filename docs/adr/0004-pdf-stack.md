@@ -65,8 +65,8 @@ For v0.1:
 - Positive: permissive licenses only (Apache-2.0, MIT); incremental saves keep the original bytes and existing
   signatures' byte ranges intact.
 - Negative: several libraries mean several save paths; any full rewrite (page operations) invalidates existing
-  digital signatures, so Varak must detect signatures and warn before rewriting.
-- Negative: until our own appearance generator exists, Turkish FreeText created in Varak may not display in
+  digital signatures, so Simpaper must detect signatures and warn before rewriting.
+- Negative: until our own appearance generator exists, Turkish FreeText created in Simpaper may not display in
   Chrome/Edge (listed in [KNOWN_LIMITATIONS.md](../KNOWN_LIMITATIONS.md)).
 - Negative: pdf.js ships monthly releases with occasional breaking changes; it is pinned and wrapped behind an
   adapter, and upgrades require the PDF regression tests.
@@ -78,6 +78,6 @@ For v0.1:
 - pdf.js 6.3.289 no longer has the `isEvalSupported` option, so there is nothing to switch off; PDF scripting is not
   loaded at all (no scripting manager, QuickJS not bundled) and XFA is off (`enableXfa: false`). CMaps, standard fonts
   and WASM are served locally; no ICC profiles are shipped (`iccUrl` is unset). Details: [dev/pdf.md](../dev/pdf.md).
-- Varak's own Unicode appearance streams for Turkish FreeText and form values were implemented in M1
+- Simpaper's own Unicode appearance streams for Turkish FreeText and form values were implemented in M1
   (`src/main/pdf/appearance.ts`), not in M2, so the Chrome/Edge consequence above no longer applies to files saved
-  by Varak.
+  by Simpaper.

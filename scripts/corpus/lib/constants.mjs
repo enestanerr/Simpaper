@@ -4,14 +4,14 @@
  */
 
 /** Bump when generated content changes, so cached corpora are regenerated. */
-export const GENERATOR_VERSION = 1;
+export const GENERATOR_VERSION = 2;
 
 /** Fixed timestamp for zip entries and document properties (deterministic output). */
 export const FIXED_DATE = new Date(Date.UTC(2026, 0, 1, 0, 0, 0));
 export const FIXED_DATE_ISO = '2026-01-01T00:00:00Z';
 
-export const AUTHOR = 'Varak Test';
-export const AUTHOR_INITIALS = 'VT';
+export const AUTHOR = 'Simpaper Test';
+export const AUTHOR_INITIALS = 'ST';
 
 export const TR = {
   pangram: 'Pijamalı hasta yağız şoföre çabucak güvendi.',
@@ -24,7 +24,7 @@ export const TR = {
 };
 
 /** Hyperlink target used in documents (IANA example domain: never resolves to real content). */
-export const LINK_URL = 'https://example.com/varak/belge?q=%C3%A7%C4%9F%C4%B1';
+export const LINK_URL = 'https://example.com/simpaper/belge?q=%C3%A7%C4%9F%C4%B1';
 
 /** Excel 1900-system serial number of a calendar date (valid from 1900-03-01). */
 export function excelSerial(year, month, day) {

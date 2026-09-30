@@ -1,7 +1,7 @@
 /**
- * Where Varak keeps its data.
- *  - userData (%APPDATA%\Varak, roaming): small user files — settings.json, recent.json.
- *  - local data (%LOCALAPPDATA%\Varak, machine-local): engine profiles, working copies, recovery
+ * Where Simpaper keeps its data.
+ *  - userData (%APPDATA%\Simpaper, roaming): small user files — settings.json, recent.json.
+ *  - local data (%LOCALAPPDATA%\Simpaper, machine-local): engine profiles, working copies, recovery
  *    snapshots, logs, Chromium session data, scratch files.
  * Unpackaged (development) runs use a `-dev` suffix so they never touch a user's real data.
  */

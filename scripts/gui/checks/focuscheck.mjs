@@ -1,12 +1,12 @@
 // On-screen check (opens windows and sends real input: only with the owner's permission, on an idle PC).
-// After a click into the document (LibreOffice has the keyboard focus), do Varak's own controls get the keys?
+// After a click into the document (LibreOffice has the keyboard focus), do Simpaper's own controls get the keys?
 // 1. real click into the font name box of the ribbon, type a letter: box or document?
 // 2. real click on the File tab, real Esc: does the backstage close?
-// Only this script's own Varak instance (isolated data folder) is touched.
+// Only this script's own Simpaper instance (isolated data folder) is touched.
 import { copyFileSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import * as W from '../win32.mjs';
-import { launchVarak, repo, requireIdle, settingsPreset, sleep } from '../harness.mjs';
+import { launchSimpaper, repo, requireIdle, settingsPreset, sleep } from '../harness.mjs';
 
 requireIdle(60_000, 'focus');
 const out = join(repo, 'test-output/gui/focuscheck');
@@ -16,13 +16,13 @@ const shots = join(out, 'shots');
 const docx = join(out, 'files', 'Odak.docx');
 copyFileSync(join(repo, 'tests/corpus/generated/docx-basic.docx'), docx);
 const report = {};
-const s = await launchVarak({ out, port: 9390, settings: settingsPreset({ language: 'tr', theme: 'light' }), tag: 'focus' });
+const s = await launchSimpaper({ out, port: 9390, settings: settingsPreset({ language: 'tr', theme: 'light' }), tag: 'focus' });
 
 const focusOwner = () => {
   const h = W.keyboardFocus();
   if (!h) return 'none';
   const pid = W.windowInfo(h).pid;
-  return pid === s.app.pid ? 'varak' : W.processImage(pid).toLowerCase().endsWith('soffice.bin') ? 'engine' : 'other';
+  return pid === s.app.pid ? 'simpaper' : W.processImage(pid).toLowerCase().endsWith('soffice.bin') ? 'engine' : 'other';
 };
 async function realClickSelector(selector, what) {
   const r = await s.cdp.rectOf(selector);

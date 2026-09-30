@@ -18,7 +18,7 @@ from .errors import RpcError, detached_error, is_connection_lost, uno_message
 from .protocol import ErrorCode
 from .values import StructFields, property_value
 
-log = logging.getLogger('varak.office')
+log = logging.getLogger('simpaper.office')
 
 SYSTEM_WIN32 = 1  # css::lang::SystemDependent::SYSTEM_WIN32
 # doc.close must stay well inside the 5 s main-core allows it; releases take milliseconds once soffice is idle.

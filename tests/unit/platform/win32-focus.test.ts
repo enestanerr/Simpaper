@@ -48,7 +48,7 @@ function fakeUser32(scene: Scene) {
   return { user32, log };
 }
 
-describe('takeFocusFromViews (Win32 focus between Varak and LibreOffice windows)', () => {
+describe('takeFocusFromViews (Win32 focus between Simpaper and LibreOffice windows)', () => {
   it('takes the focus from a LibreOffice window inside the host once it answers', async () => {
     const { user32, log } = fakeUser32({ focus: 200n, owner: { '200': 42 }, children: [200n] });
     expect(await takeFocusFromViews(user32, HOST, OWN_PID)).toBe(true);

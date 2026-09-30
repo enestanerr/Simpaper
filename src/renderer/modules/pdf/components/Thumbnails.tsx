@@ -11,7 +11,7 @@ import { AnnotationMode, type PDFDocumentProxy, type RenderTask } from '../pdfjs
 import { patchDoc, usePdfDoc } from '../state/store';
 
 const THUMB_WIDTH = 116;
-const DRAG_TYPE = 'application/x-varak-pdf-pages';
+const DRAG_TYPE = 'application/x-simpaper-pdf-pages';
 
 function range(a: number, b: number): number[] {
   const [lo, hi] = a <= b ? [a, b] : [b, a];

@@ -2,7 +2,7 @@ import type { OfficeKind } from './modules';
 
 /**
  * Wire protocol between the Electron main process and the engine bridge
- * (engine/bridge/varak_bridge, running on LibreOffice's bundled Python).
+ * (engine/bridge/simpaper_bridge, running on LibreOffice's bundled Python).
  *
  * Transport: newline-delimited JSON (one JSON-RPC 2.0 message per line, UTF-8) over the
  * bridge process' stdin (requests) and stdout (responses + notifications). stderr is for logs only.

@@ -21,7 +21,7 @@
  * SENSITIVITY. A one-word change (corpus variants *-changed) and a one-letter change (built here) must fail
  * the budget — proof that the budget sees what it is meant to see.
  *
- * Diff images are kept in test-output/visual only for failing comparisons. Set VARAK_VISUAL_REPORT=<file>
+ * Diff images are kept in test-output/visual only for failing comparisons. Set SIMPAPER_VISUAL_REPORT=<file>
  * to append every measurement as JSON lines when re-deriving the budget.
  */
 import { appendFileSync, existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
@@ -42,7 +42,7 @@ const SCALE = 1.5;
 const BUDGET = { maxRatio: 0.0002, maxWindowPixels: 8 } as const satisfies DiffBudget;
 
 function report(entry: Record<string, unknown>, r: CompareResult): void {
-  const file = process.env['VARAK_VISUAL_REPORT'];
+  const file = process.env['SIMPAPER_VISUAL_REPORT'];
   if (!file) return;
   const measured = { ratio: r.ratio, diffPixels: r.diffPixels, windowPixels: r.hotspot.diffPixels, bounds: r.bounds };
   appendFileSync(file, `${JSON.stringify({ engine: ENGINE_VERSION, scale: SCALE, ...entry, ...measured })}\n`);

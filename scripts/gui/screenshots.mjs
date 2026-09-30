@@ -1,14 +1,14 @@
 // README screenshots (docs/DEMO.md) plus on-screen checks the GUI spike does not cover: PDF annotations saved and
 // read back, KeyTips, a LibreOffice dialog over the document, quitting with unsaved changes.
 // Packaged app, light theme, window 1600 × 1000, sample documents copied to %PUBLIC%\Documents so that no personal
-// data appears in paths. Captures Varak's window only — review every image before committing it.
+// data appears in paths. Captures Simpaper's window only — review every image before committing it.
 // OPENS WINDOWS AND SENDS INPUT — run only with the machine owner's permission, while nobody uses the PC.
 //   node scripts/gui/screenshots.mjs [--lang tr|en|both] [--out test-output/screenshots] [--idle-ms 60000]
 import { copyFileSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { PDFDocument, PDFName } from '@cantoo/pdf-lib';
 import * as W from './win32.mjs';
-import { launchVarak, repo, requireIdle, settingsPreset, sleep } from './harness.mjs';
+import { launchSimpaper, repo, requireIdle, settingsPreset, sleep } from './harness.mjs';
 
 const arg = (name, def) => {
   const i = process.argv.indexOf(name);
@@ -21,14 +21,14 @@ requireIdle(Number(arg('--idle-ms', '60000')), 'shots');
 const CORPUS = join(repo, 'tests/corpus/generated');
 const LABELS = {
   tr: {
-    folder: 'Varak Örnekleri',
+    folder: 'Simpaper Örnekleri',
     files: { docx: 'Rapor.docx', xlsx: 'Bütçe.xlsx', pptx: 'Sunum.pptx', pdf: 'Belge.pdf', doc: 'Eski rapor.doc' },
     open: 'Aç',
     note: 'Kontrol edildi – Ayşe',
     discard: 'Kaydetme',
   },
   en: {
-    folder: 'Varak Samples',
+    folder: 'Simpaper Samples',
     files: { docx: 'Report.docx', xlsx: 'Budget.xlsx', pptx: 'Presentation.pptx', pdf: 'Document.pdf', doc: 'Old report.doc' },
     open: 'Open',
     note: 'Checked – Ayşe',
@@ -59,7 +59,7 @@ async function run(lang, port) {
     copyFileSync(join(CORPUS, SOURCES[key]), path[key]);
   }
   const report = { lang, checks: {} };
-  const s = await launchVarak({ out: dir, port, settings: settingsPreset({ language: lang, theme: 'light' }), tag: `shots:${lang}` });
+  const s = await launchSimpaper({ out: dir, port, settings: settingsPreset({ language: lang, theme: 'light' }), tag: `shots:${lang}` });
   try {
     // ------------------------------------------------------------ Writer
     const writer = await s.open(path.docx, 'writer');
@@ -246,7 +246,7 @@ async function darkRun(port) {
   mkdirSync(samples, { recursive: true });
   const docx = join(samples, LABELS.en.files.docx);
   copyFileSync(join(CORPUS, SOURCES.docx), docx);
-  const s = await launchVarak({ out: dir, port, settings: settingsPreset({ language: 'en', theme: 'dark' }), tag: 'shots:dark' });
+  const s = await launchSimpaper({ out: dir, port, settings: settingsPreset({ language: 'en', theme: 'dark' }), tag: 'shots:dark' });
   try {
     await s.open(docx, 'writer');
     await sleep(3000);

@@ -38,7 +38,7 @@ describe('docx reader on the generated document', () => {
     for (const w of facts.underline) expect(formattingOf(runs, w)?.every((r) => r.underline)).toBe(true);
     for (const w of facts.plain) expect(formattingOf(runs, w)?.some((r) => r.bold || r.italic)).toBe(false);
     // Heading bold comes from the style chain, not from direct formatting.
-    expect(formattingOf(runs, 'Varak Test Belgesi')?.every((r) => r.bold)).toBe(true);
+    expect(formattingOf(runs, 'Simpaper Test Belgesi')?.every((r) => r.bold)).toBe(true);
     // Table header cells are bold, body cells are not.
     expect(formattingOf(runs, 'Şehir')?.every((r) => r.bold)).toBe(true);
     expect(formattingOf(runs, 'Güneydoğu Anadolu')?.every((r) => r.bold)).toBe(false);

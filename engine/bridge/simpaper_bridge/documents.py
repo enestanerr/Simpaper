@@ -25,7 +25,7 @@ from .ops import writer_page_count
 from .protocol import MODULE_IDENTIFIER, ErrorCode
 from .values import from_uno, property_value, to_property_values
 
-log = logging.getLogger('varak.documents')
+log = logging.getLogger('simpaper.documents')
 
 MACRO_NEVER_EXECUTE = 0   # css::document::MacroExecMode::NEVER_EXECUTE
 UPDATE_NO = 0             # css::document::UpdateDocMode::NO_UPDATE
@@ -118,7 +118,7 @@ def set_no_parent_notify(hwnd):
                     raise OSError(ctypes.get_last_error(), 'SetWindowLongPtrW failed')
         except Exception:
             log.debug('WS_EX_NOPARENTNOTIFY not set', exc_info=True)
-    thread = threading.Thread(target=run, name='varak-noparentnotify', daemon=True)
+    thread = threading.Thread(target=run, name='simpaper-noparentnotify', daemon=True)
     thread.start()
     return thread
 
@@ -558,7 +558,7 @@ class Documents:
     def _create_frame(self, window, doc_id):
         frame = self.office.create('com.sun.star.frame.Frame')
         frame.initialize(window)
-        frame.setName('varak_' + re.sub(r'[^A-Za-z0-9_]', '_', doc_id))
+        frame.setName('simpaper_' + re.sub(r'[^A-Za-z0-9_]', '_', doc_id))
         self.office.desktop.getFrames().append(frame)
         frame.setCreator(self.office.desktop)
         try:
@@ -577,7 +577,7 @@ class Documents:
                 pass
 
     def _prepare_view(self, session):
-        """Hides LibreOffice's own chrome; the Varak ribbon replaces menus, toolbars and status bar.
+        """Hides LibreOffice's own chrome; the Simpaper ribbon replaces menus, toolbars and status bar.
 
         Writer and Calc: the whole layout manager is made invisible. Impress keeps it visible, because sfx2's
         work window hides all of its child windows while the layout manager is invisible

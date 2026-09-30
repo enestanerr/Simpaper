@@ -33,7 +33,7 @@ setTimeout(function () {}, 60000);
 const leftovers: number[] = [];
 
 function startTree(delayMs: number, kind: 'node' | 'waitfor' = 'node', count = 1) {
-  const child = spawnNodeScript(CHILD, [String(delayMs), kind, `VarakPlatformTest${process.pid}${Date.now()}`, String(count)]);
+  const child = spawnNodeScript(CHILD, [String(delayMs), kind, `SimpaperPlatformTest${process.pid}${Date.now()}`, String(count)]);
   if (child.pid) leftovers.push(child.pid);
   const grandchildren = async (): Promise<number[]> => {
     const pids = await waitFor(

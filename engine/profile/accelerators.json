@@ -82,12 +82,12 @@
     { "module": "global", "key": "M_SHIFT_MOD1", "default": ".uno:EditDoc", "reason": "Toggles read-only mode behind the shell's back (Writer maps the key to Decrease indent)." },
     { "module": "global", "key": "E_MOD1_MOD2", "default": ".uno:ExtensionManager", "reason": "Opens the extension manager (installs code into the engine)." },
     { "module": "global", "key": "ESCAPE_SHIFT", "default": ".uno:CommandPopup", "reason": "LibreOffice command search built on the hidden menu bar." },
-    { "module": "global", "key": "1_MOD2", "default": ".uno:SidebarDeck.PropertyDeck", "reason": "Shows LibreOffice's sidebar, which Varak hides." },
+    { "module": "global", "key": "1_MOD2", "default": ".uno:SidebarDeck.PropertyDeck", "reason": "Shows LibreOffice's sidebar, which Simpaper hides." },
     { "module": "writer", "key": "J_SHIFT_MOD1", "default": ".uno:FullScreen", "reason": "Full-screen mode of the engine frame breaks the embedded layout." },
     { "module": "calc", "key": "J_SHIFT_MOD1", "default": ".uno:FullScreen", "reason": "Full-screen mode of the engine frame breaks the embedded layout." },
-    { "module": "writer", "key": "F5_MOD1", "default": ".uno:Sidebar", "reason": "Toggles LibreOffice's sidebar, which Varak hides." },
-    { "module": "calc", "key": "F5_MOD1", "default": ".uno:Sidebar", "reason": "Toggles LibreOffice's sidebar, which Varak hides." },
-    { "module": "impress", "key": "F5_MOD1", "default": ".uno:Sidebar", "reason": "Toggles LibreOffice's sidebar, which Varak hides." },
+    { "module": "writer", "key": "F5_MOD1", "default": ".uno:Sidebar", "reason": "Toggles LibreOffice's sidebar, which Simpaper hides." },
+    { "module": "calc", "key": "F5_MOD1", "default": ".uno:Sidebar", "reason": "Toggles LibreOffice's sidebar, which Simpaper hides." },
+    { "module": "impress", "key": "F5_MOD1", "default": ".uno:Sidebar", "reason": "Toggles LibreOffice's sidebar, which Simpaper hides." },
     { "module": "writer", "key": "F11", "default": ".uno:DesignerDialog", "reason": "Opens the styles deck of LibreOffice's hidden sidebar." },
     { "module": "impress", "key": "F11", "default": ".uno:DesignerDialog", "reason": "Opens the styles deck of LibreOffice's hidden sidebar." }
   ]

@@ -1,4 +1,4 @@
-/** Brand artwork (resources/brand, original Varak marks) as bundled image URLs. */
+/** Brand artwork (resources/brand, original Simpaper marks) as bundled image URLs. */
 import type { ModuleKind } from '@shared/modules';
 import calcIcon from '../../../resources/brand/calc.svg';
 import impressIcon from '../../../resources/brand/impress.svg';

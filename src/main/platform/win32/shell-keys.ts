@@ -1,5 +1,5 @@
 /**
- * Experimental KeyTips trigger: a bare Alt tap or F10 while the Varak window (or one of its owned
+ * Experimental KeyTips trigger: a bare Alt tap or F10 while the Simpaper window (or one of its owned
  * LibreOffice windows) is in the foreground. LibreOffice's UNO key handler never sees a bare Alt
  * (modifier-only keys arrive as KeyModChange), hence a low-level keyboard hook.
  *

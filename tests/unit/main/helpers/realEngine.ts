@@ -3,7 +3,7 @@
  * DocumentService + RecoveryService + SafeWriter + CompatAnalyzer on top of the real EngineManager.
  *
  * No window is ever shown: every engine instance runs `--headless`, the view mode is overridden to `hidden`
- * (as VARAK_VIEW_MODE=hidden does in the app) and the view host is a stub that fails the test if a native
+ * (as SIMPAPER_VIEW_MODE=hidden does in the app) and the view host is a stub that fails the test if a native
  * view is attached. Each harness has its own folder and engine profiles under test-output/main-core/engine/,
  * and `dispose()` ends every process it started (the tree of each soffice/bridge process whose command line
  * contains the harness folder).
@@ -34,14 +34,14 @@ import { RecoveryService } from '../../../../src/main/recovery/service';
 export const located = locateEngine();
 export const engineAvailable = located.ok;
 if (!located.ok) {
-  console.warn(`Main-core engine tests skipped: ${located.error}. Run "npm run engine:fetch" or set VARAK_ENGINE_DIR.`);
+  console.warn(`Main-core engine tests skipped: ${located.error}. Run "npm run engine:fetch" or set SIMPAPER_ENGINE_DIR.`);
 }
 
 export const ROOT = resolve('test-output', 'main-core', 'engine');
 export const CORPUS = resolve('tests', 'corpus', 'generated');
 
-// Warnings and errors of the services are useful when a test fails; everything with VARAK_TEST_VERBOSE=1.
-const verbose = Boolean(process.env['VARAK_TEST_VERBOSE']);
+// Warnings and errors of the services are useful when a test fails; everything with SIMPAPER_TEST_VERBOSE=1.
+const verbose = Boolean(process.env['SIMPAPER_TEST_VERBOSE']);
 function metaText(meta: Record<string, unknown> | undefined): string {
   if (!meta) return '';
   try {

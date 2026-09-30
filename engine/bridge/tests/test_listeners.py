@@ -1,12 +1,12 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-"""Headless interaction handling and dispatch interception (varak_bridge.listeners) with fake UNO objects."""
+"""Headless interaction handling and dispatch interception (simpaper_bridge.listeners) with fake UNO objects."""
 import unittest
 
 import uno  # noqa: F401
 
-from varak_bridge.listeners import DispatchInterceptor, InteractionHandler, KeyHandler, base_command
+from simpaper_bridge.listeners import DispatchInterceptor, InteractionHandler, KeyHandler, base_command
 
 
 class Fake:

@@ -1,5 +1,5 @@
 /*
- * Varak design tokens. Identity: ink (#1D2B53) chrome with gold (#C9A227) highlights; each module
+ * Simpaper design tokens. Identity: ink (#1D2B53) chrome with gold (#C9A227) highlights; each module
  * has its own accent (brand colours are injected from src/shared/brand.ts by theme.ts, the values
  * below are fallbacks). Theme selection: <html data-theme="light|dark">; forced colours override all.
  */

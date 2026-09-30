@@ -67,7 +67,7 @@ export function validatePrintPages(pages: PdfPrintPage[] | undefined): PdfPrintP
 export async function printRenderedPages(pages: PdfPrintPage[], title: string, parent: BrowserWindow | null, log: Logger): Promise<void> {
   const valid = validatePrintPages(pages);
   const { BrowserWindow: Window } = await import('electron');
-  const dir = await mkdtemp(join(tmpdir(), 'varak-print-'));
+  const dir = await mkdtemp(join(tmpdir(), 'simpaper-print-'));
   let win: BrowserWindow | null = null;
   try {
     const images: PrintImage[] = [];

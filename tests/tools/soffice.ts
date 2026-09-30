@@ -18,7 +18,7 @@ import { CORPUS_OUTPUT, REPO_ROOT } from './paths';
 
 export { SofficeConversionError, SofficeTimeoutError, convertTarget, pdfFilterData } from '../../scripts/corpus/lib/soffice.mjs';
 
-/** LibreOffice program directory (VARAK_ENGINE_DIR or vendor/libreoffice/program), or null. */
+/** LibreOffice program directory (SIMPAPER_ENGINE_DIR or vendor/libreoffice/program), or null. */
 export const ENGINE_PROGRAM_DIR: string | null = findProgramDir({ repoRoot: REPO_ROOT });
 /** True when a LibreOffice engine is available for headless tests. */
 export const hasEngine = ENGINE_PROGRAM_DIR !== null;
@@ -53,7 +53,7 @@ export class Soffice {
 
   /** Starts nothing yet: the soffice process runs only during a conversion. */
   static create(opts: SofficeOptions = {}): Soffice {
-    if (!ENGINE_PROGRAM_DIR) throw new Error('LibreOffice engine not found (set VARAK_ENGINE_DIR or run npm run engine:fetch)');
+    if (!ENGINE_PROGRAM_DIR) throw new Error('LibreOffice engine not found (set SIMPAPER_ENGINE_DIR or run npm run engine:fetch)');
     const workDir = opts.workDir ?? join(CORPUS_OUTPUT, 'soffice');
     mkdirSync(workDir, { recursive: true });
     return new Soffice(new SofficeRunner({ programDir: ENGINE_PROGRAM_DIR, workDir, locale: opts.locale ?? 'en-US', name: opts.name ?? 'test', timeoutMs: opts.timeoutMs }));

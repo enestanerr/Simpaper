@@ -1,16 +1,16 @@
 // On-screen check (opens windows and sends real input: only with the owner's permission, on an idle PC).
 // C. The engine of a background document is killed: it restarts hidden and the active document stays in front.
 // H. The engine of the active, changed document hangs (soffice.bin suspended) while its view has the keyboard focus
-//    (the normal state while editing). Measures whether Varak stays usable when the user then
+//    (the normal state while editing). Measures whether Simpaper stays usable when the user then
 //    1. opens the File tab, 2. clicks "Restart engine" in the message bar, 3. closes the window (title bar ×).
-// Only this script's own Varak instance (isolated data folder) and its engines are touched; a suspended engine is
+// Only this script's own Simpaper instance (isolated data folder) and its engines are touched; a suspended engine is
 // always resumed or ended before the script exits.
 import { execFileSync } from 'node:child_process';
 import { copyFileSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import koffi from 'koffi';
 import * as W from '../win32.mjs';
-import { launchVarak, repo, requireIdle, settingsPreset, sleep } from '../harness.mjs';
+import { launchSimpaper, repo, requireIdle, settingsPreset, sleep } from '../harness.mjs';
 
 requireIdle(60_000, 'stuck');
 const only = process.argv[2] ?? 'all'; // all | c | h
@@ -61,9 +61,9 @@ const file = (name, src) => {
 };
 const report = { c: {}, h: {} };
 const settings = { ...settingsPreset({ language: 'tr', theme: 'light' }), autosaveMinutes: 1 };
-const s = await launchVarak({ out, port: 9360, settings, tag: 'stuck' });
+const s = await launchSimpaper({ out, port: 9360, settings, tag: 'stuck' });
 
-/** LibreOffice windows inside Varak's window (Chromium's GPU process has a child window there too). */
+/** LibreOffice windows inside Simpaper's window (Chromium's GPU process has a child window there too). */
 const images = new Map();
 const isEngine = (pid) => {
   if (!images.has(pid)) images.set(pid, W.processImage(pid).toLowerCase().endsWith('soffice.bin'));
@@ -82,7 +82,7 @@ function engineWindows() {
 const visibleEnginePids = () => [...new Set(engineWindows().filter((w) => w.visible && w.rect.width > 200).map((w) => w.pid))];
 const allEnginePids = () => [...new Set(engineWindows().map((w) => w.pid))];
 
-/** A promise that gives up after `ms` (Varak's main process may be blocked). */
+/** A promise that gives up after `ms` (Simpaper's main process may be blocked). */
 const within = (p, ms, fallback) => Promise.race([p.catch(() => fallback), sleep(ms).then(() => fallback)]);
 const mainAnswers = () => within(s.docs().then(() => true), 700, false);
 
@@ -94,7 +94,7 @@ async function realClickAt(x, y, what) {
   W.click(x, y);
   s.log(`real click: ${what}`, { x, y });
 }
-/** Real mouse click on an element of Varak's UI (only when that point shows Varak). */
+/** Real mouse click on an element of Simpaper's UI (only when that point shows Simpaper). */
 async function realClick(rect, what) {
   if (!rect) throw new Error(`no element for ${what}`);
   const o = W.clientOrigin(s.appHwnd);
@@ -118,7 +118,7 @@ async function waitFor(pred, ms, step = 300) {
   }
   return null;
 }
-/** Samples Varak's responsiveness for `ms`: Windows' hung flag of its window and whether main answers IPC. */
+/** Samples Simpaper's responsiveness for `ms`: Windows' hung flag of its window and whether main answers IPC. */
 async function sample(ms) {
   const t0 = Date.now();
   const points = [];

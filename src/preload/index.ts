@@ -1,14 +1,14 @@
 /**
- * Sandboxed preload: exposes a minimal, allow-listed IPC bridge as `window.varakIpc`.
+ * Sandboxed preload: exposes a minimal, allow-listed IPC bridge as `window.simpaperIpc`.
  * No Node APIs reach the renderer.
  */
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron';
-import { EVENT_CHANNELS, INVOKE_CHANNELS, type VarakIpcBridge } from '@shared/ipc';
+import { EVENT_CHANNELS, INVOKE_CHANNELS, type SimpaperIpcBridge } from '@shared/ipc';
 
 const invokeAllowed = new Set<string>(INVOKE_CHANNELS);
 const eventAllowed = new Set<string>(EVENT_CHANNELS);
 
-const bridge: VarakIpcBridge = {
+const bridge: SimpaperIpcBridge = {
   invoke(channel, req) {
     if (!invokeAllowed.has(channel)) return Promise.reject(new Error(`Blocked IPC channel: ${String(channel)}`));
     return ipcRenderer.invoke(channel, req);
@@ -23,4 +23,4 @@ const bridge: VarakIpcBridge = {
   },
 };
 
-contextBridge.exposeInMainWorld('varakIpc', bridge);
+contextBridge.exposeInMainWorld('simpaperIpc', bridge);

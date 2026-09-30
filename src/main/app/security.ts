@@ -41,7 +41,7 @@ export function hardenSession(ses: Session, isAppUrl: (url: string) => boolean, 
     callback(ok);
   });
   ses.setPermissionCheckHandler((wc, permission) => GRANTED.has(permission) && !!wc && isAppUrl(wc.getURL()));
-  // Downloads never happen in Varak; refuse anything a page might trigger.
+  // Downloads never happen in Simpaper; refuse anything a page might trigger.
   ses.on('will-download', (event) => {
     event.preventDefault();
     log.warn('download blocked');

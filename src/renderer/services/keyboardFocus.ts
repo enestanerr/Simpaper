@@ -1,7 +1,7 @@
 /**
- * Keyboard focus between Varak's own controls and LibreOffice's window (child hosting, docs/dev/platform.md §6).
+ * Keyboard focus between Simpaper's own controls and LibreOffice's window (child hosting, docs/dev/platform.md §6).
  *
- * Windows leaves the keyboard focus in LibreOffice's window when the user clicks Varak's web content, so keys
+ * Windows leaves the keyboard focus in LibreOffice's window when the user clicks Simpaper's web content, so keys
  * meant for a text box of the ribbon, the File backstage or a prompt would reach the document. The shell claims
  * the keyboard (`view:focusShell`) when a press on its own UI moves the focus into a text box, or into anything
  * outside the parts that leave the keyboard in the document as Office does (ribbon, title bar, tab strip, status
@@ -14,7 +14,7 @@ import { getActiveDocument } from '../state/appStore';
 import { focusView } from './engine';
 import { hasBridge, invoke } from './ipc';
 
-/** A focus change this long after a press on Varak's UI belongs to that press. */
+/** A focus change this long after a press on Simpaper's UI belongs to that press. */
 const PRESS_WINDOW_MS = 1000;
 /**
  * Parts of the window that leave the keyboard in the document, as in Office (switching ribbon tabs, using a
@@ -76,7 +76,7 @@ export function holdKeyboard(returnToDocument: 'ifTaken' | 'always' = 'ifTaken')
   };
 }
 
-/** Claims the keyboard when a control takes the focus right after the user pressed on Varak's UI. */
+/** Claims the keyboard when a control takes the focus right after the user pressed on Simpaper's UI. */
 export function installKeyboardClaims(target: Window = window): () => void {
   const onPress = () => {
     lastPress = Date.now();

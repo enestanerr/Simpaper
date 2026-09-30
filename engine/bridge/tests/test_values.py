@@ -1,7 +1,7 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-"""JSON <-> UNO value conversion (varak_bridge.values). Needs `uno`, no soffice."""
+"""JSON <-> UNO value conversion (simpaper_bridge.values). Needs `uno`, no soffice."""
 import os
 import unittest
 
@@ -9,9 +9,9 @@ import uno
 from com.sun.star.awt import Rectangle
 from com.sun.star.beans import PropertyValue
 
-from varak_bridge.errors import RpcError
-from varak_bridge.protocol import ErrorCode
-from varak_bridge.values import from_uno, property_value, to_property_values, to_uno, to_url, typed_value
+from simpaper_bridge.errors import RpcError
+from simpaper_bridge.protocol import ErrorCode
+from simpaper_bridge.values import from_uno, property_value, to_property_values, to_uno, to_url, typed_value
 
 
 class TypedValueTest(unittest.TestCase):

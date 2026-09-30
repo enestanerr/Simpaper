@@ -23,7 +23,7 @@ from .owned import own_window
 from .protocol import EXIT_CONNECTION_LOST, MODULE_IDENTIFIER, NEW_DOCUMENT_URL, PROTOCOL_VERSION, VIEW_MODES, ErrorCode
 from .values import from_uno, property_value, to_url
 
-log = logging.getLogger('varak.methods')
+log = logging.getLogger('simpaper.methods')
 
 DEFAULT_TIMEOUT_S = 120.0
 LONG_TIMEOUT_S = 900.0     # load / store / convert of large files
@@ -121,7 +121,7 @@ class Connection:
         self.error = None
 
     def start(self):
-        threading.Thread(target=self._run, name='varak-connect', daemon=True).start()
+        threading.Thread(target=self._run, name='simpaper-connect', daemon=True).start()
 
     def _run(self):
         try:
@@ -188,7 +188,7 @@ class Methods:
             'impress.setShapeText': self.impress_set_shape_text,
             'convert.file': self.convert_file,
         }
-        if os.environ.get('VARAK_BRIDGE_TEST_HOOKS') == '1':
+        if os.environ.get('SIMPAPER_BRIDGE_TEST_HOOKS') == '1':
             # Engine tests only (tests/engine/lifecycle.test.ts); the renderer cannot reach engine methods.
             self._table['debug.dropConnection'] = self.debug_drop_connection
             self._table['debug.viewChrome'] = self.debug_view_chrome

@@ -57,7 +57,7 @@ describe('resolveLaunchOptions', () => {
   });
 
   function fakeEngine(ini: string | null, files: string[]): string {
-    const dir = mkdtempSync(join(tmpdir(), 'varak-launch-'));
+    const dir = mkdtempSync(join(tmpdir(), 'simpaper-launch-'));
     dirs.push(dir);
     if (ini !== null) writeFileSync(join(dir, 'fundamental.ini'), ini);
     mkdirSync(join(dir, 'services'));
@@ -78,9 +78,9 @@ describe('resolveLaunchOptions', () => {
   it('leaves the engine untouched when its layout is unknown or the diagnostics switch is set', () => {
     expect(resolveLaunchOptions(fakeEngine(null, SERVICES), {}).args).toEqual([]);
     expect(resolveLaunchOptions(fakeEngine('[Bootstrap]\nOTHER=1\n', SERVICES), {}).args).toEqual([]);
-    const keep = resolveLaunchOptions(fakeEngine(`[Bootstrap]\nURE_MORE_SERVICES=${UPSTREAM}\n`, SERVICES), { VARAK_ENGINE_KEEP_PYTHON: '1' });
+    const keep = resolveLaunchOptions(fakeEngine(`[Bootstrap]\nURE_MORE_SERVICES=${UPSTREAM}\n`, SERVICES), { SIMPAPER_ENGINE_KEEP_PYTHON: '1' });
     expect(keep.args).toEqual([]);
-    expect(keep.notes.join(' ')).toMatch(/VARAK_ENGINE_KEEP_PYTHON/);
+    expect(keep.notes.join(' ')).toMatch(/SIMPAPER_ENGINE_KEEP_PYTHON/);
   });
 
   // The pruned image that electron-builder packages (scripts/engine/prepare-engine.mjs), when present.

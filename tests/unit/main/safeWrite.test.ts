@@ -59,7 +59,12 @@ describe('SafeWriter', () => {
     });
     expect(seen.startsWith(dir)).toBe(true);
     expect(STALE_SIBLING.test(seen.slice(dir.length + 1))).toBe(true);
-    expect(siblingName(target, 'abcdefabcdef', 'tmp')).toBe(join(dir, '.~varak-abcdefabcdef-Rapor.docx.tmp'));
+    expect(siblingName(target, 'abcdefabcdef', 'tmp')).toBe(join(dir, '.~simpaper-abcdefabcdef-Rapor.docx.tmp'));
+    // Leftovers of development builds from before the rename are cleaned up too; nothing else is.
+    expect(STALE_SIBLING.test('.~varak-abcdefabcdef-Rapor.docx.bak')).toBe(true);
+    expect(STALE_SIBLING.test('.~varak-abcdef-Rapor.docx.bak')).toBe(false);
+    expect(STALE_SIBLING.test('~simpaper-abcdefabcdef-Rapor.docx.tmp')).toBe(false);
+    expect(STALE_SIBLING.test('.~simpaper-abcdefabcdef-Rapor.docx')).toBe(false);
   });
 
   it('fault: write step fails → original unchanged, temp removed', async () => {

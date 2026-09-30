@@ -15,8 +15,8 @@ import { OFFICE_KINDS, type OfficeKind } from '@shared/modules';
 import { unoCommand } from '../../../src/main/ipc/validate';
 
 const ROOT = resolve(process.cwd());
-/** VARAK_ENGINE_DIR is a LibreOffice program directory; the registry is next to it. */
-const ENGINE_ROOT = process.env['VARAK_ENGINE_DIR'] ? resolve(process.env['VARAK_ENGINE_DIR'], '..') : join(ROOT, 'vendor/libreoffice');
+/** SIMPAPER_ENGINE_DIR is a LibreOffice program directory; the registry is next to it. */
+const ENGINE_ROOT = process.env['SIMPAPER_ENGINE_DIR'] ? resolve(process.env['SIMPAPER_ENGINE_DIR'], '..') : join(ROOT, 'vendor/libreoffice');
 const REGISTRY = join(ENGINE_ROOT, 'share/registry');
 const FILES = ['main.xcd', 'writer.xcd', 'calc.xcd'] as const;
 const hasRegistry = FILES.every((f) => existsSync(join(REGISTRY, f)));

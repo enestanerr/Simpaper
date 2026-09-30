@@ -1,4 +1,4 @@
-// Minimal Chrome DevTools Protocol client (Node's global WebSocket) for driving Varak's renderer in the GUI spike.
+// Minimal Chrome DevTools Protocol client (Node's global WebSocket) for driving Simpaper's renderer in the GUI spike.
 // Mouse/keyboard events sent through CDP reach the web contents without moving the OS cursor or focus.
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -58,9 +58,9 @@ export class Cdp {
     return r.result.value;
   }
 
-  /** Calls window.varakIpc.invoke(channel, req) in the page. */
+  /** Calls window.simpaperIpc.invoke(channel, req) in the page. */
   invoke(channel, req) {
-    return this.eval(`window.varakIpc.invoke(${JSON.stringify(channel)}, ${JSON.stringify(req ?? null)})`);
+    return this.eval(`window.simpaperIpc.invoke(${JSON.stringify(channel)}, ${JSON.stringify(req ?? null)})`);
   }
 
   /** Bounding rect (CSS px, viewport) of the first element matching `selector` that has a size; null if none. */

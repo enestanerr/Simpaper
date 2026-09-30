@@ -37,7 +37,7 @@ function finish(err?: unknown): void {
 setTimeout(() => finish('watchdog: the check took longer than 40 s'), 40_000).unref();
 
 // `self` mode here so that Chromium's own child processes start inside the job (the harder case).
-process.env['VARAK_PROCESS_GUARD'] = 'self';
+process.env['SIMPAPER_PROCESS_GUARD'] = 'self';
 const platform = createPlatform(); // before 'ready': the job exists before Chromium starts helpers
 const guard = platform.processGuard as Win32ProcessGuard;
 out['platform'] = { viewHost: platform.viewHost.supported, guard: guard.supported, guardMode: guard.mode, shellKeys: Boolean(platform.shellKeys) };

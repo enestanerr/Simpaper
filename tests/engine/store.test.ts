@@ -128,10 +128,10 @@ describe.skipIf(!engineAvailable)('doc.store options (headless)', () => {
 
   it("baseUrl '' stores links absolute, so a restored snapshot keeps the document's relative links (#20)", async () => {
     // The user's folder: a DOCX with a relative hyperlink to a file next to it. Working copies and snapshots
-    // live elsewhere, as deep as in the app (%LOCALAPPDATA%\Varak\{work,recovery}\<session>, see
+    // live elsewhere, as deep as in the app (%LOCALAPPDATA%\Simpaper\{work,recovery}\<session>, see
     // src/main/app/paths); at the same depth a link relative to the recovery folder would resolve by chance.
     const userDir = join(dir, 'Belgeler', 'Plan 2026');
-    const appData = join(dir, 'AppData', 'Local', 'Varak');
+    const appData = join(dir, 'AppData', 'Local', 'Simpaper');
     const workDir = join(appData, 'work', 'session');
     const recoveryDir = join(appData, 'recovery', 'session');
     for (const d of [userDir, workDir, recoveryDir]) mkdirSync(d, { recursive: true });

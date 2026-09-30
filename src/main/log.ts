@@ -20,7 +20,7 @@ export type LogSink = (level: LogLevel, scope: string, message: string, meta?: R
 let sink: LogSink = (level, scope, message, meta) => {
   const line = `[${new Date().toISOString()}] ${level.toUpperCase()} ${scope}: ${message}`;
   if (level === 'error' || level === 'warn') console.error(line, meta ?? '');
-  else if (process.env['VARAK_DEBUG']) console.log(line, meta ?? '');
+  else if (process.env['SIMPAPER_DEBUG']) console.log(line, meta ?? '');
 };
 
 /** Replaces the output (the app installs a rotating file sink at startup). */
@@ -100,7 +100,7 @@ export interface RotatingFileSinkOptions {
   maxBytes?: number;
   maxFiles?: number;
   minLevel?: LogLevel;
-  /** Also print warnings/errors (and everything when VARAK_DEBUG is set) to the console. */
+  /** Also print warnings/errors (and everything when SIMPAPER_DEBUG is set) to the console. */
   mirrorToConsole?: boolean;
 }
 
@@ -115,7 +115,7 @@ export interface RotatingFileSink {
  * last records before a crash are on disk; logging never throws.
  */
 export function createRotatingFileSink(opts: RotatingFileSinkOptions): RotatingFileSink {
-  const base = opts.baseName ?? 'varak';
+  const base = opts.baseName ?? 'simpaper';
   const maxBytes = Math.max(4096, opts.maxBytes ?? 1024 * 1024);
   const maxFiles = Math.max(1, opts.maxFiles ?? 5);
   const minLevel = LEVEL_ORDER[opts.minLevel ?? 'info'];
@@ -150,7 +150,7 @@ export function createRotatingFileSink(opts: RotatingFileSinkOptions): RotatingF
   };
 
   const write: LogSink = (level, scope, message, meta) => {
-    if (opts.mirrorToConsole && (level === 'error' || level === 'warn' || process.env['VARAK_DEBUG'])) {
+    if (opts.mirrorToConsole && (level === 'error' || level === 'warn' || process.env['SIMPAPER_DEBUG'])) {
       const line = `${level.toUpperCase()} ${scope}: ${message}`;
       if (level === 'error' || level === 'warn') console.error(line, meta ?? '');
       else console.log(line, meta ?? '');
@@ -164,7 +164,7 @@ export function createRotatingFileSink(opts: RotatingFileSinkOptions): RotatingF
       size += buf.length;
     } catch (err) {
       broken = true;
-      console.error('Varak log sink disabled:', err);
+      console.error('Simpaper log sink disabled:', err);
     }
   };
 

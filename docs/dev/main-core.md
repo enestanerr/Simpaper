@@ -58,7 +58,7 @@ Completion pass after the interrupted first pass — all items done:
 | `src/main/app/threadpool.ts` | `UV_THREADPOOL_SIZE=16` (unless set) before anything queues work on libuv's pool (see "Thread pool"). |
 | `src/main/app/bootstrap.ts` | Composition root: logger → settings → platform → engine manager → documents → recovery → PDF → IPC → window. |
 | `src/main/app/settingsEffects.ts` | What a settings change does at runtime (theme, engine profile options, autosave, recent list, shell keys). |
-| `src/main/app/shellKeys.ts` | Forwards hook-reported Alt/F10 only while a document window (not the Varak window) has the focus. |
+| `src/main/app/shellKeys.ts` | Forwards hook-reported Alt/F10 only while a document window (not the Simpaper window) has the focus. |
 | `src/main/app/window.ts`, `theme.ts` | Main window (1280×800, min 900×600, `titleBarStyle: 'hidden'` + `titleBarOverlay`, theme background). |
 | `src/main/app/security.ts` | Permission handlers, navigation/new-window blocking, allow-listed external links. |
 | `src/main/app/quit.ts` | Graceful quit: unsaved-changes prompts, dispose, clean-shutdown marker, hard timeout. |
@@ -66,7 +66,7 @@ Completion pass after the interrupted first pass — all items done:
 | `src/main/app/appController.ts` | `app:*` services (info, settings, window controls, external links). |
 | `src/main/app/paths.ts`, `argv.ts` | Data folders; files from the command line / second instance. |
 | `src/main/app/activeState.ts` | `WindowState` incl. `active` (ViewHost.isForeground), pushed as `app:windowState`. |
-| `src/main/app/testMode.ts`, `smoke.ts` | Test-only switches (`VARAK_VIEW_MODE=hidden`, `VARAK_DATA_DIR`, `VARAK_SMOKE`); smoke boot script. |
+| `src/main/app/testMode.ts`, `smoke.ts` | Test-only switches (`SIMPAPER_VIEW_MODE=hidden`, `SIMPAPER_DATA_DIR`, `SIMPAPER_SMOKE`); smoke boot script. |
 | `src/main/app/engineDirs.ts` | Engine font folders (font check; PDF text insertion). |
 | `src/main/ipc/` | Router (`router.ts`), sender check (`sender.ts`), payload validators (`validate.ts`), one handler module per namespace. |
 | `src/main/documents/service.ts` | `DocumentService` = `DocumentRegistry` + open/create/save/export/close/print, engine events, crash restore, hang watch, engine restart. |
@@ -81,15 +81,15 @@ Completion pass after the interrupted first pass — all items done:
 | `src/main/compat/` | CompatAnalyzer: container/format sniffing and findings for OOXML, ODF and legacy files; font catalogue. |
 | `src/main/recovery/` | RecoveryService: autosave snapshots, manifests, previous-session scan, restore/discard, crash entries. |
 | `src/main/settings/` | SettingsStore (validation, migration, atomic writes, change events). |
-| `src/main/log.ts` | Logger + rotating file sink (`<local>\logs\varak.log`, 1 MiB × 5). |
+| `src/main/log.ts` | Logger + rotating file sink (`<local>\logs\simpaper.log`, 1 MiB × 5). |
 
 ## Data locations
 
-- `%APPDATA%\Varak` (roaming): `settings.json`, `recent.json` only (Chromium's session data is kept locally).
-- `%LOCALAPPDATA%\Varak`: `engine\` (profiles), `work\<session>\<docId>\` (working copies), `recovery\<session>\`,
+- `%APPDATA%\Simpaper` (roaming): `settings.json`, `recent.json` only (Chromium's session data is kept locally).
+- `%LOCALAPPDATA%\Simpaper`: `engine\` (profiles), `work\<session>\<docId>\` (working copies), `recovery\<session>\`,
   `logs\`, `session\` (Chromium session data), `tmp\` (verification PDFs).
-- Unpackaged runs use `Varak-dev` so development never touches real user data.
-- `VARAK_DATA_DIR=<absolute dir>` (tests, smoke run) puts all of the above under `<dir>\Varak[-dev]`.
+- Unpackaged runs use `Simpaper-dev` so development never touches real user data.
+- `SIMPAPER_DATA_DIR=<absolute dir>` (tests, smoke run) puts all of the above under `<dir>\Simpaper[-dev]`.
 
 ## Document lifecycle
 
@@ -104,7 +104,7 @@ legacy CSV often has thousands of ASCII rows first; the preview shows the first 
 encrypted packages → `password` prompt first, and `PASSWORD_REQUIRED`/`WRONG_PASSWORD` from the engine
 re-prompt with `retry: true`. `doc.load` gets `baseUrl` = the user's file and view params from
 `ViewHost.viewParamsFor(win, settings.engine.viewMode, lastWorkspaceRect)` (or `{ mode: 'hidden' }` with the
-`viewMode` override of tests and smoke runs, `VARAK_VIEW_MODE=hidden`); the returned hwnd is attached and gets
+`viewMode` override of tests and smoke runs, `SIMPAPER_VIEW_MODE=hidden`); the returned hwnd is attached and gets
 the visibility the renderer asked for last (`viewVisible`, else "is the active document") before any bounds —
 an engine restart of a background tab must not show its new window over the active one.
 Read-only files open for editing but Save becomes Save As.
@@ -191,7 +191,7 @@ kept and listed); or `documents:restartEngine`. A probe result that arrives whil
 closing, or has no current window, is ignored (a killed window may "answer").
 
 **Rescue offer** (`DocumentServiceDeps.offerEngineRescue`, `rescueTiming`) — a hung LibreOffice child blocks input
-for the whole Varak window (docs/dev/platform.md §6), so the bar's button may not be clickable. When a document stays
+for the whole Simpaper window (docs/dev/platform.md §6), so the bar's button may not be clickable. When a document stays
 hung for 8 s, the offer ("Restart engine" / "Wait", with what a restart loses: `none`, `sinceSnapshot` + time,
 `sinceSave`, `all`) is shown by bootstrap in Electron's message box without a parent window; "restart" runs
 `restartEngine`, "Wait" offers it again after 60 s. It is withdrawn (`AbortSignal`) when the engine answers, the
@@ -272,7 +272,7 @@ The renderer is untrusted (a pdf.js or script-injection bug must not reach files
   `pdf:merge` has no `paths` (the service-level parameters stay for tests and internal callers).
 - `app:settings:update` rejects a changed `engine.programDir` (`errors.ipc.invalidRequest`; the unchanged value is
   accepted, the settings page sends the whole `engine` group); the folder is set in settings.json or with
-  VARAK_ENGINE_DIR, must be a local drive path (no UNC/device paths) and takes effect at the next start.
+  SIMPAPER_ENGINE_DIR, must be a local drive path (no UNC/device paths) and takes effect at the next start.
 
 Renderer expectations:
 - Subscribe to `documents:event` first, then call `documents:list` (documents opened from the command line may
@@ -310,12 +310,12 @@ blocked, `fs.promises.stat` answered after 28 ms with the setting in the first i
 
 `node scripts/smoke-boot.mjs [--kind calc|impress|writer] [--out <build dir>] [--no-build] [--timeout <s>]`
 
-- Uses the shared `out/` only when it is complete, contains smoke support (the `VARAK_SMOKE` marker) and is newer
+- Uses the shared `out/` only when it is complete, contains smoke support (the `SIMPAPER_SMOKE` marker) and is newer
   than everything in `src/{main,preload,renderer,shared}`, `electron.vite.config.ts` and `package.json`; otherwise it
   builds into `test-output/main-core/out` (`electron-vite build --outDir <absolute dir>`). The shared build is never
   run or written by the script.
-- Starts Electron (ELECTRON_RUN_AS_NODE removed) with `VARAK_SMOKE=1`, `VARAK_VIEW_MODE=hidden`,
-  `VARAK_DATA_DIR=test-output/main-core/smoke/data-<pid>`, `VARAK_SMOKE_REPORT=test-output/main-core/smoke/report.json`.
+- Starts Electron (ELECTRON_RUN_AS_NODE removed) with `SIMPAPER_SMOKE=1`, `SIMPAPER_VIEW_MODE=hidden`,
+  `SIMPAPER_DATA_DIR=test-output/main-core/smoke/data-<pid>`, `SIMPAPER_SMOKE_REPORT=test-output/main-core/smoke/report.json`.
 - In the app (`src/main/app/smoke.ts`): the main window is created with `show: false` and never shown (no
   `ready-to-show` show, no fallback timer, no error dialog, no DevTools key, no shell-key hook, no command-line
   files); the engine runs `--headless` without a warm spare; documents get `hidden` views. After `did-finish-load`

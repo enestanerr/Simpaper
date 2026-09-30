@@ -12,7 +12,7 @@ from .errors import RpcError, to_error_object
 from .framing import FramingError, decode_line
 from .protocol import ErrorCode
 
-log = logging.getLogger('varak.server')
+log = logging.getLogger('simpaper.server')
 
 _EOF = object()
 _STOP = object()
@@ -51,7 +51,7 @@ class Server:
 
     def run(self):
         """Returns 0 when stdin reaches EOF or after engine.shutdown was answered, or the code given to stop()."""
-        threading.Thread(target=self._read, name='varak-stdin', daemon=True).start()
+        threading.Thread(target=self._read, name='simpaper-stdin', daemon=True).start()
         while True:
             item = self._queue.get()
             if item is _STOP:

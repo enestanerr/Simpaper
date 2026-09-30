@@ -11,7 +11,7 @@
  *   to it (`view:focus`) shortly before the window lost the focus, or the document reported activity
  *   (command state, context, selection, keys) while the window was blurred. Returning to the window resets
  *   the guess. Known gap of this fallback: switching from a document view straight to another application
- *   is not observable, so the title bar stays active until Varak regains and loses the focus.
+ *   is not observable, so the title bar stays active until Simpaper regains and loses the focus.
  */
 import { create } from 'zustand';
 import type { WindowState } from '@shared/api/app';

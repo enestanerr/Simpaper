@@ -89,7 +89,7 @@ export interface DocumentServiceDeps {
   requestQuit?: () => void;
   /**
    * View mode for new views; defaults to `settings.engine.viewMode`. Tests and the smoke run pass
-   * `() => 'hidden'` (VARAK_VIEW_MODE=hidden) so that no native window is ever created.
+   * `() => 'hidden'` (SIMPAPER_VIEW_MODE=hidden) so that no native window is ever created.
    */
   viewMode?: () => ViewMode;
   /**
@@ -100,8 +100,8 @@ export interface DocumentServiceDeps {
   /** How long a PDF flush request waits for the renderer's `documents:flushDone` (default 10 s). */
   flushTimeoutMs?: number;
   /**
-   * Offers to restart a hung engine in a window of its own. While LibreOffice's window inside the Varak window
-   * hangs, Windows holds back mouse and keyboard input for the whole Varak window (their input queues are
+   * Offers to restart a hung engine in a window of its own. While LibreOffice's window inside the Simpaper window
+   * hangs, Windows holds back mouse and keyboard input for the whole Simpaper window (their input queues are
    * attached), so the message bar's "Restart engine" can't be clicked; a window without an owner still gets input.
    * Resolves with the user's choice; `signal` withdraws the offer (the engine answers again, the document is
    * closed or restarted).
@@ -356,7 +356,7 @@ export class DocumentService implements DocumentRegistry {
   }
 
   /**
-   * `view:focus`: activates the native window (owned mode, only while Varak is in the foreground) and asks
+   * `view:focus`: activates the native window (owned mode, only while Simpaper is in the foreground) and asks
    * the engine to put the keyboard focus into the document (VCL decides focus inside LibreOffice).
    */
   focusView(docId: string): void {
@@ -1222,7 +1222,7 @@ export class DocumentService implements DocumentRegistry {
    * `errors.engine.notResponding` and `ready` again (`errors.engine.responding`) when it answers. Recovery
    * paths for the user: wait, close the document (`closeStuck` prompt; its recovery snapshot is kept and
    * listed), or `restartEngine` (documents:restartEngine, or the rescue offer in a window of its own when the
-   * hang outlasts `rescueTiming.delayMs`: the Varak window itself may not get input meanwhile).
+   * hang outlasts `rescueTiming.delayMs`: the Simpaper window itself may not get input meanwhile).
    */
   watchHangs(detector: HangDetector, timing: { intervalMs?: number; timeoutMs?: number; strikes?: number } = {}): HangWatch {
     return startHangWatch({

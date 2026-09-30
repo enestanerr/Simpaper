@@ -174,7 +174,7 @@ describe('save', () => {
 
   it('warns before overwriting a signed original with a rewritten file and can save a copy instead', async () => {
     const signedDoc = await PDFDocument.load(await makePagedPdf({ pages: 2 }));
-    signedDoc.catalog.set(PDFName.of('VarakTestSig'), signedDoc.context.obj({ Type: 'Sig', ByteRange: [0, 10, 20, 30], Contents: PDFString.of('00') }));
+    signedDoc.catalog.set(PDFName.of('SimpaperTestSig'), signedDoc.context.obj({ Type: 'Sig', ByteRange: [0, 10, 20, 30], Contents: PDFString.of('00') }));
     // Signature dictionaries are never inside object streams in real files.
     const signed = await signedDoc.save({ useObjectStreams: false });
     ctx = await setup(signed);

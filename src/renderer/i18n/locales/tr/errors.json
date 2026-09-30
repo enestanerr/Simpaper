@@ -26,7 +26,7 @@
     "formatNotWritable": "Bu biçimde kaydedilemez. Başka bir biçim seçin.",
     "wrongKind": "Bu belge seçilen dosya türünde kaydedilemez.",
     "usePdfExport": "PDF oluşturmak için \"PDF olarak dışa aktar\" komutunu kullanın.",
-    "targetOpen": "Bu dosya Varak'ta başka bir sekmede açık. Önce o sekmeyi kapatın ya da farklı bir ad seçin.",
+    "targetOpen": "Bu dosya Simpaper'da başka bir sekmede açık. Önce o sekmeyi kapatın ya da farklı bir ad seçin.",
     "notFound": "Belge artık açık değil.",
     "notReady": "Belge henüz hazır değil. Birkaç saniye sonra yeniden deneyin."
   },
@@ -53,8 +53,8 @@
     "restartNotNeeded": "Belge motoru çalışıyor; yeniden başlatmaya gerek yok."
   },
   "command": {
-    "unavailable": "Bu komut Varak'ta kullanılamaz.",
-    "macrosDisabled": "Güvenliğiniz için makrolar Varak'ta hiçbir zaman çalıştırılmaz.",
+    "unavailable": "Bu komut Simpaper'da kullanılamaz.",
+    "macrosDisabled": "Güvenliğiniz için makrolar Simpaper'da hiçbir zaman çalıştırılmaz.",
     "notAllowed": "Bu komuta izin verilmiyor.",
     "remoteUnsupported": "Uzak dosyalar desteklenmiyor. Dosyayı bilgisayarınıza kaydedip açın."
   },

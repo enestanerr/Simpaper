@@ -14,12 +14,12 @@
  *   - Fonts/*            -> share/fonts/truetype/ (privately registered by LibreOffice at start-up),
  *   - System64/*.dll     -> program/ (Visual C++ runtime; the MSI normally installs it system-wide).
  * License files (LICENSE.html, license.txt, NOTICE, CREDITS.fodt, readmes/) are kept unchanged.
- * A summary is written to VARAK-ENGINE.json in the output folder.
+ * A summary is written to SIMPAPER-ENGINE.json in the output folder.
  *
  * Usage:
  *   node scripts/engine/prepare-engine.mjs [--source DIR] [--out DIR] [--ui-langs en-US,tr]
  *        [--dicts en,tr] [--copy] [--dry-run] [--verify] [--work-dir DIR]
- * Environment: VARAK_ENGINE_UI_LANGS, VARAK_ENGINE_DICTIONARIES override the language defaults.
+ * Environment: SIMPAPER_ENGINE_UI_LANGS, SIMPAPER_ENGINE_DICTIONARIES override the language defaults.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -252,8 +252,8 @@ export function prepareEngine({ sourceDir, outDir, uiLangs, dictionaries, mode =
   const used = { link: 0, copy: 0 };
   for (const f of plan) used[linkOrCopy(path.join(sourceDir, ...f.rel.split('/')), path.join(outDir, ...f.to.split('/')), mode)]++;
   for (const d of dirs) fs.mkdirSync(path.join(outDir, ...d.split('/')), { recursive: true });
-  fs.writeFileSync(path.join(outDir, 'VARAK-ENGINE.json'), `${JSON.stringify(summary, null, 2)}\n`);
-  log(`Wrote ${outDir} (${used.link} hard links, ${used.copy} copies) and VARAK-ENGINE.json`);
+  fs.writeFileSync(path.join(outDir, 'SIMPAPER-ENGINE.json'), `${JSON.stringify(summary, null, 2)}\n`);
+  log(`Wrote ${outDir} (${used.link} hard links, ${used.copy} copies) and SIMPAPER-ENGINE.json`);
   return summary;
 }
 
@@ -283,8 +283,8 @@ async function main() {
   const summary = prepareEngine({
     sourceDir,
     outDir,
-    uiLangs: listOption(values['ui-langs'], 'VARAK_ENGINE_UI_LANGS', DEFAULT_UI_LANGS),
-    dictionaries: listOption(values.dicts, 'VARAK_ENGINE_DICTIONARIES', DEFAULT_DICTIONARIES),
+    uiLangs: listOption(values['ui-langs'], 'SIMPAPER_ENGINE_UI_LANGS', DEFAULT_UI_LANGS),
+    dictionaries: listOption(values.dicts, 'SIMPAPER_ENGINE_DICTIONARIES', DEFAULT_DICTIONARIES),
     mode: values.copy ? 'copy' : 'link',
     dryRun: values['dry-run'],
   });

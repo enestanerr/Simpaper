@@ -45,7 +45,7 @@
 .vpdf__stage--placing .vpdf__container .textLayer span {
   cursor: crosshair;
 }
-.vpdf__container.varak-pdf-fields-plain .annotationLayer {
+.vpdf__container.simpaper-pdf-fields-plain .annotationLayer {
   --annotation-unfocused-field-background: none;
   --annotation-unfocused-field-filter: none;
 }

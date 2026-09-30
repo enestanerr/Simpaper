@@ -100,7 +100,7 @@ describe('DefaultEngineManager profile options', () => {
   const managers: DefaultEngineManager[] = [];
 
   beforeEach(() => {
-    root = mkdtempSync(join(tmpdir(), 'varak-engine-manager-'));
+    root = mkdtempSync(join(tmpdir(), 'simpaper-engine-manager-'));
     state.started.length = 0;
     state.collisions.length = 0;
     state.located.length = 0;

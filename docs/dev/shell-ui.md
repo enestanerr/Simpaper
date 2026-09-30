@@ -29,7 +29,7 @@ bundle build and headless engine probes. The app was used on screen in the GUI r
 
 ## 2. Data flow
 
-- The preload exposes `window.varakIpc` (`VarakIpcBridge`). `services/ipc.ts` is the only direct user; everything
+- The preload exposes `window.simpaperIpc` (`SimpaperIpcBridge`). `services/ipc.ts` is the only direct user; everything
   checks `hasBridge()` so components render in tests and previews.
 - `services/bootstrap.ts`: `wireEvents()` subscribes to `documents:event`, `app:settingsChanged`, `app:windowState`;
   `loadInitialState()` loads settings, app info, open documents, window state. `handleDocumentEvent()` routes
@@ -215,7 +215,7 @@ components; the freeze following the shown document; dialogs across blur; the ri
 in collapsed groups), `lifecycle` (closing notice, open/create/restore results, pushing PDF edits before a close and
 on `flushRequest`, Calc input line after an engine restart), `integration` (action routing, `pdf:*` states in the ribbon, engine state, contextual tabs, KeyTips,
 title bar), `shell` (start screen, recent/recovery, tabs, backstage, prompts, message bars, shortcuts — jsdom with a fake
-`window.varakIpc`), `modules` (registry, lazy PDF workspace). JSX in test files needs the `// @jsxRuntime automatic`
+`window.simpaperIpc`), `modules` (registry, lazy PDF workspace). JSX in test files needs the `// @jsxRuntime automatic`
 pragma (the test files are outside `tsconfig.web.json`, so esbuild would use the classic runtime).
 
 Verified results (2026-09-29):
@@ -253,7 +253,7 @@ Verified results (2026-09-29):
   did not return within 90 s; after a Calc/Impress document it loads in ~0.5 s (matches the Writer hang noted in
   main-core.md; engine layer).
 - Title bar fallback (no `WindowState.active`): switching from a document window straight to another application is
-  not observable; the title bar stays active until Varak regains and loses the focus.
+  not observable; the title bar stays active until Simpaper regains and loses the focus.
 - Status texts from the engine (`.uno:StateTableCell`, `.uno:PageStatus`, `.uno:LanguageStatus`) arrive in the engine's
   UI language (the first session's probe saw Turkish "Ortalama: …; Toplam: …" with an en-US profile locale).
 - Sidebar decks (styles, transitions, animations, accessibility check, navigator) are LibreOffice's own UI inside the
@@ -312,6 +312,6 @@ Later in session 2 (found by the usage review and the GUI runs), each with a tes
   it (`view:focusShell`) when a press moves the focus into a text box, or outside `.rb-ribbon`, `.vr-titlebar`,
   `.vr-doctabs`, `.vr-status`, `.vr-popup`; `holdKeyboard()` in `Dialog` (gives it back to the document if it took it)
   and `holdKeyboard('always')` in the backstage; `activateDocument` claims it for a PDF. Programmatic focus alone
-  never claims it. Tests: `shell.test.tsx` › "keyboard between Varak and the document".
+  never claims it. Tests: `shell.test.tsx` › "keyboard between Simpaper and the document".
 - One "not responding" bar per document (`hang:<docId>`), dismissed when the document leaves `busy`. Test:
   `shell.test.tsx` › "keeps one "not responding" bar per document".

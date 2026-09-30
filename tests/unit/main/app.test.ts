@@ -108,7 +108,7 @@ describe('main entry', () => {
 });
 
 describe('shell keys from the keyboard hook', () => {
-  it('reach the renderer only while a document window, not the Varak window itself, has the focus', () => {
+  it('reach the renderer only while a document window, not the Simpaper window itself, has the focus', () => {
     const sent: string[] = [];
     const target = (hostFocused: boolean, activeDocId: string | null, kind?: 'writer' | 'pdf') => ({
       hostFocused: () => hostFocused,
@@ -131,34 +131,34 @@ describe('shell keys from the keyboard hook', () => {
 describe('command line and paths', () => {
   it('extracts supported files, skipping switches and the unpackaged app path', () => {
     const cwd = process.platform === 'win32' ? 'C:\\Users\\x' : '/home/x';
-    const argv = ['varak.exe', '--allow-file-access-from-files', 'Rapor.docx', 'notes.xyz', 'Tablo.XLSX', 'Rapor.docx'];
+    const argv = ['simpaper.exe', '--allow-file-access-from-files', 'Rapor.docx', 'notes.xyz', 'Tablo.XLSX', 'Rapor.docx'];
     expect(filesFromArgv(argv, cwd, true)).toEqual([join(cwd, 'Rapor.docx'), join(cwd, 'Tablo.XLSX')]);
     expect(filesFromArgv(['electron.exe', '.', 'a.pdf'], cwd, false)).toEqual([join(cwd, 'a.pdf')]);
-    expect(filesFromArgv(['varak.exe', 'https://evil.example/x.docx'], cwd, true)).toEqual([]);
+    expect(filesFromArgv(['simpaper.exe', 'https://evil.example/x.docx'], cwd, true)).toEqual([]);
     expect(isSecondInstanceData({ argv: ['a'], cwd: 'b' })).toBe(true);
     expect(isSecondInstanceData({ argv: 'a' })).toBe(false);
   });
 
   it('keeps roaming settings and machine-local data apart', () => {
-    const p = resolveAppPaths({ appData: 'C:\\Users\\x\\AppData\\Roaming', localAppData: 'C:\\Users\\x\\AppData\\Local', folderName: 'Varak', platform: 'win32' });
-    expect(p.settingsFile).toBe(join('C:\\Users\\x\\AppData\\Roaming', 'Varak', 'settings.json'));
-    expect(p.recovery).toBe(join('C:\\Users\\x\\AppData\\Local', 'Varak', 'recovery'));
-    expect(p.engineProfiles).toBe(join('C:\\Users\\x\\AppData\\Local', 'Varak', 'engine'));
-    const fallback = resolveAppPaths({ appData: 'C:\\Users\\x\\AppData\\Roaming', folderName: 'Varak-dev', platform: 'win32' });
-    expect(fallback.logs).toBe(join('C:\\Users\\x\\AppData\\Local', 'Varak-dev', 'logs'));
+    const p = resolveAppPaths({ appData: 'C:\\Users\\x\\AppData\\Roaming', localAppData: 'C:\\Users\\x\\AppData\\Local', folderName: 'Simpaper', platform: 'win32' });
+    expect(p.settingsFile).toBe(join('C:\\Users\\x\\AppData\\Roaming', 'Simpaper', 'settings.json'));
+    expect(p.recovery).toBe(join('C:\\Users\\x\\AppData\\Local', 'Simpaper', 'recovery'));
+    expect(p.engineProfiles).toBe(join('C:\\Users\\x\\AppData\\Local', 'Simpaper', 'engine'));
+    const fallback = resolveAppPaths({ appData: 'C:\\Users\\x\\AppData\\Roaming', folderName: 'Simpaper-dev', platform: 'win32' });
+    expect(fallback.logs).toBe(join('C:\\Users\\x\\AppData\\Local', 'Simpaper-dev', 'logs'));
   });
 });
 
 describe('security and window chrome', () => {
   it('allows only listed https URLs to open externally', () => {
-    expect(isAllowedExternalUrl('https://github.com/enestanerr/varak/issues/12')).toBe(true);
-    expect(isAllowedExternalUrl('https://github.com/enestanerr/varak/blob/main/THIRD_PARTY_NOTICES.md')).toBe(true);
+    expect(isAllowedExternalUrl('https://github.com/ncreativestudios/Simpaper/issues/12')).toBe(true);
+    expect(isAllowedExternalUrl('https://github.com/ncreativestudios/Simpaper/blob/main/THIRD_PARTY_NOTICES.md')).toBe(true);
     expect(isAllowedExternalUrl('https://www.mozilla.org/en-US/MPL/2.0/')).toBe(true);
-    expect(isAllowedExternalUrl('http://github.com/enestanerr/varak')).toBe(false);
-    expect(isAllowedExternalUrl('https://github.com/enestanerr/varakx')).toBe(false);
-    expect(isAllowedExternalUrl('https://github.com/enestanerr/other-repo')).toBe(false);
-    expect(isAllowedExternalUrl('https://github.com/varak-office/varak')).toBe(false);
-    expect(isAllowedExternalUrl('https://user:pw@github.com/enestanerr/varak')).toBe(false);
+    expect(isAllowedExternalUrl('http://github.com/ncreativestudios/Simpaper')).toBe(false);
+    expect(isAllowedExternalUrl('https://github.com/ncreativestudios/Simpaperx')).toBe(false);
+    expect(isAllowedExternalUrl('https://github.com/ncreativestudios/other-repo')).toBe(false);
+    expect(isAllowedExternalUrl('https://github.com/ncreativestudios')).toBe(false);
+    expect(isAllowedExternalUrl('https://user:pw@github.com/ncreativestudios/Simpaper')).toBe(false);
     expect(isAllowedExternalUrl('file:///C:/Windows/System32/calc.exe')).toBe(false);
     expect(isAllowedExternalUrl('javascript:alert(1)')).toBe(false);
   });

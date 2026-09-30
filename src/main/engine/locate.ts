@@ -2,7 +2,7 @@
  * Finds the LibreOffice program directory, the bridge package and the profile template.
  *
  * Program directory, in this order:
- *   explicit option (settings.engine.programDir) → env VARAK_ENGINE_DIR →
+ *   explicit option (settings.engine.programDir) → env SIMPAPER_ENGINE_DIR →
  *   packaged `<resources>/engine/program` → development `<repo>/vendor/libreoffice/program`.
  * Bridge: packaged `<resources>/bridge`, development `<repo>/engine/bridge`.
  * Profile template: packaged `<resources>/profile`, development `<repo>/engine/profile`.
@@ -17,7 +17,7 @@ export interface EnginePaths {
   sofficeExe: string;
   /** LibreOffice's Python launcher (spawns the bundled interpreter). */
   pythonExe: string;
-  /** Directory that contains the `varak_bridge` package (goes on PYTHONPATH). */
+  /** Directory that contains the `simpaper_bridge` package (goes on PYTHONPATH). */
   bridgeDir: string;
   /** Directory with registrymodifications.xcu.template and accelerators.json. */
   profileTemplateDir: string;
@@ -35,8 +35,8 @@ export interface LocateOptions {
 
 export type LocateResult = { ok: true; paths: EnginePaths } | { ok: false; error: string; tried: string[] };
 
-export const ENGINE_DIR_ENV = 'VARAK_ENGINE_DIR';
-const BRIDGE_MARKER = join('varak_bridge', '__init__.py');
+export const ENGINE_DIR_ENV = 'SIMPAPER_ENGINE_DIR';
+const BRIDGE_MARKER = join('simpaper_bridge', '__init__.py');
 const TEMPLATE_MARKER = 'registrymodifications.xcu.template';
 
 function executables(platform: NodeJS.Platform): { soffice: string; python: string } {
@@ -109,7 +109,7 @@ export function locateEngine(opts: LocateOptions = {}): LocateResult {
 
   const bridgeCandidates = [resources && join(resources, 'bridge'), repo && join(repo, 'engine', 'bridge')].filter(Boolean) as string[];
   const bridgeDir = bridgeCandidates.find((d) => isFile(join(d, BRIDGE_MARKER)));
-  if (!bridgeDir) return { ok: false, error: 'Engine bridge (varak_bridge) not found', tried: [...tried, ...bridgeCandidates] };
+  if (!bridgeDir) return { ok: false, error: 'Engine bridge (simpaper_bridge) not found', tried: [...tried, ...bridgeCandidates] };
 
   const templateCandidates = [resources && join(resources, 'profile'), repo && join(repo, 'engine', 'profile')].filter(Boolean) as string[];
   const profileTemplateDir = templateCandidates.find((d) => isFile(join(d, TEMPLATE_MARKER)));

@@ -1,4 +1,4 @@
-# Contributing to Varak
+# Contributing to Simpaper
 
 Thank you for helping to build a free, Office-familiar office suite. Contributions of every size are welcome: bug
 reports, translations, test files with clean licenses, documentation and code. You can write issues and pull
@@ -24,10 +24,10 @@ rest of the project ([ADR 0006](docs/adr/0006-license.md)). There is no contribu
 
 ## Ways to contribute
 
-- **Report a bug** with the [bug report form](https://github.com/enestanerr/varak/issues/new/choose). Never
+- **Report a bug** with the [bug report form](https://github.com/ncreativestudios/Simpaper/issues/new/choose). Never
   attach confidential documents; create a small file that shows the problem instead.
 - **Suggest a feature** with the feature request form, or start a
-  [discussion](https://github.com/enestanerr/varak/discussions) when the idea is not concrete yet. Check the
+  [discussion](https://github.com/ncreativestudios/Simpaper/discussions) when the idea is not concrete yet. Check the
   [roadmap](docs/ROADMAP.md) first.
 - **Improve translations**: every user-facing text exists in Turkish and English (see [Translations](#translations)).
 - **Add test files**: small documents that exercise a feature, generated or under a permissive license (see
@@ -51,8 +51,8 @@ rest of the project ([ADR 0006](docs/adr/0006-license.md)). There is no contribu
 ### First build
 
 ```powershell
-git clone https://github.com/enestanerr/varak.git
-cd varak
+git clone https://github.com/ncreativestudios/Simpaper.git
+cd Simpaper
 npm ci                  # exact dependency versions from package-lock.json
 npm run engine:fetch    # downloads LibreOffice 26.8.0.3, verifies SHA-256 and signature, extracts it to vendor/
 npm test                # unit tests (no windows)
@@ -77,7 +77,7 @@ Useful commands:
 `npm run engine:fetch` writes only inside the repository (`vendor/`, git-ignored) and installs nothing on your
 system. To test with another LibreOffice `program` folder, for example the prepared engine in
 `vendor/engine-dist/program` (which has the bundled fonts where LibreOffice looks for them), set
-`VARAK_ENGINE_DIR` to that folder.
+`SIMPAPER_ENGINE_DIR` to that folder.
 
 ### VS Code and `ELECTRON_RUN_AS_NODE`
 
@@ -108,7 +108,7 @@ notes in [docs/dev/](docs/dev/).
 | `src/main/` | Electron main process: `app/` (start-up, window, security), `ipc/` (router and validators), `documents/` (open/save/close), `files/` (safe save, working copies), `compat/` (loss-risk analysis), `recovery/`, `settings/`, `engine/` (engine processes and RPC), `pdf/` (PDF file operations), `platform/` (Win32 window hosting, process guard) |
 | `src/preload/` | The only bridge between the sandboxed renderer and the main process |
 | `src/renderer/` | React UI: `shell/` (title bar, backstage, tabs, status bar), `ribbon/` (ribbon framework), `modules/` (writer, calc, impress, pdf), `i18n/`, `theme/` |
-| `engine/bridge/` | `varak_bridge`, a Python package that runs on LibreOffice's bundled Python and talks UNO to the engine; NDJSON JSON-RPC over stdio |
+| `engine/bridge/` | `simpaper_bridge`, a Python package that runs on LibreOffice's bundled Python and talks UNO to the engine; NDJSON JSON-RPC over stdio |
 | `engine/profile/` | Template of the engine's user profile (macros disabled, updates off, shortcuts) |
 | `scripts/` | Engine fetch/prepare/verify, corpus generator, notices, icons, smoke boot (`smoke-boot.mjs`), GUI runs and on-screen checks (`gui/`, `gui/checks/`; they open windows, see [Testing rules](#testing-rules)) |
 | `tests/` | `unit/`, `engine/` (headless LibreOffice), `tools/` (independent OOXML/ODF/PDF readers), `corpus/` |
@@ -197,7 +197,7 @@ only commands on the allow-list in `src/shared/commands.ts`, so a new command ne
 - Use Microsoft Office's established Turkish terms where they exist (Giriş, Ekle, Düzen, Gözden Geçir, Görünüm …),
   "siz" form, sentence case. Turkish text must use `tr` locale rules for upper/lower case (`İ`/`i`, `I`/`ı`); use
   the helpers in `src/renderer/i18n/turkish.ts` instead of `toUpperCase()`.
-- LibreOffice's own dialogs are translated by LibreOffice and are not part of Varak's files.
+- LibreOffice's own dialogs are translated by LibreOffice and are not part of Simpaper's files.
 
 ## Code style
 

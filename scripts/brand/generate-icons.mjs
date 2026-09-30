@@ -5,7 +5,7 @@
  * Outputs:
  *   build/icon.ico            app icon for electron-builder (PNG-compressed entries, 16-256 px)
  *   build/icon.png            512 px app icon
- *   resources/icons/*.png     app and module icons for the UI (varak-<size>.png, <module>-<size>.png)
+ *   resources/icons/*.png     app and module icons for the UI (simpaper-<size>.png, <module>-<size>.png)
  *
  * Sizes up to 32 px use the simplified mark (logo-small.svg). Every written file is read back and
  * its dimensions are checked.
@@ -109,7 +109,7 @@ function main() {
   const appIcon = (size) => renderSvg(size <= SMALL_MARK_MAX ? logoSmall : logo, size);
   const written = [];
 
-  for (const size of APP_SIZES) written.push(writeChecked(path.join(iconsDir, `varak-${size}.png`), appIcon(size), size));
+  for (const size of APP_SIZES) written.push(writeChecked(path.join(iconsDir, `simpaper-${size}.png`), appIcon(size), size));
   for (const name of MODULES) {
     const svg = readSvg(name);
     for (const size of MODULE_SIZES) written.push(writeChecked(path.join(iconsDir, `${name}-${size}.png`), renderSvg(svg, size), size));

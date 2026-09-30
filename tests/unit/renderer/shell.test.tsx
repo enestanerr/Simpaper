@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 // @jsxRuntime automatic
 /**
- * Shell smoke tests with a fake preload bridge (`window.varakIpc`): start screen, new/open/recent/recovery,
+ * Shell smoke tests with a fake preload bridge (`window.simpaperIpc`): start screen, new/open/recent/recovery,
  * document tabs, File backstage pages, prompt dialogs from the main process, message bars and shortcuts.
  * Nothing here opens windows or starts the engine.
  */
@@ -27,7 +27,7 @@ import { descriptor, FakeIpc, flush, installIpc, removeIpc, resetRendererState }
 const pdfModule = { kind: 'pdf', ribbon: pdfRibbon, actions: pdfActions, Workspace: () => <div>pdf</div> } as unknown as ModuleDefinition;
 
 const APP_INFO: AppInfo = {
-  productName: 'Varak',
+  productName: 'Simpaper',
   version: '0.1.0',
   electronVersion: '44.4.5',
   chromeVersion: '152',
@@ -84,7 +84,7 @@ describe('start screen', () => {
   it('offers blank documents, opening files and the recent list, and opens a new document', async () => {
     ipc.handle('documents:create', ({ kind }) => descriptor('c1', kind, { title: 'Hesap Tablosu1' }));
     await renderShell();
-    expect(screen.getByRole('heading', { level: 1, name: 'Varak' })).toBeTruthy();
+    expect(screen.getByRole('heading', { level: 1, name: 'Simpaper' })).toBeTruthy();
     expect(screen.getByRole('button', { name: /Boş belge/ })).toBeTruthy();
     expect(screen.getByRole('button', { name: /Boş sunu/ })).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Dosya aç…' })).toBeTruthy();
@@ -97,11 +97,11 @@ describe('start screen', () => {
     expect(ipc.callsTo('documents:create').map((c) => c.req)).toEqual([{ kind: 'calc' }]);
     expect(ipc.callsTo('documents:activate').map((c) => c.req)).toEqual([{ docId: 'c1' }]);
     // The Calc UI replaced the start screen: ribbon, formula bar, document area.
-    expect(screen.queryByRole('heading', { level: 1, name: 'Varak' })).toBeNull();
+    expect(screen.queryByRole('heading', { level: 1, name: 'Simpaper' })).toBeNull();
     expect(screen.getByRole('tab', { name: 'Formüller' })).toBeTruthy();
     expect(screen.getByRole('group', { name: 'Formül çubuğu' })).toBeTruthy();
     expect(screen.getByRole('region', { name: 'Belge alanı: Hesap Tablosu1' })).toBeTruthy();
-    expect(document.title).toBe('Hesap Tablosu1 — Varak');
+    expect(document.title).toBe('Hesap Tablosu1 — Simpaper');
   });
 
   it('opens recent files, disables missing ones and offers recovery', async () => {
@@ -454,7 +454,7 @@ describe('message bars and shortcuts', () => {
   });
 });
 
-describe('keyboard between Varak and the document (GUI check 2026-09-29: a letter for the font box went into the document)', () => {
+describe('keyboard between Simpaper and the document (GUI check 2026-09-29: a letter for the font box went into the document)', () => {
   it('a press into a text box claims the keyboard; switching ribbon tabs or a focus change without a press does not', async () => {
     ipc.handle('view:focusShell', () => true);
     open(descriptor('w1', 'writer'));
@@ -502,7 +502,7 @@ describe('keyboard between Varak and the document (GUI check 2026-09-29: a lette
   });
 
   it('closing the backstage always returns the keyboard to the document, as in Office', async () => {
-    // The focus was in Varak already (e.g. the font box): nothing was taken, yet the document gets the keyboard.
+    // The focus was in Simpaper already (e.g. the font box): nothing was taken, yet the document gets the keyboard.
     ipc.handle('view:focusShell', () => false);
     open(descriptor('w1', 'writer'));
     await renderShell();

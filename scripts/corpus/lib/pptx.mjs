@@ -105,15 +105,15 @@ function themeXml(name) {
         {},
         el(
           'a:clrScheme',
-          { name: 'Varak' },
+          { name: 'Simpaper' },
           el('a:dk1', {}, el('a:sysClr', { val: 'windowText', lastClr: '000000' })),
           el('a:lt1', {}, el('a:sysClr', { val: 'window', lastClr: 'FFFFFF' })),
           Object.entries(colors).map(([k, v]) => el(`a:${k}`, {}, el('a:srgbClr', { val: v }))),
         ),
-        el('a:fontScheme', { name: 'Varak' }, el('a:majorFont', {}, font), el('a:minorFont', {}, font)),
+        el('a:fontScheme', { name: 'Simpaper' }, el('a:majorFont', {}, font), el('a:minorFont', {}, font)),
         el(
           'a:fmtScheme',
-          { name: 'Varak' },
+          { name: 'Simpaper' },
           el('a:fillStyleLst', {}, three(() => scheme('phClr'))),
           el('a:lnStyleLst', {}, three((i) => el('a:ln', { w: 6350 * i }, scheme('phClr')))),
           el('a:effectStyleLst', {}, three(() => el('a:effectStyle', {}, el('a:effectLst')))),
@@ -248,7 +248,7 @@ function slideXml(shapes) {
 
 // ---------------------------------------------------------------------------------------------- slides
 function standardSlides(variant) {
-  const picAlt = 'Varak test görseli';
+  const picAlt = 'Simpaper test görseli';
   const table = [
     ['Ürün', 'Fiyat'],
     ['Çay', '12,50 ₺'],
@@ -263,7 +263,7 @@ function standardSlides(variant) {
   return [
     {
       layout: 1,
-      title: 'Varak Sunum Testi',
+      title: 'Simpaper Sunum Testi',
       subtitle: `Türkçe karakterler: ${TR.lower} ${TR.upper} — ${TR.casing}`,
       notes: `Konuşmacı notu 1: ${TR.pangram}`,
     },
@@ -359,15 +359,15 @@ export async function buildPptx(opts = {}) {
         ['rId3', REL.extProps, 'docProps/app.xml'],
       ]),
     ],
-    ['docProps/core.xml', corePropsXml({ title: 'Varak Sunum Testi', subject: 'Türkçe PPTX test sunusu', creator: AUTHOR, language: 'tr-TR', created: FIXED_DATE_ISO })],
-    ['docProps/app.xml', appPropsXml({ application: 'Varak corpus generator' })],
+    ['docProps/core.xml', corePropsXml({ title: 'Simpaper Sunum Testi', subject: 'Türkçe PPTX test sunusu', creator: AUTHOR, language: 'tr-TR', created: FIXED_DATE_ISO })],
+    ['docProps/app.xml', appPropsXml({ application: 'Simpaper corpus generator' })],
     ['ppt/_rels/presentation.xml.rels', relsXml(presRels)],
     ['ppt/presentation.xml', presentation],
     ['ppt/presProps.xml', XML_DECL + el('p:presentationPr', P_NS)],
     ['ppt/viewProps.xml', XML_DECL + el('p:viewPr', P_NS, el('p:gridSpacing', { cx: 72_008, cy: 72_008 }))],
     ['ppt/tableStyles.xml', XML_DECL + el('a:tblStyleLst', { 'xmlns:a': NS.a, def: '{5C22544A-7EE6-4342-B048-85BDC9FD1C3A}' })],
-    ['ppt/theme/theme1.xml', themeXml('Varak')],
-    ['ppt/theme/theme2.xml', themeXml('Varak Notlar')],
+    ['ppt/theme/theme1.xml', themeXml('Simpaper')],
+    ['ppt/theme/theme2.xml', themeXml('Simpaper Notlar')],
     ['ppt/slideMasters/_rels/slideMaster1.xml.rels', relsXml([...LAYOUTS.map((_, i) => [`rId${i + 1}`, REL.slideLayout, `../slideLayouts/slideLayout${i + 1}.xml`]), ['rId9', REL.theme, '../theme/theme1.xml']])],
     ['ppt/slideMasters/slideMaster1.xml', masterXml(LAYOUTS.length)],
     ...LAYOUTS.flatMap((layout, i) => [

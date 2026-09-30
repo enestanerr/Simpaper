@@ -17,7 +17,7 @@ export async function dispatchUno(docId: string, command: string, args?: Record<
   const doc = getDocument(docId);
   if (!doc || !isOfficeKind(doc.kind) || !hasBridge()) return false;
   if (!isAllowedUnoCommand(doc.kind, command)) {
-    console.warn(`[varak] blocked command not in allow-list: ${command}`);
+    console.warn(`[simpaper] blocked command not in allow-list: ${command}`);
     return false;
   }
   try {

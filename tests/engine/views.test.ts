@@ -5,7 +5,7 @@
  *  - every document is loaded with `startHidden` (MediaDescriptor Hidden), and `view.setVisible(true)`
  *    is never called;
  *  - the returned HWNDs are inspected with the platform's Win32 bindings (koffi): the engine owns an owned
- *    view's frame before loading into it (engine/bridge/varak_bridge/owned.py), so the platform's real
+ *    view's frame before loading into it (engine/bridge/simpaper_bridge/owned.py), so the platform's real
  *    owned-mode code (makeOwned) must find nothing left to change.
  * Windows only; skipped without the engine or koffi.
  */
@@ -24,8 +24,8 @@ import { engineAvailable, log, makeManager, TURKISH } from './helpers';
 
 const api = process.platform === 'win32' ? win32() : null;
 
-// Bridges started by this file offer the test-only 'debug.viewChrome' (varak_bridge/methods.py).
-process.env['VARAK_BRIDGE_TEST_HOOKS'] = '1';
+// Bridges started by this file offer the test-only 'debug.viewChrome' (simpaper_bridge/methods.py).
+process.env['SIMPAPER_BRIDGE_TEST_HOOKS'] = '1';
 interface ViewChrome {
   layoutVisible: boolean;
   visibleElements: string[];
@@ -46,7 +46,7 @@ const GetMessageW = user32.func('__stdcall', 'GetMessageW', 'int', [koffi.out(ko
 const DispatchMessageW = user32.func('__stdcall', 'DispatchMessageW', 'intptr_t', [koffi.pointer(MSG)]);
 if (process.argv[1] === 'pmv1') SetProcessDpiAwarenessContext(-3);
 // WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, no WS_VISIBLE: never shown.
-const hwnd = CreateWindowExW(0, 'STATIC', 'Varak engine view test host', 0x00CF0000 | 0x02000000, 100, 100, 900, 700, null, null, GetModuleHandleW(null), null);
+const hwnd = CreateWindowExW(0, 'STATIC', 'Simpaper engine view test host', 0x00CF0000 | 0x02000000, 100, 100, 900, 700, null, null, GetModuleHandleW(null), null);
 if (!hwnd) { fs.writeSync(1, 'ERROR\\n'); process.exit(1); }
 fs.writeSync(1, 'HWND ' + BigInt.asUintN(32, BigInt(hwnd)) + '\\n');
 const msg = {};

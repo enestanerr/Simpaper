@@ -1,5 +1,5 @@
 /**
- * One engine instance: an unmodified soffice (own profile, random named pipe) plus the varak_bridge
+ * One engine instance: an unmodified soffice (own profile, random named pipe) plus the simpaper_bridge
  * process that talks UNO to it and NDJSON JSON-RPC to us.
  *
  * Process tree on Windows: soffice.exe (launcher) → soffice.bin; python.exe (launcher) → python (bridge).
@@ -21,7 +21,7 @@ import type { EngineCallOptions, EngineExitInfo, EngineInstance, EngineInstanceI
 export const RESTART_EXIT_CODE = 81;
 /**
  * The bridge exits with this code when its URP connection to soffice is lost although nobody asked soffice
- * to end (EXIT_CONNECTION_LOST in engine/bridge/varak_bridge/protocol.py): soffice died, or binaryurp gave
+ * to end (EXIT_CONNECTION_LOST in engine/bridge/simpaper_bridge/protocol.py): soffice died, or binaryurp gave
  * up on the connection while soffice keeps running. The instance is unusable either way: it ends as crashed.
  */
 export const BRIDGE_EXIT_CONNECTION_LOST = 3;
@@ -115,7 +115,7 @@ export class OfficeInstance implements EngineInstance {
   private state: EngineInstanceState = 'starting';
   private readonly log: Logger;
   private readonly guard: ProcessGuard;
-  private readonly pipe = `varak_${randomBytes(8).toString('hex')}`;
+  private readonly pipe = `simpaper_${randomBytes(8).toString('hex')}`;
   private readonly pidFile: string;
   private office: ChildProcess | null = null;
   private bridge: ChildProcess | null = null;
@@ -225,7 +225,7 @@ export class OfficeInstance implements EngineInstance {
     env['PYTHONDONTWRITEBYTECODE'] = '1';
     env['PYTHONNOUSERSITE'] = '1';
     const args = [
-      '-m', 'varak_bridge',
+      '-m', 'simpaper_bridge',
       '--pipe', this.pipe,
       '--log-level', this.config.bridgeLogLevel ?? 'info',
       '--connect-timeout', String(Math.max(5, Math.ceil(startTimeoutMs / 1000))),

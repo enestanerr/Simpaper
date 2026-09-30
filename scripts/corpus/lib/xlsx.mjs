@@ -7,7 +7,7 @@ import ExcelJS from 'exceljs';
 import { AUTHOR, FIXED_DATE, TR, excelSerial } from './constants.mjs';
 import { normalizeZip } from './zip.mjs';
 
-const APPLICATION = 'Varak corpus generator (exceljs 4.4.0)';
+const APPLICATION = 'Simpaper corpus generator (exceljs 4.4.0)';
 
 /** Source rows of the "Veriler" sheet (synthetic figures, not statistics). */
 export const XLSX_ROWS = [
@@ -134,7 +134,7 @@ function setup(wb) {
   wb.lastModifiedBy = AUTHOR;
   wb.created = FIXED_DATE;
   wb.modified = FIXED_DATE;
-  wb.title = 'Varak Tablo Testi';
+  wb.title = 'Simpaper Tablo Testi';
   wb.subject = 'Türkçe XLSX test çalışma kitabı';
   // No cached results are written, so consumers must calculate on load.
   wb.calcProperties = { ...(wb.calcProperties ?? {}), fullCalcOnLoad: true };

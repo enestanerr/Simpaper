@@ -4,8 +4,8 @@
 """Pure helpers: spreadsheet addresses, Calc error names, accelerator key names."""
 import unittest
 
-from varak_bridge.addresses import cell_name, column_name, error_name, view_data_cursor
-from varak_bridge.keys import format_key_name, key_constant_name, parse_key_name
+from simpaper_bridge.addresses import cell_name, column_name, error_name, view_data_cursor
+from simpaper_bridge.keys import format_key_name, key_constant_name, parse_key_name
 
 
 class ColumnNameTest(unittest.TestCase):

@@ -5,7 +5,7 @@
 
 LibreOffice shows a freshly loaded frame and brings it to the foreground (LoadEnv, ShowFlags::ForegroundTask).
 Converting that visible, active top-level window afterwards (hide, restyle and set the owner from the host
-process) left Varak's UI thread hung inside PeekMessage while soffice sat idle in GetMessage (GUI spike,
+process) left Simpaper's UI thread hung inside PeekMessage while soffice sat idle in GetMessage (GUI spike,
 2026-09-29). Methods._open_document therefore creates the frame window in one main-thread job, calls
 own_window() outside of any job and loads the document into the window in a second job; the host's
 makeOwned() then finds nothing left to change.
@@ -140,7 +140,7 @@ def own_window(hwnd, owner, timeout_s=OWN_WINDOW_TIMEOUT_S):
         except BaseException as exc:  # reported to the caller below
             outcome['error'] = exc
 
-    thread = threading.Thread(target=run, name='varak-own-window', daemon=True)
+    thread = threading.Thread(target=run, name='simpaper-own-window', daemon=True)
     thread.start()
     thread.join(timeout_s)
     if thread.is_alive():

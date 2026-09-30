@@ -1,6 +1,6 @@
 /**
  * Shared set-up for the headless engine tests (Vitest project "engine").
- * The tests need the LibreOffice development image (vendor/libreoffice) or VARAK_ENGINE_DIR;
+ * The tests need the LibreOffice development image (vendor/libreoffice) or SIMPAPER_ENGINE_DIR;
  * without it every suite is skipped with a message. No window is ever shown: all instances run
  * with --headless and documents use `hidden` views.
  */
@@ -19,14 +19,14 @@ export const located = locateEngine();
 export const engineAvailable = located.ok;
 export const skipMessage = located.ok
   ? ''
-  : `Engine tests skipped: ${located.error}. Run "npm run engine:fetch" or set VARAK_ENGINE_DIR to a LibreOffice program directory.`;
+  : `Engine tests skipped: ${located.error}. Run "npm run engine:fetch" or set SIMPAPER_ENGINE_DIR to a LibreOffice program directory.`;
 if (!engineAvailable) console.warn(skipMessage);
 
 export const OUT = resolve('test-output', 'engine');
 export const PROFILES = join(OUT, 'profiles');
 
-// Engine logs are useful when a test fails; keep warnings/errors, everything with VARAK_TEST_VERBOSE=1.
-const verbose = Boolean(process.env['VARAK_TEST_VERBOSE']);
+// Engine logs are useful when a test fails; keep warnings/errors, everything with SIMPAPER_TEST_VERBOSE=1.
+const verbose = Boolean(process.env['SIMPAPER_TEST_VERBOSE']);
 setLogSink((level: LogLevel, scope, message, meta) => {
   if (verbose || level === 'warn' || level === 'error') console.log(`[${level}] ${scope}: ${message}`, meta ? JSON.stringify(meta) : '');
 });

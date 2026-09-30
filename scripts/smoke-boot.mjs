@@ -4,7 +4,7 @@
 //
 // The app runs from a build: the shared `out/` when it is up to date and contains smoke support, otherwise a
 // private build in test-output/main-core/out (electron-vite build --outDir …; the shared out/ is never written).
-// Electron gets VARAK_SMOKE=1 (hidden window, headless engine, hidden document views, scripted IPC checks, exit
+// Electron gets SIMPAPER_SMOKE=1 (hidden window, headless engine, hidden document views, scripted IPC checks, exit
 // code 0/1), an isolated data folder and a report file. Afterwards every process still running from that data
 // folder (engine profiles live there) is killed and counted as a failure.
 import { execFile, spawn } from 'node:child_process';
@@ -15,7 +15,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const require = createRequire(import.meta.url);
-const MARKER = 'VARAK_SMOKE';
+const MARKER = 'SIMPAPER_SMOKE';
 const SOURCE_DIRS = ['src/main', 'src/preload', 'src/renderer', 'src/shared'];
 const SOURCE_FILES = ['electron.vite.config.ts', 'package.json'];
 
@@ -156,11 +156,11 @@ async function main() {
   if (typeof electron !== 'string') throw new Error('the electron package did not return its executable path');
   const mainFile = join(buildDir, 'main', 'index.js');
   const env = cleanEnv({
-    VARAK_SMOKE: '1',
-    VARAK_VIEW_MODE: 'hidden',
-    VARAK_DATA_DIR: dataDir,
-    VARAK_SMOKE_REPORT: report,
-    VARAK_SMOKE_KIND: opts.kind,
+    SIMPAPER_SMOKE: '1',
+    SIMPAPER_VIEW_MODE: 'hidden',
+    SIMPAPER_DATA_DIR: dataDir,
+    SIMPAPER_SMOKE_REPORT: report,
+    SIMPAPER_SMOKE_KIND: opts.kind,
   });
   delete env.ELECTRON_RENDERER_URL;
   console.log(`[smoke] starting Electron (hidden window) with ${mainFile}`);
@@ -206,7 +206,7 @@ async function main() {
   const ok = !timedOut && exit.code === 0 && parsed?.ok === true && left.length === 0;
   console.log(`[smoke] ${ok ? 'PASSED' : 'FAILED'} (report: ${report})`);
   if (ok) rmSync(dataDir, { recursive: true, force: true });
-  else console.log(`[smoke] data folder kept for inspection (logs in ${join(dataDir, 'Varak-dev', 'logs')})`);
+  else console.log(`[smoke] data folder kept for inspection (logs in ${join(dataDir, 'Simpaper-dev', 'logs')})`);
   process.exit(ok ? 0 : 1);
 }
 

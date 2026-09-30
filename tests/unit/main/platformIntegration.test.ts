@@ -36,7 +36,7 @@ async function openDocx(hh: Harness, name: string): Promise<string> {
 }
 
 describe('DocumentService — views', () => {
-  it('loads every document without a native window when the view mode is overridden (VARAK_VIEW_MODE=hidden)', async () => {
+  it('loads every document without a native window when the view mode is overridden (SIMPAPER_VIEW_MODE=hidden)', async () => {
     const hh = await setup({ viewMode: () => 'hidden' });
     const doc = await hh.service.create('calc');
     const inst = hh.engine.instance(doc.docId);
@@ -264,7 +264,7 @@ describe('DocumentService — restartEngine', () => {
   });
 });
 
-describe('DocumentService — hung engine (GUI check 2026-09-29: a hung view holds back input for the Varak window)', () => {
+describe('DocumentService — hung engine (GUI check 2026-09-29: a hung view holds back input for the Simpaper window)', () => {
   /** One watchdog round with `responding()`; the watch is returned for further rounds. */
   async function hang(hh: Harness, responding: () => boolean = () => false) {
     const watch = hh.service.watchHangs({ isResponding: async () => responding() }, { intervalMs: 60_000, strikes: 1 });
@@ -549,15 +549,15 @@ describe('test mode switches', () => {
 
   it('reads hidden views, the data folder and the smoke options', () => {
     const data = resolve('test-output', 'main-core', 'x');
-    expect(readTestMode({ VARAK_VIEW_MODE: 'hidden', VARAK_DATA_DIR: data })).toEqual({ hiddenViews: true, dataDir: data, smoke: null });
+    expect(readTestMode({ SIMPAPER_VIEW_MODE: 'hidden', SIMPAPER_DATA_DIR: data })).toEqual({ hiddenViews: true, dataDir: data, smoke: null });
     // Relative data folders are ignored (never write next to the working directory by accident).
-    expect(readTestMode({ VARAK_DATA_DIR: 'relative\\dir' }).dataDir).toBeNull();
-    const smoke = readTestMode({ VARAK_SMOKE: '1', VARAK_SMOKE_KIND: 'impress', VARAK_SMOKE_REPORT: join(data, 'r.json') }, 42);
+    expect(readTestMode({ SIMPAPER_DATA_DIR: 'relative\\dir' }).dataDir).toBeNull();
+    const smoke = readTestMode({ SIMPAPER_SMOKE: '1', SIMPAPER_SMOKE_KIND: 'impress', SIMPAPER_SMOKE_REPORT: join(data, 'r.json') }, 42);
     expect(smoke.hiddenViews).toBe(true);
     expect(smoke.smoke).toEqual({ reportFile: join(data, 'r.json'), kind: 'impress' });
     // Smoke runs always get an isolated data folder.
-    expect(smoke.dataDir).toMatch(/varak-smoke-42$/);
-    expect(readTestMode({ VARAK_SMOKE: 'yes', VARAK_SMOKE_KIND: 'pdf' }).smoke?.kind).toBe('calc');
+    expect(smoke.dataDir).toMatch(/simpaper-smoke-42$/);
+    expect(readTestMode({ SIMPAPER_SMOKE: 'yes', SIMPAPER_SMOKE_KIND: 'pdf' }).smoke?.kind).toBe('calc');
   });
 });
 

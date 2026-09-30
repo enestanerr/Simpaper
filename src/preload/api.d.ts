@@ -1,8 +1,8 @@
-import type { VarakIpcBridge } from '../shared/ipc';
+import type { SimpaperIpcBridge } from '../shared/ipc';
 
 declare global {
   interface Window {
-    varakIpc: VarakIpcBridge;
+    simpaperIpc: SimpaperIpcBridge;
   }
 }
 

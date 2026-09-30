@@ -67,14 +67,14 @@ verified yet.
    window. Electron keeps **one** callback per message per window, so no other module may hook these two.
 10. **Packaging.** koffi is a native module: unpack `node_modules/koffi/**` and
     `node_modules/@koromix/koffi-win32-x64/**` from the asar; only the win32-x64 binary is needed.
-11. **Process guard mode.** Default `adopt`. `VARAK_PROCESS_GUARD=self` puts the app process itself into
+11. **Process guard mode.** Default `adopt`. `SIMPAPER_PROCESS_GUARD=self` puts the app process itself into
     the job (see §7 for why that is not the default).
 
 ### Requirements for the engine bridge
 
 - **Owned mode:** create the frame as a *hidden top-level* window (not `createSystemChild` on our
   HWND), not maximized/minimized, **own it before loading into it** (borderless tool window, owner =
-  `parentHwnd`; `engine/bridge/varak_bridge/owned.py`, between two main-thread jobs) and report its HWND.
+  `parentHwnd`; `engine/bridge/simpaper_bridge/owned.py`, between two main-thread jobs) and report its HWND.
   The view host then only places and shows it; `makeOwned` converts a frame itself only when the engine
   did not (no `parentHwnd`). Converting a frame that LibreOffice had already shown and made the foreground
   window hung Electron's UI thread (§6, GUI spike 2026-09-29). Reason: a cross-process `CreateWindow` under a parent
@@ -162,7 +162,7 @@ overtaken by sent messages). A view that appears is inserted directly above its 
 setting the owner afterwards does not reorder windows, so a frame created before the host was last
 activated (e.g. a warm spare engine) would otherwise appear behind it. Moves use `SWP_NOZORDER`.
 Limits: an owned window trails the host by a few milliseconds while it is dragged; clicking into the
-document activates the LibreOffice window (host `blur`); `focus()` only activates while Varak is in the
+document activates the LibreOffice window (host `blur`); `focus()` only activates while Simpaper is in the
 foreground (Windows foreground lock) and calls `AllowSetForegroundWindow` for the engine process so its
 dialogs can come to the front.
 
@@ -189,17 +189,17 @@ LibreOffice's child window and Chromium's window share one input queue (cross-th
   opening the File view never reached it. Fix: the renderer asks for the focus (`view:focusShell` →
   `Platform.focusHost` → `win32/focus.ts`: `GetFocus` on the UI thread; if it is a LibreOffice child *inside* the
   host that answers `WM_NULL` within 250 ms on a worker, `SetFocus(host)`; LibreOffice dialogs, windows of this
-  process and hung windows are left alone). Asked for when a press on Varak's UI moves the focus into a text box
+  process and hung windows are left alone). Asked for when a press on Simpaper's UI moves the focus into a text box
   or outside ribbon/title bar/tab strip/status bar/ribbon menus, while a dialog or the File view is open (the
   document gets the focus back when they close) and when a PDF becomes active (`services/keyboardFocus.ts`).
   Ribbon tab switches and commands keep the keyboard in the document, as in Office (checked on screen).
-- While soffice is suspended, the Varak window gets **no mouse or keyboard input** although its UI thread keeps
+- While soffice is suspended, the Simpaper window gets **no mouse or keyboard input** although its UI thread keeps
   running (IPC, timers, repaint, the "not responding" bar): clicks on "Restart engine", the File tab or the title
   bar were processed only when soffice ran again. `AttachThreadInput(…, FALSE)` from another process returned TRUE
   but did not release them. Hence (a) a hang that lasts 8 s makes `DocumentService` offer the restart in
   Electron's message box **without a parent window** (it runs on a thread of its own and still gets input; checked
   on screen: it appeared 13.7 s after the suspension, real keys chose "restart", the document came back from the
-  autosave 1.7 s later and Varak took input again), withdrawn through its `AbortSignal` when the engine answers;
+  autosave 1.7 s later and Simpaper took input again), withdrawn through its `AbortSignal` when the engine answers;
   (b) a hung engine is killed **before** its view is detached (`stopInstance`, `discard`): hiding the container
   while the hung child has the focus sends it `WM_KILLFOCUS` and would block the UI thread.
 - The File tab did not freeze the UI thread in that state (sampled for 12 s); the view's operations queue behind
@@ -229,8 +229,8 @@ Why `adopt` is the default although `self` covers everything without calls: with
 no-breakaway kill-on-close job, **everything the app starts dies when it exits**: Electron's
 `app.relaunch()` helper (it uses plain `base::LaunchProcess`, no breakaway, so the relaunch never
 happens), an updater started before quitting, and programs opened via `shell.openExternal`/`openPath`
-that were not already running (a PDF viewer the user keeps working in would be killed with Varak).
-`VARAK_PROCESS_GUARD=self` enables it anyway; if it cannot join (enclosing job), it logs and falls back to
+that were not already running (a PDF viewer the user keeps working in would be killed with Simpaper).
+`SIMPAPER_PROCESS_GUARD=self` enables it anyway; if it cannot join (enclosing job), it logs and falls back to
 `adopt`. Programs LibreOffice itself starts (hyperlinks) are in the job in both modes; routing hyperlink
 opening through the main process would avoid that.
 
@@ -279,7 +279,7 @@ node tests/unit/platform/electron/run-headless-check.ts    # Node ≥ 22.18 (typ
   Ctrl+S, backstage, Calc/Impress/PDF, window moves, themes); **owned** hung the UI thread about 3 s after
   the first document appeared (fix above; re-run on screen in the next point). Still not observed: DPI > 100 %,
   mixed-DPI monitors, shell-key hooks, freeze fidelity in owned mode.
-- **Owned mode, second run (with the engine owning the frame first):** Varak stayed responsive, but soffice
+- **Owned mode, second run (with the engine owning the frame first):** Simpaper stayed responsive, but soffice
   stopped responding about 4 s after the first click into the document (hang detector: "engine window not
   responding"; `doc.info` timed out). Owned mode is therefore no longer offered in Options; it can only be set in
   `settings.json` (`"engine": { "viewMode": "owned" }`) for development.

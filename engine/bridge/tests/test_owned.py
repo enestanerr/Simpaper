@@ -1,7 +1,7 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-"""Owned views (varak_bridge.owned and Methods._open_document): the frame window gets its owner before the
+"""Owned views (simpaper_bridge.owned and Methods._open_document): the frame window gets its owner before the
 load can show it. Real Win32 windows here are created hidden and never shown."""
 import sys
 import threading
@@ -9,10 +9,10 @@ import time
 import unittest
 from unittest import mock
 
-from varak_bridge import owned
-from varak_bridge.documents import PreparedView
-from varak_bridge.errors import RpcError
-from varak_bridge.protocol import ErrorCode
+from simpaper_bridge import owned
+from simpaper_bridge.documents import PreparedView
+from simpaper_bridge.errors import RpcError
+from simpaper_bridge.protocol import ErrorCode
 
 # Same vectors as tests/unit/platform/styles.test.ts ('owned styles match the engine bridge').
 STYLE_VECTORS = [
@@ -89,8 +89,8 @@ class HiddenWindow:
 @unittest.skipUnless(sys.platform == 'win32', 'Win32 only')
 class OwnWindowTest(unittest.TestCase):
     def setUp(self):
-        self.host = HiddenWindow('Varak test host')
-        self.view = HiddenWindow('Varak test view')
+        self.host = HiddenWindow('Simpaper test host')
+        self.view = HiddenWindow('Simpaper test view')
         _, self.user32 = owned._user32()
 
     def tearDown(self):
@@ -117,7 +117,7 @@ class OwnWindowTest(unittest.TestCase):
         with self.assertRaises(RpcError) as ctx:
             owned.own_window(self.view.hwnd, self.host.hwnd)
         self.assertEqual(ctx.exception.code, ErrorCode.INVALID_PARAMS)
-        self.host = HiddenWindow('Varak test host')  # for tearDown
+        self.host = HiddenWindow('Simpaper test host')  # for tearDown
 
 
 class FakeUser32:
@@ -218,7 +218,7 @@ class OpenDocumentFlowTest(unittest.TestCase):
     """doc.load / doc.new: owned views are owned between two main-thread jobs, never inside one."""
 
     def setUp(self):
-        from varak_bridge.methods import Methods
+        from simpaper_bridge.methods import Methods
         self.log = []
         self.office = FlowOffice(self.log)
         self.methods = Methods('unused', lambda _e: None)
@@ -233,7 +233,7 @@ class OpenDocumentFlowTest(unittest.TestCase):
         return self.methods.call('doc.load', {'docId': 'd1', 'url': 'file:///C:/x/a.docx', 'view': view})
 
     def test_owned_view_is_owned_between_two_jobs(self):
-        with mock.patch('varak_bridge.methods.own_window', side_effect=self.own):
+        with mock.patch('simpaper_bridge.methods.own_window', side_effect=self.own):
             result = self.load({'mode': 'owned', 'parentHwnd': '777', 'bounds': {'x': 1, 'y': 2, 'width': 3, 'height': 4}})
         self.assertEqual(result['hwnd'], '4242')
         self.assertEqual(self.log, [
@@ -243,13 +243,13 @@ class OpenDocumentFlowTest(unittest.TestCase):
         ])
 
     def test_new_owned_document_takes_the_same_route(self):
-        with mock.patch('varak_bridge.methods.own_window', side_effect=self.own):
+        with mock.patch('simpaper_bridge.methods.own_window', side_effect=self.own):
             self.methods.call('doc.new', {'docId': 'n1', 'kind': 'writer', 'view': {'mode': 'owned', 'parentHwnd': '9'}})
         self.assertEqual([entry[0] for entry in self.log], ['job', 'prepare', 'own', 'job', 'open'])
 
     def test_failed_ownership_disposes_the_window_and_loads_nothing(self):
         failure = RpcError(ErrorCode.LOAD_FAILED, 'cannot attach')
-        with mock.patch('varak_bridge.methods.own_window', side_effect=failure):
+        with mock.patch('simpaper_bridge.methods.own_window', side_effect=failure):
             with self.assertRaises(RpcError) as ctx:
                 self.load({'mode': 'owned', 'parentHwnd': '777'})
         self.assertEqual(ctx.exception.code, ErrorCode.LOAD_FAILED)
@@ -257,8 +257,8 @@ class OpenDocumentFlowTest(unittest.TestCase):
         self.assertTrue(self.log[-1][2])  # disposed inside a main-thread job
 
     def test_other_views_load_in_a_single_job(self):
-        with mock.patch('varak_bridge.methods.own_window') as own, \
-                mock.patch('varak_bridge.methods.set_no_parent_notify'):
+        with mock.patch('simpaper_bridge.methods.own_window') as own, \
+                mock.patch('simpaper_bridge.methods.set_no_parent_notify'):
             self.load({'mode': 'hidden'})
             self.load({'mode': 'owned'})  # no owner given: the host converts the window itself
             self.load({'mode': 'child', 'parentHwnd': '5'})

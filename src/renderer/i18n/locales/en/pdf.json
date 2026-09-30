@@ -231,7 +231,7 @@
     "link": {
       "title": "External link",
       "copy": "Copy link",
-      "message": "This PDF links to a web address. For your safety Varak does not open links; copy the address and open it in your browser.",
+      "message": "This PDF links to a web address. For your safety Simpaper does not open links; copy the address and open it in your browser.",
       "address": "Link address",
       "copied": "The link was copied to the clipboard."
     }

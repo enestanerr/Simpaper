@@ -1,5 +1,5 @@
 /**
- * Keyboard focus between Varak's own controls and LibreOffice's child windows (child hosting).
+ * Keyboard focus between Simpaper's own controls and LibreOffice's child windows (child hosting).
  *
  * Windows leaves the keyboard focus in a LibreOffice child window when the user clicks the web content of the
  * host window: Chromium does not take it back (checked on screen 2026-09-29, scripts/gui/checks/focuscheck.mjs), so

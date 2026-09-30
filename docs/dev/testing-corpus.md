@@ -44,7 +44,7 @@ threshold 0.1 and anti-aliased pixels excluded. Both sides of a comparison are r
 same fonts, so no reference images are stored: absolute renders depend on the fonts of the machine (see
 [Fonts](#fonts)).
 
-Measured (VARAK_VISUAL_REPORT output and the calibration runs of this session; window = 32 × 32 px):
+Measured (SIMPAPER_VISUAL_REPORT output and the calibration runs of this session; window = 32 × 32 px):
 
 | Comparison | Page | Differing px | Page ratio | Densest window | Where |
 |---|---|---:|---:|---:|---|
@@ -95,13 +95,13 @@ threshold. `KNOWN_CHANGES` in `visual.test.ts` holds, per corpus file:
   remove the entry and update this file.
 
 To add a known change: explain it in the XML first, write the edits, and confirm with
-`VARAK_VISUAL_REPORT` that *round trip vs original + edits* is 0 px (or within the budget) before adding it here
+`SIMPAPER_VISUAL_REPORT` that *round trip vs original + edits* is 0 px (or within the budget) before adding it here
 under [Findings](#findings).
 
 To re-derive the budget (for example after an engine upgrade):
 
 ```powershell
-$env:VARAK_VISUAL_REPORT = "test-output/corpus/visual-report.jsonl"
+$env:SIMPAPER_VISUAL_REPORT = "test-output/corpus/visual-report.jsonl"
 npx vitest run --project engine tests/engine/visual.test.ts
 ```
 
@@ -139,7 +139,7 @@ so those now come from LibreOffice's list style: in `pptx-basic` the level-2 ite
 about 11 pt, its dash shrinks to 75 % and the next item moves down with it (4,220 px). The original with only
 those two properties added to the master's level 2 renders identical to the round trip (0 px). Consequence:
 decks from PowerPoint whose master text styles define spacing or bullet sizes not repeated on the paragraphs
-can change appearance after a save in Varak — a candidate for the compatibility notes and the loss-risk
+can change appearance after a save in Simpaper — a candidate for the compatibility notes and the loss-risk
 analysis.
 
 **F3 — Macros (VBA)** (asserted: independent, `poi-macro-*`). Fresh conversions of the Apache POI samples:

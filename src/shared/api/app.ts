@@ -30,7 +30,7 @@ export interface Settings {
     showStatusBar: boolean;
     /**
      * Experimental: KeyTips (bare Alt / F10) while a native document window has the keyboard focus.
-     * Installs a low-level keyboard hook while Varak is in the foreground (src/main/platform). Default off;
+     * Installs a low-level keyboard hook while Simpaper is in the foreground (src/main/platform). Default off;
      * absent = off.
      */
     documentKeyTips?: boolean;

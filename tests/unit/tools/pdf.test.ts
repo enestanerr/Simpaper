@@ -32,8 +32,8 @@ describe('pdfText / pdfInfo', () => {
 
   it('reads metadata, A4 page size and AcroForm widgets', async () => {
     const info = await pdfInfo(corpus.path('pdf-text'));
-    expect(info.info['Title']).toBe('Varak PDF Test Belgesi');
-    expect(info.info['Author']).toBe('Varak Test');
+    expect(info.info['Title']).toBe('Simpaper PDF Test Belgesi');
+    expect(info.info['Author']).toBe('Simpaper Test');
     expect(info.pageSizes[0]!.width).toBeCloseTo(595.28, 1);
     expect(info.pageSizes[0]!.height).toBeCloseTo(841.89, 1);
     expect(info.fields).toEqual([]);

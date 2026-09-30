@@ -9,10 +9,10 @@ body:
         Thank you for the suggestion. You can write in English or Turkish.
         *İngilizce veya Türkçe yazabilirsiniz.*
 
-        Please look at the [roadmap](https://github.com/enestanerr/varak/blob/main/docs/ROADMAP.md) and the
-        [known limitations](https://github.com/enestanerr/varak/blob/main/docs/KNOWN_LIMITATIONS.md) first; many
+        Please look at the [roadmap](https://github.com/ncreativestudios/Simpaper/blob/main/docs/ROADMAP.md) and the
+        [known limitations](https://github.com/ncreativestudios/Simpaper/blob/main/docs/KNOWN_LIMITATIONS.md) first; many
         features are already planned for a later version. Open questions and ideas that are not yet concrete fit
-        better into [Discussions](https://github.com/enestanerr/varak/discussions).
+        better into [Discussions](https://github.com/ncreativestudios/Simpaper/discussions).
   - type: dropdown
     id: module
     attributes:

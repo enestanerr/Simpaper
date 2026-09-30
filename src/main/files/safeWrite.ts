@@ -68,15 +68,18 @@ const nodeFs: SafeWriteFs = {
   copyFile: (a, b) => fsp.copyFile(a, b),
 };
 
-/** Name of the hidden temp/backup siblings: `.~varak-<rand>-<name>.<suffix>`. */
+/** Name of the hidden temp/backup siblings: `.~simpaper-<rand>-<name>.<suffix>`. */
 export function siblingName(targetPath: string, token: string, suffix: 'tmp' | 'bak'): string {
   const name = basename(targetPath);
   const short = name.length > 60 ? name.slice(name.length - 60) : name;
-  return join(dirname(targetPath), `.~varak-${token}-${short}.${suffix}`);
+  return join(dirname(targetPath), `.~simpaper-${token}-${short}.${suffix}`);
 }
 
-/** Matches temp/backup files left behind by an interrupted save (e.g. the process was killed). */
-export const STALE_SIBLING = /^\.~varak-[0-9a-f]{12}-.+\.(tmp|bak)$/;
+/**
+ * Matches temp/backup files left behind by an interrupted save (e.g. the process was killed). `.~varak-` is the
+ * prefix of development builds before the rename (docs/adr/0009-product-name-simpaper.md).
+ */
+export const STALE_SIBLING = /^\.~(?:simpaper|varak)-[0-9a-f]{12}-.+\.(tmp|bak)$/;
 
 export function createSafeWriter(deps: SafeWriterDeps = {}): SafeWriter {
   const fs: SafeWriteFs = { ...nodeFs, ...deps.fs };

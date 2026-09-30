@@ -10,10 +10,10 @@ import { AUTHOR, FIXED_DATE, TR, prng, withSeededRandom } from './constants.mjs'
 
 const A4 = [595.28, 841.89];
 const MARGIN = 56.7; // 2 cm
-const PRODUCER = 'Varak corpus generator (@cantoo/pdf-lib 2.11.1)';
+const PRODUCER = 'Simpaper corpus generator (@cantoo/pdf-lib 2.11.1)';
 const INK = rgb(0x1d / 255, 0x2b / 255, 0x53 / 255);
 
-export const PDF_PASSWORD = 'varak123';
+export const PDF_PASSWORD = 'simpaper123';
 
 async function newDocument(fontPath, title, seedMeta = {}) {
   const doc = await PDFDocument.create({ updateMetadata: false });
@@ -21,9 +21,9 @@ async function newDocument(fontPath, title, seedMeta = {}) {
   const font = await doc.embedFont(readFileSync(fontPath), { subset: true });
   doc.setTitle(title);
   doc.setAuthor(AUTHOR);
-  doc.setSubject(seedMeta.subject ?? 'Varak PDF test dosyası');
-  doc.setKeywords(['varak', 'test', 'türkçe']);
-  doc.setCreator('Varak');
+  doc.setSubject(seedMeta.subject ?? 'Simpaper PDF test dosyası');
+  doc.setKeywords(['simpaper', 'test', 'türkçe']);
+  doc.setCreator('Simpaper');
   doc.setProducer(PRODUCER);
   doc.setLanguage('tr-TR');
   doc.setCreationDate(FIXED_DATE);
@@ -63,12 +63,12 @@ const save = (doc) => doc.save({ useObjectStreams: false });
 /** Three-page text document. */
 export async function buildTextPdf({ fontPath, boldFontPath }) {
   return withSeededRandom(101, async () => {
-    const { doc, font } = await newDocument(fontPath, 'Varak PDF Test Belgesi');
+    const { doc, font } = await newDocument(fontPath, 'Simpaper PDF Test Belgesi');
     const bold = boldFontPath ? await doc.embedFont(readFileSync(boldFontPath), { subset: true }) : font;
     const width = A4[0] - 2 * MARGIN;
     const pagesSpec = [
       {
-        title: 'Varak PDF Test Belgesi',
+        title: 'Simpaper PDF Test Belgesi',
         paragraphs: [TR.pangram, TR.pangramUpper, `Küçük harfler: ${TR.lower} — büyük harfler: ${TR.upper}`, `Noktalı ve noktasız i: ${TR.casing}`, `Yerler: ${TR.places.join(', ')}`],
       },
       {
@@ -90,14 +90,14 @@ export async function buildTextPdf({ fontPath, boldFontPath }) {
       page.drawText(footer, { x: A4[0] / 2 - font.widthOfTextAtSize(footer, 10) / 2, y: MARGIN / 2, size: 10, font, color: INK });
       facts.pages.push({ title: spec.title, paragraphs: spec.paragraphs, footer });
     });
-    return { buffer: Buffer.from(await save(doc)), facts: { ...facts, title: 'Varak PDF Test Belgesi', author: AUTHOR, pageCount: pagesSpec.length } };
+    return { buffer: Buffer.from(await save(doc)), facts: { ...facts, title: 'Simpaper PDF Test Belgesi', author: AUTHOR, pageCount: pagesSpec.length } };
   });
 }
 
 /** AcroForm with a text field, a multi-line text field, a checkbox and a dropdown (Turkish values). */
 export async function buildFormPdf({ fontPath }) {
   return withSeededRandom(202, async () => {
-    const { doc, font } = await newDocument(fontPath, 'Varak Form Testi', { subject: 'AcroForm test dosyası' });
+    const { doc, font } = await newDocument(fontPath, 'Simpaper Form Testi', { subject: 'AcroForm test dosyası' });
     const page = doc.addPage(A4);
     const form = doc.getForm();
     const top = A4[1] - MARGIN;
@@ -143,11 +143,11 @@ export async function buildFormPdf({ fontPath }) {
 
 /** Password-protected (AES-256) one-page document. Not byte-reproducible: encryption salts are random. */
 export async function buildEncryptedPdf({ fontPath }) {
-  const { doc, font } = await newDocument(fontPath, 'Varak Şifreli Belge');
+  const { doc, font } = await newDocument(fontPath, 'Simpaper Şifreli Belge');
   const page = doc.addPage(A4);
   const text = ['Şifreli belge', TR.pangram, `Parola korumalı içerik: ${TR.lower} ${TR.upper}`];
   drawLines(page, font, text, { size: 14 });
-  doc.encrypt({ userPassword: PDF_PASSWORD, ownerPassword: 'varak-sahip-456', permissions: { printing: 'highResolution', copying: true, modifying: false } });
+  doc.encrypt({ userPassword: PDF_PASSWORD, ownerPassword: 'simpaper-sahip-456', permissions: { printing: 'highResolution', copying: true, modifying: false } });
   return { buffer: Buffer.from(await save(doc)), facts: { password: PDF_PASSWORD, algorithm: 'AES-256', text } };
 }
 
@@ -157,7 +157,7 @@ export async function buildEncryptedPdf({ fontPath }) {
  */
 export async function buildScannedPdf({ fontPath }) {
   const { createCanvas, GlobalFonts } = await import('@napi-rs/canvas');
-  GlobalFonts.registerFromPath(fontPath, 'VarakScan');
+  GlobalFonts.registerFromPath(fontPath, 'SimpaperScan');
   const [w, h] = [1240, 1754];
   const canvas = createCanvas(w, h);
   const ctx = canvas.getContext('2d');
@@ -169,9 +169,9 @@ export async function buildScannedPdf({ fontPath }) {
   ctx.translate(-w / 2, -h / 2);
   ctx.fillStyle = '#1b1b1b';
   const lines = ['TARANMIŞ SAYFA', TR.pangram, TR.pangramUpper, `${TR.places.slice(0, 4).join(', ')}`, `Küçük: ${TR.lower}  Büyük: ${TR.upper}`];
-  ctx.font = 'bold 44px VarakScan';
+  ctx.font = 'bold 44px SimpaperScan';
   ctx.fillText(lines[0], 120, 200);
-  ctx.font = '30px VarakScan';
+  ctx.font = '30px SimpaperScan';
   lines.slice(1).forEach((line, i) => ctx.fillText(line, 120, 300 + i * 60));
   ctx.restore();
   const img = ctx.getImageData(0, 0, w, h);
@@ -185,7 +185,7 @@ export async function buildScannedPdf({ fontPath }) {
 
   return withSeededRandom(304, async () => {
     const doc = await PDFDocument.create({ updateMetadata: false });
-    doc.setTitle('Varak Taranmış Sayfa');
+    doc.setTitle('Simpaper Taranmış Sayfa');
     doc.setAuthor(AUTHOR);
     doc.setProducer(PRODUCER);
     doc.setCreationDate(FIXED_DATE);

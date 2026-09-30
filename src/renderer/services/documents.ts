@@ -69,7 +69,7 @@ export function activateDocument(docId: string): void {
   if (!doc) return;
   setActiveDocId(docId);
   closeBackstage();
-  // A PDF is shown by Varak itself: its keys must not go to the hidden window of the office document before it.
+  // A PDF is shown by Simpaper itself: its keys must not go to the hidden window of the office document before it.
   if (!isOfficeKind(doc.kind)) void claimKeyboard();
   if (!hasBridge() || lastActivationSent === docId) return;
   lastActivationSent = docId;

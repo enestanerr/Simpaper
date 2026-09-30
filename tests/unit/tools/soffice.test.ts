@@ -85,12 +85,12 @@ describe('findProgramDir', () => {
   const tmp = mkdtempSync(join(CORPUS_OUTPUT, 'unit-soffice-'));
   afterAll(() => rmSync(tmp, { recursive: true, force: true }));
 
-  it('accepts an explicit or VARAK_ENGINE_DIR install root and rejects folders without soffice', () => {
+  it('accepts an explicit or SIMPAPER_ENGINE_DIR install root and rejects folders without soffice', () => {
     const program = join(tmp, 'engine', 'program');
     mkdirSync(program, { recursive: true });
     writeFileSync(join(program, process.platform === 'win32' ? 'soffice.exe' : 'soffice'), '');
     expect(findProgramDir({ explicit: program, env: {} })).toBe(program);
-    expect(findProgramDir({ env: { VARAK_ENGINE_DIR: join(tmp, 'engine') } })).toBe(program);
+    expect(findProgramDir({ env: { SIMPAPER_ENGINE_DIR: join(tmp, 'engine') } })).toBe(program);
     expect(findProgramDir({ explicit: tmp, env: {}, repoRoot: tmp })).toBeNull();
     expect(pathToFileURL(program).href.startsWith('file:///')).toBe(true);
   });

@@ -1,7 +1,7 @@
 # Release build (docs/PACKAGING.md#release-workflow, docs/adr/0008-packaging.md).
 # Builds the per-user NSIS installer and the ZIP from a v* tag and uploads them to a DRAFT GitHub release for
 # manual review. Nothing is published automatically.
-# Code signing is NOT configured: the installer, the ZIP and Varak.exe are unsigned (planned: SignPath Foundation,
+# Code signing is NOT configured: the installer, the ZIP and Simpaper.exe are unsigned (planned: SignPath Foundation,
 # see docs/PACKAGING.md#signing-plan). The LibreOffice files inside keep The Document Foundation's signatures.
 # No caches are used: every release downloads the engine and verifies its SHA-256 digest and OpenPGP signature.
 name: Release
@@ -50,7 +50,7 @@ jobs:
           if ($env:RELEASE_TAG -cne "v$version") {
             throw "Tag '$env:RELEASE_TAG' does not match the version in package.json ($version)."
           }
-          Write-Host "Building Varak $version"
+          Write-Host "Building Simpaper $version"
 
       - name: Install dependencies
         run: npm ci
@@ -77,7 +77,7 @@ jobs:
         shell: pwsh
         run: |
           $version = $env:RELEASE_TAG.Substring(1)
-          $files = @("Varak-Setup-$version-x64.exe", "Varak-$version-x64.zip")
+          $files = @("Simpaper-Setup-$version-x64.exe", "Simpaper-$version-x64.zip")
           $lines = foreach ($name in $files) {
             $path = Join-Path release $name
             if (-not (Test-Path -LiteralPath $path)) { throw "Missing build output: $path" }
@@ -90,13 +90,13 @@ jobs:
           $notes = @"
           <!-- Maintainers: add the CHANGELOG section of this version before publishing. -->
           > [!WARNING]
-          > Varak is in early development. Do not use it for important documents yet; see the
+          > Simpaper is in early development. Do not use it for important documents yet; see the
           > [known limitations](https://github.com/${env:GITHUB_REPOSITORY}/blob/$env:RELEASE_TAG/docs/KNOWN_LIMITATIONS.md).
 
           | File | Content |
           |---|---|
-          | ``Varak-Setup-$version-x64.exe`` | Installer for the current user (no administrator rights needed) |
-          | ``Varak-$version-x64.zip`` | The same application for portable use: unzip and run ``Varak.exe`` |
+          | ``Simpaper-Setup-$version-x64.exe`` | Installer for the current user (no administrator rights needed) |
+          | ``Simpaper-$version-x64.zip`` | The same application for portable use: unzip and run ``Simpaper.exe`` |
           | ``SHA256SUMS.txt`` | SHA-256 checksums of both files |
 
           **Not code-signed yet:** Windows SmartScreen shows a warning when the installer or the app is started for the
@@ -117,12 +117,12 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.RELEASE_TAG }}
-          name: Varak ${{ env.RELEASE_TAG }}
+          name: Simpaper ${{ env.RELEASE_TAG }}
           body_path: ${{ runner.temp }}/release-notes.md
           draft: true
           prerelease: ${{ contains(env.RELEASE_TAG, '-') }}
           fail_on_unmatched_files: true
           files: |
-            release/Varak-Setup-*-x64.exe
-            release/Varak-*-x64.zip
+            release/Simpaper-Setup-*-x64.exe
+            release/Simpaper-*-x64.zip
             release/SHA256SUMS.txt

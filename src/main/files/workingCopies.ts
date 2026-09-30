@@ -2,7 +2,7 @@
  * Working copies: the engine and pdf.js only ever touch a private copy of the user's file,
  * stored under `<local>/work/<session>/<docId>/<file name>`; the user's file is written only by
  * the save pipeline. Folders of earlier sessions are removed at startup (the single-instance lock
- * guarantees no other Varak process is using them).
+ * guarantees no other Simpaper process is using them).
  */
 import { chmod, copyFile, mkdir, readdir } from 'node:fs/promises';
 import { basename, join } from 'node:path';

@@ -1,13 +1,13 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-"""NDJSON framing (varak_bridge.framing)."""
+"""NDJSON framing (simpaper_bridge.framing)."""
 import io
 import json
 import threading
 import unittest
 
-from varak_bridge.framing import FramingError, MessageWriter, decode_line, encode_message, sanitize
+from simpaper_bridge.framing import FramingError, MessageWriter, decode_line, encode_message, sanitize
 
 
 class DecodeLineTest(unittest.TestCase):

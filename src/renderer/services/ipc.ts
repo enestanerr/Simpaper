@@ -1,9 +1,9 @@
-/** Typed access to the main process. The preload exposes `window.varakIpc` (see src/preload/index.ts). */
-import type { Channel, ChannelReq, ChannelRes, EventChannel, Events, VarakIpcBridge } from '@shared/ipc';
+/** Typed access to the main process. The preload exposes `window.simpaperIpc` (see src/preload/index.ts). */
+import type { Channel, ChannelReq, ChannelRes, EventChannel, Events, SimpaperIpcBridge } from '@shared/ipc';
 
-function bridge(): VarakIpcBridge {
-  const b = (globalThis as unknown as { varakIpc?: VarakIpcBridge }).varakIpc;
-  if (!b) throw new Error('varakIpc bridge is not available (preload not loaded?)');
+function bridge(): SimpaperIpcBridge {
+  const b = (globalThis as unknown as { simpaperIpc?: SimpaperIpcBridge }).simpaperIpc;
+  if (!b) throw new Error('simpaperIpc bridge is not available (preload not loaded?)');
   return b;
 }
 
@@ -17,5 +17,5 @@ export function on<E extends EventChannel>(channel: E, listener: (payload: Event
 
 /** True when running inside the Electron shell (false in unit tests / storybook-like previews). */
 export function hasBridge(): boolean {
-  return Boolean((globalThis as unknown as { varakIpc?: unknown }).varakIpc);
+  return Boolean((globalThis as unknown as { simpaperIpc?: unknown }).simpaperIpc);
 }

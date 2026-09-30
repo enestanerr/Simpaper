@@ -26,8 +26,8 @@ export const INVOKE_CHANNELS: readonly string[] = [
 ];
 export const EVENT_CHANNELS: readonly string[] = [...APP_EVENTS, ...DOCUMENT_EVENTS];
 
-/** What the preload script exposes as `window.varakIpc`. */
-export interface VarakIpcBridge {
+/** What the preload script exposes as `window.simpaperIpc`. */
+export interface SimpaperIpcBridge {
   invoke<C extends Channel>(channel: C, req: ChannelReq<C>): Promise<ChannelRes<C>>;
   on<E extends EventChannel>(channel: E, listener: (payload: Events[E]) => void): () => void;
 }

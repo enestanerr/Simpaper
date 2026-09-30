@@ -87,7 +87,7 @@ export function createWin32ViewOps(api: Win32Api, log: Logger, encodePng: PngEnc
         !user32.IsZoomed(view) &&
         !user32.IsIconic(view)
       ) {
-        // The engine owned the frame before loading into it (engine/bridge/varak_bridge/owned.py). The loaded
+        // The engine owned the frame before loading into it (engine/bridge/simpaper_bridge/owned.py). The loaded
         // frame may already be shown and active: hiding or restyling it from this worker thread is what hung
         // the UI thread (GUI spike 2026-09-29), so there is nothing to do.
         log.debug('Owned view ready (owned by the engine)', { hwnd: formatHwnd(view), windowDpi: user32.GetDpiForWindow(view), hostDpi: user32.GetDpiForWindow(host) });

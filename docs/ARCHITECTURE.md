@@ -1,6 +1,6 @@
 # Architecture
 
-This document records **why** Varak is built the way it is and **how** the pieces fit together.
+This document records **why** Simpaper is built the way it is and **how** the pieces fit together.
 Individual decisions are in [`docs/adr/`](adr/); the research behind them (with sources) is in
 [`docs/research/`](research/).
 
@@ -37,28 +37,28 @@ Key facts behind the table (details and sources in `docs/research/`):
 ## 3. System overview
 
 ```
-┌──────────────────────────── Varak (Electron) ────────────────────────────┐
+┌─────────────────────────── Simpaper (Electron) ───────────────────────────┐
 │ Renderer (React, sandboxed)                                               │
 │  title bar · QAT · tabs · ribbon · backstage · status bar · dialogs       │
 │  PDF module (pdf.js viewer + annotation editor)                           │
 │        ▲ typed, allow-listed IPC (src/shared/ipc.ts)                      │
 │ Main process (Node)                                                       │
 │  DocumentService ─ SafeWriter ─ CompatAnalyzer ─ RecoveryService          │
-│  EngineManager ── EngineInstance (one per office document) ──┐           │
+│  EngineManager ── EngineInstance (one per office document) ───┐           │
 │  PdfService (@cantoo/pdf-lib)   ViewHost (Win32 via koffi)    │           │
 └───────────────────────────────────────────────────────────────┼───────────┘
-                                   NDJSON JSON-RPC over stdio  │
-                  ┌────────────────────────────────────────────▼──┐
-                  │ varak_bridge (LibreOffice's bundled Python)    │
+                                   NDJSON JSON-RPC over stdio   │
+                  ┌─────────────────────────────────────────────▼──┐
+                  │ simpaper_bridge (LibreOffice's bundled Python) │
                   │  UNO: load/store, dispatch, status listeners,  │
                   │  dispatch interception, context events         │
                   └──────────────┬─────────────────────────────────┘
                                  │ URP over a random named pipe
                   ┌──────────────▼─────────────────────────────────┐
-                  │ soffice.bin (unmodified LibreOffice 26.8)       │
-                  │  own profile per instance; macros disabled      │
-                  │  native editing window hosted in Varak's window │
-                  └─────────────────────────────────────────────────┘
+                  │ soffice.bin (unmodified LibreOffice 26.8)      │
+                  │  own profile per instance; macros disabled     │
+                  │  editing window hosted in Simpaper's window    │
+                  └────────────────────────────────────────────────┘
 ```
 
 ### Process model
@@ -91,12 +91,12 @@ LibreOffice's editing window is a native Win32 window in another process. Two ho
 implemented behind `ViewHost` (`src/main/platform/`):
 
 - **child** (default): LibreOffice's `createSystemChild` WS_CHILD window inside a layered `STATIC` container
-  of the Varak window. The container has its own redirection surface and Chromium runs with
+  of the Simpaper window. The container has its own redirection surface and Chromium runs with
   `--disable-features=RemoveRedirectionBitmap`, so the GDI-painted view is visible although Chromium ≥ 139
   creates top-level windows with `WS_EX_NOREDIRECTIONBITMAP`. Passed the first GUI spike.
-- **owned** (development only): a borderless top-level LibreOffice window owned by the Varak window and kept
-  exactly over the document area; own redirection surface and DPI mode. It hung Varak's UI thread in the first
-  GUI spike; with the engine owning the frame before loading into it, Varak stayed responsive in the second run,
+- **owned** (development only): a borderless top-level LibreOffice window owned by the Simpaper window and kept
+  exactly over the document area; own redirection surface and DPI mode. It hung Simpaper's UI thread in the first
+  GUI spike; with the engine owning the frame before loading into it, Simpaper stayed responsive in the second run,
   but soffice stopped responding after the first click into the document ([ADR 0003](adr/0003-document-surface.md),
   amendment).
 

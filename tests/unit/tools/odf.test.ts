@@ -22,7 +22,7 @@ describe('odfText', () => {
       'application/vnd.oasis.opendocument.text',
       `<office:text>
         <text:h text:outline-level="1">Başlık İ</text:h>
-        <text:p>a<text:s text:c="3"/>b<text:tab/>c<text:line-break/>d<office:annotation><dc:creator>Varak Test</dc:creator><text:p>yorum ğ</text:p></office:annotation></text:p>
+        <text:p>a<text:s text:c="3"/>b<text:tab/>c<text:line-break/>d<office:annotation><dc:creator>Simpaper Test</dc:creator><text:p>yorum ğ</text:p></office:annotation></text:p>
         <text:p>önce<draw:frame><draw:text-box><text:p>kutu ş</text:p></draw:text-box></draw:frame>sonra</text:p>
         <draw:frame><draw:image xlink:href="Pictures/a.png"/></draw:frame>
         <table:table table:name="T"><table:table-row><table:table-cell><text:p>x</text:p></table:table-cell><table:table-cell><text:p>ı</text:p></table:table-cell></table:table-row></table:table>
@@ -33,7 +33,7 @@ describe('odfText', () => {
     expect(t.mimetype).toBe('application/vnd.oasis.opendocument.text');
     expect(t.paragraphs).toEqual(['Başlık İ', 'a   b\tc\nd', 'öncesonra', 'kutu ş', 'x', 'ı']);
     expect(t.headings).toEqual([{ level: 1, text: 'Başlık İ' }]);
-    expect(t.annotations).toEqual([{ author: 'Varak Test', text: 'yorum ğ' }]);
+    expect(t.annotations).toEqual([{ author: 'Simpaper Test', text: 'yorum ğ' }]);
     expect(t.headers).toEqual(['Üst']);
     expect(t.footers).toEqual(['Alt']);
     expect(t.images).toBe(1);

@@ -4,7 +4,7 @@
  * fallback, where `viewHost.supported === false`.
  *
  * Call once, early in main-process startup (before engine processes are spawned).
- * VARAK_PROCESS_GUARD=self makes the app process itself join the kill-on-close job instead of only
+ * SIMPAPER_PROCESS_GUARD=self makes the app process itself join the kill-on-close job instead of only
  * adopted processes; see win32/process-guard.ts for the trade-off.
  */
 import { createLogger } from '../log';
@@ -29,7 +29,7 @@ export function createPlatform(): Platform {
   return {
     viewHost,
     processGuard: new Win32ProcessGuard(api, {
-      mode: process.env['VARAK_PROCESS_GUARD'] === 'self' ? 'self' : 'adopt',
+      mode: process.env['SIMPAPER_PROCESS_GUARD'] === 'self' ? 'self' : 'adopt',
       log: log.child('process'),
     }),
     hangDetector: new Win32HangDetector(api),

@@ -4,7 +4,7 @@
  * (JSZip + XML, exceljs, pdf.js). Expectations come from the generator's manifest (computed in JS)
  * or from the third-party files themselves — never from LibreOffice output.
  *
- * Skipped when no engine is available (vendor/libreoffice or VARAK_ENGINE_DIR).
+ * Skipped when no engine is available (vendor/libreoffice or SIMPAPER_ENGINE_DIR).
  */
 import { createHash } from 'node:crypto';
 import { readFileSync, rmSync } from 'node:fs';

@@ -8,7 +8,7 @@
 
 ## Context
 
-- Varak must install **without administrator rights** on Windows 10/11 x64 and run **offline**; it must never
+- Simpaper must install **without administrator rights** on Windows 10/11 x64 and run **offline**; it must never
   download the engine or anything else at run time.
 - The engine is the official LibreOffice 26.8.0.3 MSI (374,906,880 bytes). Its administrative extraction is a
   self-contained folder of about 1.5 GiB with all 120+ UI languages, 55 spelling dictionaries and the offline
@@ -35,7 +35,7 @@
    (UI languages other than en-US and tr, dictionaries other than English and Turkish, the offline help, the
    admin-image MSI copy, the 32-bit runtime, Python caches); bundled fonts move to `share/fonts/truetype`
    (where LibreOffice registers them privately) and the x64 Visual C++ runtime DLLs move to `program/`. The
-   result is recorded in `VARAK-ENGINE.json`. `--verify` runs a headless smoke test (`verify-engine.mjs`):
+   result is recorded in `SIMPAPER-ENGINE.json`. `--verify` runs a headless smoke test (`verify-engine.mjs`):
    Turkish text converted to PDF and DOCX, text read back, bundled fonts embedded.
 3. **Installer and archive** with **electron-builder 26** (`electron-builder.yml`):
    - NSIS assisted installer, x64, **per-user** (`perMachine: false`, `allowElevation: false`), installation
@@ -51,9 +51,9 @@
    letting the user choose defaults), Microsoft Store packages. electron-builder's own signing is switched off
    (`win.signExecutable: false`, added 2026-09-29): with a certificate it would re-sign every `.exe` copied from
    `extraResources`, i.e. replace The Document Foundation's signatures on the engine and break the
-   byte-identical guarantee. Signing will be a separate CI step limited to Varak's own files.
+   byte-identical guarantee. Signing will be a separate CI step limited to Simpaper's own files.
 5. **Never** register LibreOffice's Maintenance Service or updaters; the engine's update checks are disabled in
-   the engine profile, and updates come only with new Varak releases.
+   the engine profile, and updates come only with new Simpaper releases.
 6. **Source code of the engine:** release notes and [THIRD_PARTY_NOTICES.md](../../THIRD_PARTY_NOTICES.md)
    point to TDF's source directory for the exact version (`sourceUrl` in the lock file). Before the first public
    release, the source tarballs of the shipped engine version are mirrored with the release assets so that the
@@ -70,7 +70,7 @@
 | electron-builder `portable` target | Re-extracts the whole ~1 GB payload to `%TEMP%` on every start |
 | Download the engine on first start | Violates the offline requirement and complicates verification |
 | Require a separately installed LibreOffice | Version drift, macro/updater settings outside our control, admin rights |
-| Ship all LibreOffice languages | Twice the size for UI languages Varak does not offer |
+| Ship all LibreOffice languages | Twice the size for UI languages Simpaper does not offer |
 | Microsoft Store (MSIX) | Store identity, sandbox restrictions on spawning the engine; not needed for v0.1 |
 
 ## Consequences
@@ -81,7 +81,7 @@
   measured 331 MiB for the installer and 436 MiB for the ZIP ([PACKAGING.md](../PACKAGING.md#sizes)).
 - Unsigned installers trigger Microsoft Defender SmartScreen warnings until signing is set up.
 - The "unmodified engine" statement holds because every shipped LibreOffice file is byte-identical to the MSI
-  content; `VARAK-ENGINE.json` lists what was left out or relocated.
+  content; `SIMPAPER-ENGINE.json` lists what was left out or relocated.
 - Every release must run fetch → prepare (with `--verify`) → build → package; the CI engine cache is keyed by
   the lock file.
-- Adding UI languages means adding them to the prepare step (`--ui-langs`) and to Varak's own translations.
+- Adding UI languages means adding them to the prepare step (`--ui-langs`) and to Simpaper's own translations.

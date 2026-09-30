@@ -1,7 +1,7 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-"""Command line entry point: python -m varak_bridge --pipe <name> [--log-level info]."""
+"""Command line entry point: python -m simpaper_bridge --pipe <name> [--log-level info]."""
 
 import argparse
 import logging
@@ -19,7 +19,7 @@ LOST_EXIT_GRACE_S = 5.0
 
 
 def parse_args(argv):
-    parser = argparse.ArgumentParser(prog='varak_bridge', description='Varak engine bridge')
+    parser = argparse.ArgumentParser(prog='simpaper_bridge', description='Simpaper engine bridge')
     parser.add_argument('--pipe', required=True, help='name of the soffice UNO pipe acceptor')
     parser.add_argument('--log-level', default='info', choices=sorted(_LEVELS))
     parser.add_argument('--connect-timeout', type=float, default=120.0, help='seconds to wait for soffice')
@@ -63,10 +63,10 @@ def main(argv=None):
 
         def force_exit():
             time.sleep(LOST_EXIT_GRACE_S)
-            logging.getLogger('varak').error('request loop still busy after the connection loss; exiting')
+            logging.getLogger('simpaper').error('request loop still busy after the connection loss; exiting')
             flush()
             os._exit(EXIT_CONNECTION_LOST)
-        threading.Thread(target=force_exit, name='varak-lost-exit', daemon=True).start()
+        threading.Thread(target=force_exit, name='simpaper-lost-exit', daemon=True).start()
 
     methods.on_connection_lost = connection_lost
     methods.start()
@@ -74,7 +74,7 @@ def main(argv=None):
     try:
         code = server.run()
     except BaseException:
-        logging.getLogger('varak').exception('bridge failed')
+        logging.getLogger('simpaper').exception('bridge failed')
     finally:
         flush()
         # Skip interpreter teardown: joining pyuno's bridge threads can hang after soffice is gone.

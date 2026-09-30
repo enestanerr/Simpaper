@@ -1,6 +1,7 @@
 # ADR 0007: Product name — "Varak"
 
-- **Status:** Accepted as the working name; a formal trademark search is required before the first public
+- **Status:** Superseded by [ADR 0009](0009-product-name-simpaper.md) (2026-09-30: the product is called Simpaper).
+  Before that: accepted as the working name; a formal trademark search was required before the first public
   release
 - **Date:** 2026-09-28
 - **Related:** `src/shared/brand.ts`, [ADR 0006](0006-license.md), research:

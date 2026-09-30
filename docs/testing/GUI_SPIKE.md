@@ -12,9 +12,9 @@ hosting) and roadmap M2 (high DPI).
 |---|---|
 | Build | `npm run build`, then `npm start` (or `npm run dev` for DevTools) |
 | Engine | `vendor/libreoffice` (26.8.0.3) |
-| Logs | `VARAK_DEBUG=1`: the view host logs `Owned view ready {windowDpi, hostDpi}`, attach/detach and failures |
-| Mode switch | `settings.json` → `"engine": { "viewMode": "child" }` (default) or `"owned"` (development only); read at start-up, so restart Varak |
-| Guard mode | default `adopt`; `VARAK_PROCESS_GUARD=self` for test J3 only |
+| Logs | `SIMPAPER_DEBUG=1`: the view host logs `Owned view ready {windowDpi, hostDpi}`, attach/detach and failures |
+| Mode switch | `settings.json` → `"engine": { "viewMode": "child" }` (default) or `"owned"` (development only); read at start-up, so restart Simpaper |
+| Guard mode | default `adopt`; `SIMPAPER_PROCESS_GUARD=self` for test J3 only |
 | Test files | `tests/corpus` (Writer DOCX with images/tables, Calc XLSX with 3 sheets, Impress PPTX with 3 slides — `pptx-basic`; `npm run corpus:generate -- --large` adds a 200-slide deck) |
 | Tools | Windows Settings → Display (scale), a second monitor, Process Explorer (suspend/kill), NVDA or Narrator, Snipping Tool |
 | Record | one row per test and mode: pass/fail, notes, screenshot name, measured numbers |
@@ -51,7 +51,7 @@ than one frame.
 | B3 | AltGr on Turkish Q: AltGr+Q (@), AltGr+E (€), AltGr+< (\|), AltGr+ş (´ dead key) then e. | Characters inserted; **no KeyTips appear**; LibreOffice menus do not open. |
 | B4 | Click the ribbon (e.g. Bold), then click back into the document and type. | Typing continues in the document after one click; caret visible. |
 | B5 | `view:focus` path: use a ribbon control that returns focus to the document (e.g. font size box + Enter). | Keyboard focus is back in the document without a click. |
-| B6 | Alt+Tab to another app and back (3×), and click the taskbar button. | Focus returns to the document; the Varak title bar looks active while typing in the document (`isForeground`). |
+| B6 | Alt+Tab to another app and back (3×), and click the taskbar button. | Focus returns to the document; the Simpaper title bar looks active while typing in the document (`isForeground`). |
 | B7 | Emoji panel (Win+.) and clipboard history (Win+V) while typing in Writer. | Inserted into the document. |
 | B8 | Calc: type a formula `=TOPLA(A1:A3)` in a cell and in the formula bar; Enter, Tab, arrow keys. | Behaves like LibreOffice standalone. |
 
@@ -59,9 +59,9 @@ than one frame.
 
 | # | Steps | Pass criteria |
 |---|---|---|
-| C1 | In the document: Ctrl+S, Ctrl+Shift+S, Ctrl+O, Ctrl+N, Ctrl+W, Ctrl+Q; then Ctrl+P. | The first six reach Varak (engine `intercept` event → Varak UI) and no LibreOffice dialog opens; Ctrl+P opens LibreOffice's print dialog (`.uno:Print` is not intercepted, see engine/profile/ACCELERATORS.md), modal over the document. |
+| C1 | In the document: Ctrl+S, Ctrl+Shift+S, Ctrl+O, Ctrl+N, Ctrl+W, Ctrl+Q; then Ctrl+P. | The first six reach Simpaper (engine `intercept` event → Simpaper UI) and no LibreOffice dialog opens; Ctrl+P opens LibreOffice's print dialog (`.uno:Print` is not intercepted, see engine/profile/ACCELERATORS.md), modal over the document. |
 | C2 | Ctrl+B/I/U, Ctrl+Z/Y, Ctrl+C/V, Ctrl+A, Ctrl+F. | Handled by LibreOffice; ribbon state updates within 100 ms. |
-| C3 | F6, Shift+F6, Ctrl+F1, Ctrl+Tab. | Engine `key` events arrive; Varak moves focus as designed. |
+| C3 | F6, Shift+F6, Ctrl+F1, Ctrl+Tab. | Engine `key` events arrive; Simpaper moves focus as designed. |
 
 ## D. KeyTips trigger (ShellKeys, when enabled)
 
@@ -71,7 +71,7 @@ than one frame.
 | D2 | Alt+Tab, Alt+F4 (cancel the close), Alt+Shift (layout switch), Ctrl+Alt, AltGr+Q. | Nothing reported. |
 | D3 | Writer: hold Alt and drag with the mouse (block selection), release Alt. | Nothing reported. |
 | D4 | F10; Shift+F10; Ctrl+F10. | `F10` only for the plain F10. |
-| D5 | Switch to another app (Notepad), type and tap Alt there; return. | Nothing reported while Notepad is in front; no typing lag in Notepad (hook installed only while Varak is in front). |
+| D5 | Switch to another app (Notepad), type and tap Alt there; return. | Nothing reported while Notepad is in front; no typing lag in Notepad (hook installed only while Simpaper is in front). |
 | D6 | Open a LibreOffice dialog (Format → Character) and tap Alt in it. | Nothing reported; the dialog's mnemonics work. |
 
 ## E. Popups and freeze-frame
@@ -89,9 +89,9 @@ than one frame.
 
 | # | Steps | Pass criteria |
 |---|---|---|
-| F1 | Start Varak on each monitor; open a document. | Placement rule; LibreOffice text size matches the scale (bitmap-stretched = slightly blurry is accepted on non-system-DPI monitors, tdf#145710). |
+| F1 | Start Simpaper on each monitor; open a document. | Placement rule; LibreOffice text size matches the scale (bitmap-stretched = slightly blurry is accepted on non-system-DPI monitors, tdf#145710). |
 | F2 | Drag the window slowly across the monitor boundary and back (D4, D5). | After the DPI switch (window centre crosses), placement rule within 200 ms; no crash; no runaway resize loop. |
-| F3 | Change the scale of the current monitor in Settings while Varak runs. | View re-placed after `WM_DPICHANGED`; placement rule. |
+| F3 | Change the scale of the current monitor in Settings while Simpaper runs. | View re-placed after `WM_DPICHANGED`; placement rule. |
 | F4 | Log `Owned view ready` values on each monitor. | `windowDpi` = system DPI (LibreOffice is System-aware), `hostDpi` = monitor DPI. Record for ADR 0003. |
 | F5 | LibreOffice dialogs (Format → Paragraph) on each monitor. | Readable, correctly sized, fully on screen. |
 | F6 (child) | Repeat F1–F2 in child mode; note whether LibreOffice's process DPI awareness was force-reset (`windowDpi`). | Record the difference between the modes. |
@@ -100,8 +100,8 @@ than one frame.
 
 | # | Steps | Pass criteria |
 |---|---|---|
-| G1 | Open Format → Character via the ribbon. | Dialog above Varak, modal, keyboard focus in the dialog; our ribbon does not act while it is open (engine `dialog` event). |
-| G2 | Move Varak behind another app, then click Varak's taskbar button. | The dialog comes back in front with Varak. |
+| G1 | Open Format → Character via the ribbon. | Dialog above Simpaper, modal, keyboard focus in the dialog; our ribbon does not act while it is open (engine `dialog` event). |
+| G2 | Move Simpaper behind another app, then click Simpaper's taskbar button. | The dialog comes back in front with Simpaper. |
 | G3 | Close the dialog (OK/Cancel/Esc). | Focus back in the document; no stray window. |
 | G4 | Open a file-picker from inside a LibreOffice dialog (e.g. Insert → Image if not intercepted). | Picker works and is owned correctly. |
 
@@ -109,12 +109,12 @@ than one frame.
 
 | # | Steps | Pass criteria |
 |---|---|---|
-| H1 | Process Explorer → Suspend `soffice.bin` of the active document. Click the ribbon, other tabs, the PDF module. | Varak's own UI stays responsive (owned mode). Child mode: record how input behaves (attached queues). |
+| H1 | Process Explorer → Suspend `soffice.bin` of the active document. Click the ribbon, other tabs, the PDF module. | Simpaper's own UI stays responsive (owned mode). Child mode: record how input behaves (attached queues). |
 | H2 | Keep it suspended 10 s. | Watchdog reports not responding within 5 s; the recovery UI appears. |
 | H3 | Resume, or let recovery kill it. | Document restored from the working copy/recovery snapshot; no orphan `soffice.bin`/`python.exe`. |
 | H4 | Kill `soffice.bin` while editing. | View disappears cleanly (no frozen image left), recovery offered; other documents unaffected. |
 
-Result (2026-09-29, runs 10–12 below): H1 child mode — the Varak window gets no input while soffice hangs; the way
+Result (2026-09-29, runs 10–12 below): H1 child mode — the Simpaper window gets no input while soffice hangs; the way
 out is the rescue message box (after 8 s, a window without owner). H2 — hang bar after ~5 s. H3 — restart from the
 box restores the autosave. H4 — checked for a background document.
 
@@ -122,9 +122,9 @@ box restores the autosave. H4 — checked for a background document.
 
 | # | Steps | Pass criteria |
 |---|---|---|
-| J1 | Close Varak with three documents open (answer the save prompts). | No LibreOffice window remains visible at any moment; all engine processes gone within 3 s. |
+| J1 | Close Simpaper with three documents open (answer the save prompts). | No LibreOffice window remains visible at any moment; all engine processes gone within 3 s. |
 | J2 | Kill `electron.exe` (main process) in Process Explorer. | Every `soffice.exe`, `soffice.bin` and bridge `python.exe` is gone within 2 s (job, adopt mode). |
-| J3 | With `VARAK_PROCESS_GUARD=self`: start Varak, open documents, open a link via `shell.openExternal` with the browser closed beforehand, then quit; repeat J2. | The UI (sandboxed renderer) and documents work inside the job; J2 passes; record that the browser is killed with Varak (known trade-off of self mode). |
+| J3 | With `SIMPAPER_PROCESS_GUARD=self`: start Simpaper, open documents, open a link via `shell.openExternal` with the browser closed beforehand, then quit; repeat J2. | The UI (sandboxed renderer) and documents work inside the job; J2 passes; record that the browser is killed with Simpaper (known trade-off of self mode). |
 | J4 | If the app uses `app.relaunch()` (e.g. after a language change): trigger it. | App restarts (adopt mode). |
 
 ## K. Accessibility
@@ -139,9 +139,9 @@ box restores the autosave. H4 — checked for a background document.
 `node scripts/gui/gui-spike.mjs [--view-mode child|owned] [--out test-output/gui] [--idle-ms 60000]` runs the
 packaged app (`release/win-unpacked`) with an isolated data folder, drives it with real mouse and keyboard input
 (koffi `SendInput`) and the renderer's DevTools protocol, checks the saved DOCX independently, watches for hangs
-after every step (stack dumps of Varak and soffice when it hangs) and captures Varak's window only. Safety rules:
+after every step (stack dumps of Simpaper and soffice when it hangs) and captures Simpaper's window only. Safety rules:
 it does not start unless keyboard and mouse have been idle for `--idle-ms`, it never clicks or types while another
-window is in front of Varak, and it logs other windows without their titles. It types at 40 ms per key: keys
+window is in front of Simpaper, and it logs other windows without their titles. It types at 40 ms per key: keys
 injected within milliseconds right after a document's first modification are lost inside LibreOffice.
 
 Single behaviours have their own scripts in `scripts/gui/checks/` (same safety rules; see the README there).
@@ -150,18 +150,18 @@ Single behaviours have their own scripts in `scripts/gui/checks/` (same safety r
 
 | Run | Mode | Result |
 |---|---|---|
-| 1 | owned | **Hang:** Varak's UI thread blocked in `NtUserPeekMessage` ~3 s after the Writer view appeared (also without input); soffice idle |
+| 1 | owned | **Hang:** Simpaper's UI thread blocked in `NtUserPeekMessage` ~3 s after the Writer view appeared (also without input); soffice idle |
 | 2 | child | Passed: placement, ribbon Bold, Ctrl+S with the DOCX checked on disk, backstage, Calc `=TOPLA(1,5;2,25)` → 3,75, new Impress slide, text/form PDFs, window move, light theme. Found: no Impress slide pane, "Slayt 0 / 3", Slides group overlap; typed text lost (burst injection) |
 | 3 | child | Fixes confirmed on screen (slide pane, "Slayt 1 / 3" → "Slayt 2 / 4", ribbon layout, font-size drop-down with freeze-frame) |
-| 4 | owned | Engine owns the frame before loading: Varak stays responsive, but **soffice** stops responding ~4 s after the first click into the document → owned is development-only |
+| 4 | owned | Engine owns the frame before loading: Simpaper stays responsive, but **soffice** stops responding ~4 s after the first click into the document → owned is development-only |
 | 5 | child | With the `doc.info` page-count fix: burst-typed text still lost → separate typing experiments: at 40 ms per key every character arrives, bursts right after the first modification lose keys inside LibreOffice |
 | 6 | child | Typing at 40 ms per key: 53/53 characters, the saved DOCX contains the Turkish sentence (AutoCorrect turns " - " into an en dash) |
 | 7 | child | `screenshots.mjs` tr/en: all README shots; PDF highlight + free text saved and read back; loss warning; KeyTips; quit prompts. Found: a LibreOffice dialog opened from the ribbon has no keyboard focus |
 | 8 | child | `quitcheck.mjs`: unsaved PDF and DOCX → one "Save your changes?" per document, "Don't save" → files unchanged, app exits |
 | 9 | child | `dialogcheck.mjs` after the `AllowSetForegroundWindow` fix: Paragraph and Font dialogs have the focus, a real Esc closes them, the ribbon is disabled while they are open and enabled afterwards |
 | 10 | child | `stuckcheck.mjs` (H4 for a background tab): the engine of a background Writer document killed with Calc in front → it restarts hidden, Calc stays in front, the tab switch shows the restarted Writer |
-| 11 | child | `stuckcheck.mjs`/`hangprobe.mjs` (H1–H2): soffice suspended while its view had the focus → hang bar after ~5 s, Varak's UI thread keeps running, but **no mouse/keyboard input reaches the Varak window** (clicks on "Restart engine", the File tab, Ctrl+W are processed only when soffice runs again); `AttachThreadInput(FALSE)` does not help. Also found: Ctrl+W after a click on the ribbon reached LibreOffice (the focus had stayed there) |
-| 12 | child | `rescuecheck.mjs` with the fixes (rescue message box without a parent, kill before detach): the box appeared 12.7–13.8 s after the suspension in front, real keys chose "Motoru yeniden başlat", the engine ended, the document came back from the autosave (1.7 s) with the keyboard in it, and Varak took input again (File view, Esc). Hanging again, the box closed by itself when the engine was resumed. Found on the way: after the restart the focus had fallen to the view container (fixed: it is taken back, and the restored document is focused) |
+| 11 | child | `stuckcheck.mjs`/`hangprobe.mjs` (H1–H2): soffice suspended while its view had the focus → hang bar after ~5 s, Simpaper's UI thread keeps running, but **no mouse/keyboard input reaches the Simpaper window** (clicks on "Restart engine", the File tab, Ctrl+W are processed only when soffice runs again); `AttachThreadInput(FALSE)` does not help. Also found: Ctrl+W after a click on the ribbon reached LibreOffice (the focus had stayed there) |
+| 12 | child | `rescuecheck.mjs` with the fixes (rescue message box without a parent, kill before detach): the box appeared 12.7–13.8 s after the suspension in front, real keys chose "Motoru yeniden başlat", the engine ended, the document came back from the autosave (1.7 s) with the keyboard in it, and Simpaper took input again (File view, Esc). Hanging again, the box closed by itself when the engine was resumed. Found on the way: after the restart the focus had fallen to the view container (fixed: it is taken back, and the restored document is focused) |
 | 13 | child | `focuscheck.mjs`: before the fix a letter typed into the ribbon's font box after a click into the document went into the document, and a real Esc did not close the File view; with `view:focusShell` the letter lands in the box, Esc closes the File view, the keyboard returns to the document, and a ribbon tab switch still leaves it in the document |
 
 
@@ -176,5 +176,5 @@ criteria above are the assertions.
 ## M. Decision record
 
 Decided on D1 (2026-09-29, ADR 0003 amendment): **child** is the default — it passed runs 2, 3, 5 and 6, while owned
-hung (Varak in run 1, soffice in run 4). Still to fill in: D2–D5 (DPI) and freeze latency. H1 was measured automatically (runs 11–12): a hung engine blocks
-input to the Varak window in child mode, which the rescue message box answers.
+hung (Simpaper in run 1, soffice in run 4). Still to fill in: D2–D5 (DPI) and freeze latency. H1 was measured automatically (runs 11–12): a hung engine blocks
+input to the Simpaper window in child mode, which the rescue message box answers.

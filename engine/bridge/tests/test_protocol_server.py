@@ -1,17 +1,17 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-"""Protocol constants vs. src/shared/engine-protocol.ts, and the request loop (varak_bridge.server)."""
+"""Protocol constants vs. src/shared/engine-protocol.ts, and the request loop (simpaper_bridge.server)."""
 import io
 import json
 import os
 import re
 import unittest
 
-from varak_bridge.errors import RpcError
-from varak_bridge.framing import MessageWriter
-from varak_bridge.protocol import INTERCEPTED_COMMANDS, PROTOCOL_VERSION, ErrorCode
-from varak_bridge.server import Server
+from simpaper_bridge.errors import RpcError
+from simpaper_bridge.framing import MessageWriter
+from simpaper_bridge.protocol import INTERCEPTED_COMMANDS, PROTOCOL_VERSION, ErrorCode
+from simpaper_bridge.server import Server
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
 TS_PROTOCOL = os.path.join(ROOT, 'src', 'shared', 'engine-protocol.ts')

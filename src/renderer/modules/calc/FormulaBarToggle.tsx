@@ -1,4 +1,4 @@
-/** View › Show › Formula bar: toggles Varak's own formula bar (renderer view option). */
+/** View › Show › Formula bar: toggles Simpaper's own formula bar (renderer view option). */
 import { useTranslation } from 'react-i18next';
 import { IconMathFunction } from '@tabler/icons-react';
 import { cls } from '../../ribbon/controls/shared';

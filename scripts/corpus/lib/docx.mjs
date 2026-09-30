@@ -276,11 +276,11 @@ export async function buildDocx(opts = {}) {
   const variant = opts.variant ?? 'basic';
   const extraPages = opts.pages ?? 0;
   const picture = testPicture(320, 200);
-  const alt = 'Varak test görseli: lacivert–altın degrade';
-  const header = 'Varak Test Belgesi — Üstbilgi (çğıöşü)';
+  const alt = 'Simpaper test görseli: lacivert–altın degrade';
+  const header = 'Simpaper Test Belgesi — Üstbilgi (çğıöşü)';
   const comment = `Yorum: ${TR.lower} ${TR.upper}`;
   const inserted = 'eklenen metin';
-  const linkText = 'Varak örnek bağlantısı';
+  const linkText = 'Simpaper örnek bağlantısı';
   const tableRows = [
     ['Şehir', 'Bölge', 'Plaka'],
     ['İstanbul', 'Marmara', '34'],
@@ -292,7 +292,7 @@ export async function buildDocx(opts = {}) {
   const secondPage = `${TR.pangram} ${TR.pangramUpper} `.repeat(6).trim();
 
   const body = [
-    para('Varak Test Belgesi', { style: 'Heading1' }),
+    para('Simpaper Test Belgesi', { style: 'Heading1' }),
     para(TR.pangram),
     para([run('Biçim denemesi: '), run(formatWord, { b: true }), run(', '), run('italik', { i: true }), run(', '), run('kalın italik', { b: true, i: true }), run(' ve '), run('altı çizili', { u: true }), run(' sözcükler.')]),
     para('Türkçe büyük/küçük harf', { style: 'Heading2' }),
@@ -385,9 +385,9 @@ export async function buildDocx(opts = {}) {
     ],
     [
       'docProps/core.xml',
-      corePropsXml({ title: 'Varak Test Belgesi', subject: 'Türkçe OOXML test belgesi', creator: AUTHOR, keywords: 'varak; test; çğıöşü', language: 'tr-TR', created: FIXED_DATE_ISO }),
+      corePropsXml({ title: 'Simpaper Test Belgesi', subject: 'Türkçe OOXML test belgesi', creator: AUTHOR, keywords: 'simpaper; test; çğıöşü', language: 'tr-TR', created: FIXED_DATE_ISO }),
     ],
-    ['docProps/app.xml', appPropsXml({ application: 'Varak corpus generator' })],
+    ['docProps/app.xml', appPropsXml({ application: 'Simpaper corpus generator' })],
     [
       'word/_rels/document.xml.rels',
       relsXml([
@@ -414,7 +414,7 @@ export async function buildDocx(opts = {}) {
   const facts = {
     pages: 2 + extraPages,
     headings: [
-      { level: 1, text: 'Varak Test Belgesi' },
+      { level: 1, text: 'Simpaper Test Belgesi' },
       { level: 2, text: 'Türkçe büyük/küçük harf' },
       { level: 3, text: 'Tablo' },
       { level: 3, text: 'Görsel' },

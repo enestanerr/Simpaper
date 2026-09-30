@@ -341,7 +341,7 @@ describe('title bar active look', () => {
     const { container } = render(<TitleBar />);
     const header = container.querySelector('header')!;
     expect(header.className).toBe('vr-titlebar');
-    expect(document.title).toBe('• Rapor.docx — Varak');
+    expect(document.title).toBe('• Rapor.docx — Simpaper');
     expect(within(header).getByText('Rapor.docx')).toBeTruthy();
     act(() => noteWindowFocus(false));
     expect(header.className).toContain('vr-titlebar--inactive');

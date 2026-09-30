@@ -7,7 +7,7 @@
 
 ## Context
 
-Varak needs its own Office-like interface: title bar, Quick Access Toolbar, ribbon with tabs and groups,
+Simpaper needs its own Office-like interface: title bar, Quick Access Toolbar, ribbon with tabs and groups,
 File backstage, document tabs, status bar, dialogs, Turkish and English UI, light and dark themes, keyboard
 access (KeyTips) and good accessibility. The PDF module needs a web renderer anyway (pdf.js). The shell must
 host LibreOffice's native editing window ([ADR 0003](0003-document-surface.md)).

@@ -1,7 +1,7 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-"""varak_bridge.documents without soffice: dialog tracking with real pyuno wrappers, and the arguments of
+"""simpaper_bridge.documents without soffice: dialog tracking with real pyuno wrappers, and the arguments of
 doc.store (markSaved, baseUrl) with a fake model."""
 import unittest
 from unittest import mock
@@ -9,10 +9,10 @@ from unittest import mock
 import uno
 from com.sun.star.io import IOException
 
-from varak_bridge.documents import Documents, store_to_url
-from varak_bridge.errors import RpcError
-from varak_bridge.listeners import TopWindowListener
-from varak_bridge.protocol import ErrorCode
+from simpaper_bridge.documents import Documents, store_to_url
+from simpaper_bridge.errors import RpcError
+from simpaper_bridge.listeners import TopWindowListener
+from simpaper_bridge.protocol import ErrorCode
 
 OPEN = {'type': 'dialog', 'open': True}
 CLOSED = {'type': 'dialog', 'open': False}
@@ -38,7 +38,7 @@ class DialogTrackingTest(unittest.TestCase):
         self.events = []
         self.documents = Documents(office=None, emit=self.events.append)
         # The stand-in is no XDialog; everything else is the real code path.
-        patcher = mock.patch('varak_bridge.documents.supports', lambda _obj, name: name == 'com.sun.star.awt.XDialog')
+        patcher = mock.patch('simpaper_bridge.documents.supports', lambda _obj, name: name == 'com.sun.star.awt.XDialog')
         patcher.start()
         self.addCleanup(patcher.stop)
 
@@ -84,7 +84,7 @@ class DialogTrackingTest(unittest.TestCase):
         self.assertEqual(self.events, [OPEN, OPEN, CLOSED, CLOSED])
 
     def test_non_dialog_windows_are_ignored(self):
-        with mock.patch('varak_bridge.documents.supports', lambda _obj, _name: False):
+        with mock.patch('simpaper_bridge.documents.supports', lambda _obj, _name: False):
             window = wrappers(uno_object(), 1)[0]
             self.documents.on_top_window_opened(window)
             self.documents.on_top_window_closed(window)
@@ -175,7 +175,7 @@ class DocStoreMethodTest(unittest.TestCase):
     """The doc.store RPC parameters (src/shared/engine-protocol.ts)."""
 
     def setUp(self):
-        from varak_bridge.methods import Methods
+        from simpaper_bridge.methods import Methods
         self.model = FakeModel()
         self.office = StoreOffice()
         self.methods = Methods('unused', lambda _e: None)

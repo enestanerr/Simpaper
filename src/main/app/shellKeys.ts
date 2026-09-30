@@ -1,8 +1,8 @@
 /**
  * Shell keys (bare Alt / F10) reported by the platform keyboard hook (settings.ui.documentKeyTips).
  *
- * The hook is installed while Varak — its window or one of its native document windows — is in the foreground,
- * but a gesture is forwarded to the renderer only while a document window has the focus: when the Varak window
+ * The hook is installed while Simpaper — its window or one of its native document windows — is in the foreground,
+ * but a gesture is forwarded to the renderer only while a document window has the focus: when the Simpaper window
  * itself is focused, the renderer handles Alt/F10 on its own, and a second report would re-open KeyTips the user
  * just closed (or open them for Right Alt, which the renderer ignores on purpose).
  */

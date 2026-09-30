@@ -30,8 +30,10 @@ import { containsAscii, isEncryptedError, usesXrefStream } from './load';
 import { getAcroForm } from './structure';
 
 /** Key in our appearance streams holding a hash of the inputs, to detect stale appearances. */
-const MARKER = PDFName.of('VarakAP');
-const FONT_KEY = 'VarakF1';
+const MARKER = PDFName.of('SimpaperAP');
+/** The same key as written by development builds before the rename (docs/adr/0009-product-name-simpaper.md). */
+const LEGACY_MARKER = PDFName.of('VarakAP');
+const FONT_KEY = 'SimpaperF1';
 /** pdf.js FreeText metrics (LINE_FACTOR / LINE_DESCENT_FACTOR in src/core/annotation.js). */
 const LINE_FACTOR = 1.35;
 const LINE_DESCENT_FACTOR = 0.35;
@@ -117,7 +119,7 @@ function existingMarker(doc: PDFDocument, annot: PDFDict): string | null | undef
   const normal = ap.get(N.N);
   const stream = normal instanceof PDFRef ? doc.context.lookup(normal) : normal;
   if (!(stream instanceof PDFStream)) return null;
-  const marker = stream.dict.get(MARKER);
+  const marker = stream.dict.get(MARKER) ?? stream.dict.get(LEGACY_MARKER);
   return decodeText(marker) ?? null;
 }
 

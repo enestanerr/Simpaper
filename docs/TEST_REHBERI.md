@@ -1,6 +1,6 @@
 # Elle test rehberi (v0.1)
 
-Bu rehber, Varak'ı kendi bilgisayarınızda adım adım denemeniz içindir. Otomatik testlerin kapsamı
+Bu rehber, Simpaper'ı kendi bilgisayarınızda adım adım denemeniz içindir. Otomatik testlerin kapsamı
 [TESTING.md](TESTING.md) dosyasında; bilinen sınırlamalar [KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md) dosyasındadır.
 İlk sürüm olduğu için **gerçek dosyalarınızın kopyalarıyla** çalışın.
 
@@ -8,16 +8,16 @@ Bu rehber, Varak'ı kendi bilgisayarınızda adım adım denemeniz içindir. Oto
 
 Seçeneklerden birini kullanın:
 
-- **Kurulum dosyası:** `release\Varak-Setup-0.1.0-x64.exe`. Henüz yayımlanmış bir sürüm yok: bu dosyayı (ve
+- **Kurulum dosyası:** `release\Simpaper-Setup-0.1.0-x64.exe`. Henüz yayımlanmış bir sürüm yok: bu dosyayı (ve
   aşağıdaki ZIP'i) proje klasöründe [Kaynaktan derleme](../README.tr.md#kaynaktan-derleme) adımlarıyla
   (`npm run dist:win -- --publish never`) üretin. Yönetici izni istemez; yalnızca sizin kullanıcı
   hesabınıza kurulur. Kurulum dosyası henüz imzalı olmadığı için Windows SmartScreen "Windows bilgisayarınızı
   korudu" uyarısı gösterebilir: **Ek bilgi → Yine de çalıştır**.
-- **Taşınabilir sürüm:** `release\Varak-0.1.0-x64.zip` dosyasını bir klasöre çıkarıp `Varak.exe`'yi çalıştırın.
+- **Taşınabilir sürüm:** `release\Simpaper-0.1.0-x64.zip` dosyasını bir klasöre çıkarıp `Simpaper.exe`'yi çalıştırın.
 - **Geliştirici modu:** proje klasöründe `npm run dev`.
 
-Kaldırmak için: **Ayarlar → Uygulamalar → Varak → Kaldır**. Ayarlar `%APPDATA%\Varak`, motor profilleri, kurtarma
-dosyaları ve günlükler `%LOCALAPPDATA%\Varak` altında tutulur.
+Kaldırmak için: **Ayarlar → Uygulamalar → Simpaper → Kaldır**. Ayarlar `%APPDATA%\Simpaper`, motor profilleri, kurtarma
+dosyaları ve günlükler `%LOCALAPPDATA%\Simpaper` altında tutulur.
 
 ## 2. Genel kontroller
 
@@ -89,11 +89,11 @@ dosyaları ve günlükler `%LOCALAPPDATA%\Varak` altında tutulur.
 | V1 | Makro içeren bir DOCM/XLSM'yi DOCX/XLSX olarak kaydetmeyi deneyin | Kayıp uyarısı: "Kopya kaydet… / Yine de kaydet / ODF olarak kaydet / İptal"; "Kopya kaydet…" seçilidir |
 | V2 | Değiştirilmiş belgeyi kapatmayı deneyin | "Değişiklikler kaydedilsin mi?" sorusu: Kaydet / Kaydetme / İptal |
 | V3 | Belgeyi değiştirin, otomatik kayıt süresi kadar (varsayılan 3 dk) bekleyin, sonra Görev Yöneticisi'nden `soffice.bin` sürecini sonlandırın | Motor yeniden başlar; "Belge, en son otomatik kurtarma kopyasından geri yüklendi…" bildirimi; o kopyadan sonraki değişiklikler yoktur |
-| V4 | Belgeyi değiştirip otomatik kaydı bekleyin, Varak'ı Görev Yöneticisi'nden sonlandırıp yeniden açın | Başlangıç ekranında "Kaydedilmemiş 1 belge kurtarılabilir." bandı → Göster → Geri yükle |
-| V5 | (İleri düzey) Belgeyi değiştirip otomatik kaydı bekleyin; Kaynak İzleyicisi'nde (resmon) CPU sekmesinde belgenin `soffice.bin` sürecini (belgeye yazarken CPU kullanan; Varak bir yedek motor da çalıştırır, yanlışını seçerseniz bir şey olmaz, devam ettirip diğerini deneyin) → İşlemi askıya al | Varak penceresi tıklamalara yanıt vermez; yaklaşık 13 sn sonra (Varak motorun yanıt vermediğini ~5 sn'de fark eder, ardından 8 sn bekler) ayrı bir "Varak" penceresi "Motoru yeniden başlat / Bekle" sorar. "Motoru yeniden başlat" → belge otomatik kayıttan açılır ve yazmaya devam edilir. "Bekle" seçerseniz süreci Kaynak İzleyicisi'nde devam ettirin |
+| V4 | Belgeyi değiştirip otomatik kaydı bekleyin, Simpaper'ı Görev Yöneticisi'nden sonlandırıp yeniden açın | Başlangıç ekranında "Kaydedilmemiş 1 belge kurtarılabilir." bandı → Göster → Geri yükle |
+| V5 | (İleri düzey) Belgeyi değiştirip otomatik kaydı bekleyin; Kaynak İzleyicisi'nde (resmon) CPU sekmesinde belgenin `soffice.bin` sürecini (belgeye yazarken CPU kullanan; Simpaper bir yedek motor da çalıştırır, yanlışını seçerseniz bir şey olmaz, devam ettirip diğerini deneyin) → İşlemi askıya al | Simpaper penceresi tıklamalara yanıt vermez; yaklaşık 13 sn sonra (Simpaper motorun yanıt vermediğini ~5 sn'de fark eder, ardından 8 sn bekler) ayrı bir "Simpaper" penceresi "Motoru yeniden başlat / Bekle" sorar. "Motoru yeniden başlat" → belge otomatik kayıttan açılır ve yazmaya devam edilir. "Bekle" seçerseniz süreci Kaynak İzleyicisi'nde devam ettirin |
 
 ## 8. Sorun bildirirken
 
 Uygulama sürümünü (Dosya → Hakkında), Windows sürümünü, modülü, dosya türünü, adımları ve mümkünse ekran görüntüsünü
-yazın. **Gizli belge paylaşmayın.** Günlük dosyaları `%LOCALAPPDATA%\Varak\logs` altındadır; belge içeriği
+yazın. **Gizli belge paylaşmayın.** Günlük dosyaları `%LOCALAPPDATA%\Simpaper\logs` altındadır; belge içeriği
 içermezler ama dosya adları geçebilir.

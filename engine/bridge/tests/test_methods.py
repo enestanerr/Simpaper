@@ -1,8 +1,8 @@
-"""Command-name validation of RPC parameters (varak_bridge.methods)."""
+"""Command-name validation of RPC parameters (simpaper_bridge.methods)."""
 import unittest
 
-from varak_bridge.errors import RpcError
-from varak_bridge.methods import _command
+from simpaper_bridge.errors import RpcError
+from simpaper_bridge.methods import _command
 
 
 class CommandNameTest(unittest.TestCase):

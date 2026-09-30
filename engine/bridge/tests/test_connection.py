@@ -1,7 +1,7 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-"""Loss of the URP connection to soffice (varak_bridge.office / methods / server).
+"""Loss of the URP connection to soffice (simpaper_bridge.office / methods / server).
 
 When the connection is gone the bridge must end its process with EXIT_CONNECTION_LOST instead of answering
 ENGINE_UNAVAILABLE forever: only an exit makes the main process run its crash handling. The URP tests talk
@@ -20,12 +20,12 @@ import unittest
 import uno  # noqa: F401  (registers the com.sun.star import hook)
 from com.sun.star.lang import DisposedException
 
-from varak_bridge.errors import RpcError
-from varak_bridge.framing import MessageWriter
-from varak_bridge.methods import Methods
-from varak_bridge.office import ConnectionLoss, MainThreadExecutor, connect
-from varak_bridge.protocol import EXIT_CONNECTION_LOST, ErrorCode
-from varak_bridge.server import Server
+from simpaper_bridge.errors import RpcError
+from simpaper_bridge.framing import MessageWriter
+from simpaper_bridge.methods import Methods
+from simpaper_bridge.office import ConnectionLoss, MainThreadExecutor, connect
+from simpaper_bridge.protocol import EXIT_CONNECTION_LOST, ErrorCode
+from simpaper_bridge.server import Server
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, '..', '..', '..'))
@@ -133,7 +133,7 @@ def methods_with_office():
 class MethodsTest(unittest.TestCase):
     def test_a_lost_connection_ends_the_bridge_unless_soffice_is_being_ended(self):
         methods, _office, lost = methods_with_office()
-        with self.assertLogs('varak.methods', 'ERROR') as logs:
+        with self.assertLogs('simpaper.methods', 'ERROR') as logs:
             methods._connection_lost('URP bridge disposed')
         self.assertEqual(len(lost.calls), 1)
         self.assertIn('exit code %d' % EXIT_CONNECTION_LOST, logs.output[0])
@@ -221,7 +221,7 @@ class UrpConnectionTest(unittest.TestCase):
     """connect() and ConnectionLoss against a URP peer in another process."""
 
     def setUp(self):
-        self.pipe = 'varak_test_%d_%d' % (os.getpid(), int(time.monotonic() * 1000) % 1000000)
+        self.pipe = 'simpaper_test_%d_%d' % (os.getpid(), int(time.monotonic() * 1000) % 1000000)
         self.peer = subprocess.Popen([LAUNCHER, os.path.join(HERE, 'urp_peer.py'), self.pipe],
                                      stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
         self.addCleanup(self._end_peer)

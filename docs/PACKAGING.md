@@ -1,6 +1,6 @@
 # Packaging
 
-How a Windows release of Varak is built, reproducibly, from a clean checkout. The reasoning is in
+How a Windows release of Simpaper is built, reproducibly, from a clean checkout. The reasoning is in
 [ADR 0008](adr/0008-packaging.md); the configuration is `electron-builder.yml` and `scripts/engine/`.
 
 ## Prerequisites
@@ -26,8 +26,8 @@ The output is written to `release/`:
 
 | File | Content |
 |---|---|
-| `Varak-Setup-<version>-x64.exe` | Per-user NSIS installer (no administrator rights needed; English and Turkish) |
-| `Varak-<version>-x64.zip` | The same application as a ZIP for portable use |
+| `Simpaper-Setup-<version>-x64.exe` | Per-user NSIS installer (no administrator rights needed; English and Turkish) |
+| `Simpaper-<version>-x64.zip` | The same application as a ZIP for portable use |
 
 `npm run dist:dir` builds the unpacked application only (`release/win-unpacked/`), which is useful for checking the
 layout without creating an installer.
@@ -77,13 +77,13 @@ are taken **byte for byte**, as hard links when possible (no extra disk space) o
 
 | Step | Why |
 |---|---|
-| Keep UI languages `en-US` and `tr` only (`--ui-langs`, env `VARAK_ENGINE_UI_LANGS`): `program/resource/<lang>`, `share/registry/Langpack-<lang>.xcd`, `share/registry/res/*_<lang>.xcd`, `share/autotext/<lang>`, `share/extensions/*/help/<lang>` | Varak offers Turkish and English only |
-| Keep spelling dictionaries and word lists for `en` and `tr` only (`--dicts`, env `VARAK_ENGINE_DICTIONARIES`): `share/extensions/dict-*`, `share/wordbook/*.dic` | Saves about 390 MiB; more languages can be added |
+| Keep UI languages `en-US` and `tr` only (`--ui-langs`, env `SIMPAPER_ENGINE_UI_LANGS`): `program/resource/<lang>`, `share/registry/Langpack-<lang>.xcd`, `share/registry/res/*_<lang>.xcd`, `share/autotext/<lang>`, `share/extensions/*/help/<lang>` | Simpaper offers Turkish and English only |
+| Keep spelling dictionaries and word lists for `en` and `tr` only (`--dicts`, env `SIMPAPER_ENGINE_DICTIONARIES`): `share/extensions/dict-*`, `share/wordbook/*.dic` | Saves about 390 MiB; more languages can be added |
 | Move `Fonts/*` to `share/fonts/truetype/` | LibreOffice registers fonts from there privately; in the admin image they are not used at all (verified: without the move, LibreOffice substitutes Calibri and Times New Roman for Carlito and Liberation Serif) |
 | Move `System64/*.dll` (Visual C++ runtime) to `program/` | The MSI normally installs the runtime system-wide; a per-user app must bring it along |
 | Leave out `help/`, the admin-image MSI copy, `System/` (32-bit runtime) and `__pycache__` folders | Not needed at run time |
 | Keep `LICENSE.html`, `license.txt`, `NOTICE`, `CREDITS.fodt`, `readmes/` unchanged | License compliance |
-| Write `VARAK-ENGINE.json` | Version, build id, MSI digest, languages, sizes, and every removed or relocated item |
+| Write `SIMPAPER-ENGINE.json` | Version, build id, MSI digest, languages, sizes, and every removed or relocated item |
 
 `--verify` runs `scripts/engine/verify-engine.mjs` on the result: a Flat ODF document with Turkish text in Carlito
 and Liberation Serif is converted to PDF and DOCX with `soffice.exe --headless`, using a throw-away profile under
@@ -103,8 +103,8 @@ Measured on 2026-09-29 with LibreOffice 26.8.0.3:
 | — of which left out | spelling dictionaries 393 MiB, other UI languages 349 MiB, MSI copy 19 MiB, help 11 MiB, extension help 4.5 MiB, AutoText 3 MiB, 32-bit runtime 1.5 MiB |
 | Electron 44.4.5 runtime (before locale pruning) | about 368 MB |
 | Unpacked application (`release/win-unpacked`, 0.1.0 build of 2026-09-29 evening) | **1,109 MiB, 6,823 files**, of which `resources/engine` 742 MiB (6,713 files) and `app.asar` 44 MiB |
-| Installer `Varak-Setup-0.1.0-x64.exe` | 346,332,767 bytes (330.3 MiB; without `elevate.exe`) |
-| ZIP `Varak-0.1.0-x64.zip` | 456,570,179 bytes (435.4 MiB) |
+| Installer `Simpaper-Setup-0.1.0-x64.exe` | 346,332,767 bytes (330.3 MiB; without `elevate.exe`) |
+| ZIP `Simpaper-0.1.0-x64.zip` | 456,570,179 bytes (435.4 MiB) |
 
 The uncompressed payload of about 1.1 GB is below NSIS's 2 GB limit. The installer was installed and used on the
 development PC (per user, no administrator rights); a clean machine is still to be tried.
@@ -114,8 +114,8 @@ development PC (per user, no administrator rights); a clean machine is still to 
 `npm run dist:dir` (or `npx electron-builder --win dir --config.directories.output=<folder>` after
 `npm run build`) produces `win-unpacked/`. On 2026-09-29 such a build was checked file by file: the 6,713 files
 of `resources/engine` were byte-identical to `vendor/engine-dist` (SHA-256), `resources/bridge` contained only
-the `varak_bridge` modules, koffi and `@koromix/koffi-win32-x64` were in `app.asar.unpacked` and loaded from the
-packaged path, `LICENSE.txt` and `THIRD_PARTY_NOTICES.md` were next to `Varak.exe`, and the fuses listed below were
+the `simpaper_bridge` modules, koffi and `@koromix/koffi-win32-x64` were in `app.asar.unpacked` and loaded from the
+packaged path, `LICENSE.txt` and `THIRD_PARTY_NOTICES.md` were next to `Simpaper.exe`, and the fuses listed below were
 set. The application itself was not started (that opens windows).
 
 ## Installer behaviour
@@ -134,7 +134,7 @@ set. The application itself was not started (that opens windows).
   Vite.
 - The native module koffi (Win32 bindings) is unpacked from `app.asar` (`asarUnpack`), as Node-API binaries can't
   be loaded from inside an archive.
-- `LICENSE.txt` (MPL-2.0) and `THIRD_PARTY_NOTICES.md` are installed next to `Varak.exe`; Electron's
+- `LICENSE.txt` (MPL-2.0) and `THIRD_PARTY_NOTICES.md` are installed next to `Simpaper.exe`; Electron's
   `LICENSE.electron.txt` and `LICENSES.chromium.html` are added by electron-builder.
 - No file associations and no auto-update in v0.1 (planned for M3).
 
@@ -153,8 +153,8 @@ The plan:
    authentication for maintainers, and releases built by CI from the public repository.
 2. Publish the code-signing policy in this repository (who may approve a signing request, which artifacts are
    signed).
-3. Add the signing steps to `.github/workflows/release.yml`: build `win-unpacked`, have SignPath sign `Varak.exe`
-   (only Varak's own files, **never** anything under `resources/engine`), build the installer and the ZIP from the
+3. Add the signing steps to `.github/workflows/release.yml`: build `win-unpacked`, have SignPath sign `Simpaper.exe`
+   (only Simpaper's own files, **never** anything under `resources/engine`), build the installer and the ZIP from the
    signed folder (`electron-builder --prepackaged`), then sign the installer. The uninstaller is generated inside
    the NSIS build, so signing it needs a custom signing hook that forwards only that file to SignPath; this is to
    be designed together with the SignPath setup.

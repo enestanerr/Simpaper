@@ -1,5 +1,5 @@
 /**
- * Helpers for the shell/ribbon tests: repository paths, locale files, a fake `window.varakIpc` bridge that
+ * Helpers for the shell/ribbon tests: repository paths, locale files, a fake `window.simpaperIpc` bridge that
  * records every call, and store resets.
  * (.tsx: files that import renderer code stay out of tsconfig.node.json, whose composite project cannot include
  * src/renderer; they are type-checked with tests/unit/renderer/tsconfig.renderer-tests.json.)
@@ -7,7 +7,7 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { Channel, ChannelReq, ChannelRes, EventChannel, Events, VarakIpcBridge } from '@shared/ipc';
+import type { Channel, ChannelReq, ChannelRes, EventChannel, Events, SimpaperIpcBridge } from '@shared/ipc';
 import type { DocumentDescriptor } from '@shared/api/documents';
 import type { ModuleKind } from '@shared/modules';
 import { DEFAULT_SETTINGS } from '@shared/api/app';
@@ -79,7 +79,7 @@ export interface IpcCall {
 type Handler = (req: unknown) => unknown;
 
 /** A fake preload bridge: records calls, answers from per-channel handlers, lets tests emit events. */
-export class FakeIpc implements VarakIpcBridge {
+export class FakeIpc implements SimpaperIpcBridge {
   readonly calls: IpcCall[] = [];
   private readonly handlers = new Map<string, Handler>();
   private readonly listeners = new Map<string, Set<(payload: unknown) => void>>();
@@ -130,14 +130,14 @@ export class FakeIpc implements VarakIpcBridge {
   }
 }
 
-/** Installs a fake bridge as `globalThis.varakIpc` (what the preload script exposes). */
+/** Installs a fake bridge as `globalThis.simpaperIpc` (what the preload script exposes). */
 export function installIpc(ipc = new FakeIpc()): FakeIpc {
-  (globalThis as unknown as { varakIpc?: VarakIpcBridge }).varakIpc = ipc;
+  (globalThis as unknown as { simpaperIpc?: SimpaperIpcBridge }).simpaperIpc = ipc;
   return ipc;
 }
 
 export function removeIpc(): void {
-  delete (globalThis as unknown as { varakIpc?: VarakIpcBridge }).varakIpc;
+  delete (globalThis as unknown as { simpaperIpc?: SimpaperIpcBridge }).simpaperIpc;
 }
 
 /** Resets every renderer store and module-level service state between tests. */

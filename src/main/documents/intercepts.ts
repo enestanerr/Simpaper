@@ -1,5 +1,5 @@
 /**
- * Commands the bridge intercepts inside a document frame (INTERCEPTED_COMMANDS) and how Varak
+ * Commands the bridge intercepts inside a document frame (INTERCEPTED_COMMANDS) and how Simpaper
  * handles them: file commands go through our own safe pipelines and dialogs; commands with a shell page
  * (options, about, the PDF export page with its options) are forwarded to the renderer as `intercept`
  * events; help, mail, template and macro commands are refused with a notice (macros are never executed).

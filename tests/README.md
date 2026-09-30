@@ -1,6 +1,6 @@
 # Tests
 
-How Varak is tested, the ground rules and what is (not) verified are described in
+How Simpaper is tested, the ground rules and what is (not) verified are described in
 [docs/TESTING.md](../docs/TESTING.md). This file explains the layout of `tests/`, the test corpus and the
 verification tools. Developer notes with measurements and findings: [docs/dev/testing-corpus.md](../docs/dev/testing-corpus.md).
 
@@ -27,7 +27,7 @@ npx vitest run --project engine tests/engine/independent.test.ts tests/engine/vi
 node scripts/corpus/third-party.mjs                             # verify the vendored corpus offline
 ```
 
-Engine tests need LibreOffice: `vendor/libreoffice` (`npm run engine:fetch`) or `VARAK_ENGINE_DIR` pointing to a
+Engine tests need LibreOffice: `vendor/libreoffice` (`npm run engine:fetch`) or `SIMPAPER_ENGINE_DIR` pointing to a
 LibreOffice installation or its `program` folder. Without an engine they are skipped, not failed. They never open
 windows. The corpus suites (`independent`, `visual`) run LibreOffice with `--headless --invisible`, each runner
 with its own profile under `test-output/corpus/soffice/`, and kill the whole process tree of everything they
@@ -66,7 +66,7 @@ the same source data, never read from LibreOffice output.
 | `xlsx-basic` (`xlsx-basic.xlsx`) | Sheets Veriler/Hesaplar/Biçimler: typed data; number formats (decimal, thousands, percent, scientific, date, time, Turkish lira and US dollar currency, text, fraction); 21 formulas (SUM, AVERAGE, IF, VLOOKUP, INDEX/MATCH, DATE, TEXT, COUNTIF, ROUND, IFERROR, MOD, AND, UPPER, CONCATENATE, a defined name, cross-sheet and absolute references) written **without cached results** except one deliberately stale cached value; merged cells, borders, list data validation, conditional formatting, frozen panes |
 | `pdf-text` | Three pages of Turkish text in an embedded Unicode font (DejaVu Sans from the engine image), document metadata |
 | `pdf-form` | AcroForm with two text fields, a check box and a drop-down, Turkish values |
-| `pdf-encrypted` | AES-256 encrypted PDF (user password `varak123`) |
+| `pdf-encrypted` | AES-256 encrypted PDF (user password `simpaper123`) |
 | `pdf-scanned` | Image-only page (JPEG) without a text layer |
 | `large-xlsx`, `large-docx`, `large-pptx` | Only with `--large`: 100,000 rows, 300 pages, 200 slides (performance; never committed) |
 | `*-odt`, `*-doc`, `*-rtf`, `*-txt`, `*-dotx`, `*-ods`, `*-xls`, `*-csv-tr`, `*-csv-en`, `*-tsv-en`, `*-xltx`, `*-odp`, `*-ppt`, `*-potx`, `*-ppsx` (`derived/`) | Derived by headless LibreOffice from the three OOXML files (ODF, legacy binary, RTF, UTF-8 text, templates, slide show, CSV/TSV in a Turkish and an English profile); written only when an engine is available, checked by `engine/independent.test.ts` |

@@ -20,7 +20,7 @@ from com.sun.star.view import XSelectionChangeListener
 from .errors import uno_type_name
 from .protocol import INTERCEPTED_COMMANDS
 
-log = logging.getLogger('varak.listeners')
+log = logging.getLogger('simpaper.listeners')
 
 
 def base_command(url_complete):

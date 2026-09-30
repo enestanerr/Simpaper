@@ -45,6 +45,7 @@ push). The maintainer's open tasks on GitHub are listed under "Maintainer TODOs"
 | Installer file types | `node scripts/installer/check-associations.mjs` | PASSED: 28 extensions, 27 ProgIDs; exact registry tree after install, update, switch to "all users" and uninstall (scratch key) |
 | Packaged engine | `npm run engine:prepare -- --verify` | PASSED (Turkish PDF and DOCX conversion, bundled fonts embedded) |
 | Type check / lint | `npm run typecheck`, `npx tsc -p tests/unit/{renderer,pdf}/tsconfig.renderer-tests.json --noEmit`, `npm run lint` | clean |
+| CI on GitHub | `.github/workflows/ci.yml` on every push to `main` | first run (commit 89ea113): `tests/unit/tools/pdf.test.ts` failed, because the runner keeps the repository on D: and the corpus font on C: (a cross-drive path joined to the repository root; fixed in 1c2a5a7). Second run: both jobs passed (`Lint, type check, unit tests, build` 99 s; `Engine tests (headless LibreOffice)` 511 s, with the engine downloaded and verified from scratch) |
 
 ### Rename and Windows file types (2026-09-30)
 
@@ -165,8 +166,8 @@ shows it, look for a transient file lock on the working copy.
   pre-rename build was installed, on this development PC).
 - The screenshots in `docs/screenshots/` predate the rename and show "Varak"; capturing them again is a GUI run.
 - Nothing is claimed as verified in Microsoft Office (not installed here).
-- CI on GitHub: the workflows run on every push to `main`; the first results are not recorded here yet
-  (repository → Actions).
+- The release workflow (`.github/workflows/release.yml`) has not run on GitHub yet (it starts on a `v*` tag and
+  builds a draft release).
 
 ## How to resume
 
@@ -194,10 +195,8 @@ runs always use `SIMPAPER_DATA_DIR` under `test-output/` and never touch any ins
 
 ## Next steps
 
-1. Check the first CI run on GitHub (jobs `Lint, type check, unit tests, build` and
-   `Engine tests (headless LibreOffice)`) and fix what fails; then the Maintainer TODOs in
-   [dev/repo.md](dev/repo.md) (Code of Conduct contact, private vulnerability reporting, Discussions, branch
-   protection).
+1. The Maintainer TODOs in [dev/repo.md](dev/repo.md) (Code of Conduct contact, private vulnerability reporting,
+   Discussions, branch protection requiring the two CI jobs, which pass on GitHub).
 2. On this PC: remove the Varak test installation, install `release/Simpaper-Setup-0.1.0-x64.exe` and go through
    section 2 of [TEST_REHBERI.md](TEST_REHBERI.md) (file types); record the result here.
 3. Capture the screenshots again (`node scripts/gui/screenshots.mjs --lang both`, idle PC, owner's permission).

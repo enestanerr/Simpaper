@@ -48,10 +48,9 @@ The repository https://github.com/ncreativestudios/Simpaper is public.
   issue chooser and the CoC link to `/security/advisories/new`, and the CoC names it as the reporting channel until
   its e-mail address is published.
 - Protect `main`, requiring the `CI` checks `Lint, type check, unit tests, build` and
-  `Engine tests (headless LibreOffice)`.
+  `Engine tests (headless LibreOffice)`; both pass on GitHub since the second push ([STATUS.md](../STATUS.md), Test
+  results).
 - Replace the e-mail placeholder in `CODE_OF_CONDUCT.md` (Enforcement section).
-- First CI run (started by the first push): lint, type check, unit and engine tests were clean locally on 2026-09-29
-  ([STATUS.md](../STATUS.md), Test results); check the result under Actions and record it in STATUS.md.
 - Check the file types on a real installation ([ADR 0010](../adr/0010-file-associations.md), Consequences): icons
   in Explorer, double-click, Windows' prompt, Simpaper's Default apps page and Options › File types. This needs an
   install on a test PC with someone at the screen. A PC with the old Varak test installation keeps it next to

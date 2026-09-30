@@ -50,7 +50,8 @@ Nothing has been released yet. This section collects the work towards **v0.1.0**
   entries and a page under Settings › Apps › Default apps. It makes Simpaper the default only for office and PDF
   types that no installed app owns yet; uninstalling removes these entries, an update keeps them, switching an
   "only for me" installation to "all users" removes the per-user entries, and the finish page offers to open Windows
-  Settings to choose Simpaper as the default app. The ZIP registers nothing. Not yet tried in a real installation.
+  Settings to choose Simpaper as the default app. The ZIP registers nothing. Checked on a real installation on the
+  development PC (see below).
 - Options › File types (Windows): shows whether documents, spreadsheets, presentations and PDF files open with
   Simpaper; its "Choose default apps…" button opens Simpaper's page in Windows Settings. The app itself never writes
   the registry.
@@ -58,15 +59,24 @@ Nothing has been released yet. This section collects the work towards **v0.1.0**
   artwork). `scripts/installer/check-associations.mjs` compiles `build/installer.nsh` and runs its install, update
   and uninstall parts against a scratch registry key, comparing every value and the complete list of keys and values;
   it passed on the development PC, and the release workflow runs it after building.
+- `scripts/installer/verify-install.mjs` checks the built installer on the real system (it changes the computer; only
+  with the owner's permission on an idle PC): silent install, the registry values, which types open with Simpaper,
+  the icons Windows shows, a double-click and a multiple selection, Options › File types, and that uninstalling
+  restores every type. On the development PC 23 of the 24 office and PDF types opened with Simpaper and showed its
+  icons (`.pdf` stayed with Edge), and an update over the installed build kept all file-type entries
+  ([docs/PACKAGING.md](docs/PACKAGING.md#real-installation)).
+- On-screen checks `themecheck.mjs` (accent colours and their contrast in every module and theme, the Options
+  layout) and `menucheck.mjs` (a menu opened with the mouse is operated with the keyboard); `focuscheck.mjs` also
+  covers a ribbon menu and a prompt over the document.
 - `electron-builder.yml` sets `publish: null`: without an update feed, builds no longer ship a
   `resources/app-update.yml` derived from the build machine's git remote.
 
 ### Changed
 
 - Renamed from the working name "Varak" to Simpaper ([ADR 0009](docs/adr/0009-product-name-simpaper.md)): application
-  id `io.github.ncreativestudios.simpaper`, data folders `%APPDATA%\Simpaper` and `%LOCALAPPDATA%\Simpaper`,
+  id `io.github.enestanerr.simpaper`, data folders `%APPDATA%\Simpaper` and `%LOCALAPPDATA%\Simpaper`,
   `Simpaper.exe`, `Simpaper-Setup-<version>-x64.exe` and `Simpaper-<version>-x64.zip`, `SIMPAPER_*` environment
-  variables and the `simpaper_bridge` Python package. The repository is https://github.com/ncreativestudios/Simpaper.
+  variables and the `simpaper_bridge` Python package. The repository is https://github.com/enestanerr/Simpaper.
   Simpaper installs next to a Varak test installation (new installer GUID) and does not migrate its settings. Varak's
   PDF appearance streams (`/VarakAP`) and leftovers of an interrupted save (`.~varak-…`) are still recognised.
 
@@ -108,6 +118,19 @@ Nothing has been released yet. This section collects the work towards **v0.1.0**
   the first 64 KiB only.
 - Files opened together from a multi-selection in Explorer (Windows starts one Simpaper process per file) started
   their engines all at once; they now open one after another through a single queue.
+- The colours derived from a module's accent were never applied (the theme tokens resolved to nothing): the selected
+  ribbon tab, large ribbon icons, menu check marks, dialog icons, chips, selected gallery items and the table grid
+  showed plain text colours or no background. Dialogs and menus, which are drawn outside the app's root element, had
+  no accent at all. In the dark theme the start screen highlights with gold (ink was too dark to read there); text in
+  an accent colour keeps at least 4.5:1 contrast in every module and theme.
+- Options: the checkboxes of the Saving, CSV and Interface sections were drawn above their labels.
+- Menus opened with the mouse did not take the keyboard focus, so the arrow keys did nothing and Esc did not close
+  them; Tab did not close a menu, and the focus did not return to the menu's button. With a document open, menus,
+  galleries and collapsed ribbon groups now take the keyboard while they are open, as in Office, and give it back
+  to the document when they close.
+- After a menu or a prompt over the document, and sometimes after closing the File view, the keyboard stayed in
+  Simpaper instead of returning to the document: the request reached LibreOffice while its window was still hidden.
+  It is now sent once the document is shown again.
 
 ### Security
 
@@ -117,4 +140,4 @@ Nothing has been released yet. This section collects the work towards **v0.1.0**
 - The renderer can no longer change the folder engines are started from, choose save targets without a dialog,
   or pass arguments to engine commands beyond an allow-list.
 
-[Unreleased]: https://github.com/ncreativestudios/Simpaper/commits/main
+[Unreleased]: https://github.com/enestanerr/Simpaper/commits/main

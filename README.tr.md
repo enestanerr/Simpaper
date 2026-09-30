@@ -47,9 +47,11 @@ Aşağıdakiler ilk sürümün hedefleridir; her birinin ne kadarının hazır o
 Simpaper ilk kurulabilir sürümüne doğru geliştiriliyor. 2026-09-30 itibarıyla dürüst bir özet: "Birim testlerinden
 geçti" ifadesi, uygulama çalıştırılmadan yürütülen otomatik testleri; "gerçek motorla test edildi" ifadesi, pencere
 göstermeden LibreOffice'i süren otomatik testleri; "ekranda kullanıldı" ifadesi ise paketlenmiş uygulamada gerçek fare
-ve klavye girdisiyle yapılan otomatik GUI denemelerini kasteder. Bu denemeler dışında yalnızca ad değişikliğinden
-önceki bir derleme (o zamanki adıyla Varak) sahibi tarafından geliştirme bilgisayarında kurulup denendi; kayıtlı bir
-elle test turu ([docs/TEST_REHBERI.md](docs/TEST_REHBERI.md)) henüz yok. Test sayıları: 784 birim testi (67 dosya),
+ve klavye girdisiyle yapılan otomatik GUI denemelerini kasteder. Bu denemeler dışında bir betik, Simpaper yükleyicisini
+geliştirme bilgisayarına kurup dosya türlerini, simgeleri, çift tıklamayı, güncellemeyi ve kaldırmayı denetledi
+([sonuçlar](docs/PACKAGING.md#real-installation), İngilizce); sahibi de ad değişikliğinden önceki bir derlemeyi (o
+zamanki adıyla Varak) kurup denedi. Kayıtlı bir elle test turu ([docs/TEST_REHBERI.md](docs/TEST_REHBERI.md)) henüz
+yok. Test sayıları: 794 birim testi (68 dosya),
 115 motor entegrasyon testi (14 dosya; ayrıca 5 test atlandı: isteğe bağlı üç uzun döngü ve tasarım gereği iki test),
 109 köprü testi ([docs/STATUS.md](docs/STATUS.md)).
 
@@ -64,7 +66,7 @@ elle test turu ([docs/TEST_REHBERI.md](docs/TEST_REHBERI.md)) henüz yok. Test s
 | Belge, Hesap Tablosu ve Sunu modülleri | **Uygulandı; temel akışlar ekranda kullanıldı:** Writer'da yazma ve kaydetme, Calc'te Türkçe söz dizimiyle formül, Impress'te slayt paneliyle yeni slayt. 202 Writer, 225 Calc ve 164 Impress komutunun her biri LibreOffice 26.8 komut kaydında denetlendi ve pencere açmadan çalışan motorda gönderilebildiği doğrulandı; Calc formül çubuğu ve seçim istatistikleri; slayt komutları ve slayt gösterisi |
 | Motorda dosya biçimi gidiş-dönüşleri | **Otomatik testlerden geçiyor** (`tests/engine`): Türkçe içerikli üretilmiş DOCX, XLSX ve PPTX dosyaları ile lisansı temiz örnek dosyalar, pencere açmadan çalışan LibreOffice ile açılıp kaydediliyor; sonuç, LibreOffice kullanmayan okuyucularla ve sayfa sayfa görsel karşılaştırmayla denetleniyor. ODF, CSV, TXT, RTF, eski Office ve şablon biçimlerine dönüştürmeler de test ediliyor. Bu testler motoru doğrudan kullanır, henüz Simpaper uygulaması üzerinden değil; bulguları [uyumluluk tablosunda](docs/COMPATIBILITY.md#test-status) listelenir. |
 | PDF modülü | **Uygulandı, birim testlerinden geçti; görüntüleyici ekranda kullanıldı** (Türkçe metinli bir metin PDF'i ve bir form PDF'i): küçük resimlerle görüntüleme, Türkçeye uygun arama (İ/ı), vurgulama, metin kutusu, çizim, resim ve yorumlar, form doldurma, sayfaları döndürme, silme, taşıma, ekleme ve çoğaltma, PDF birleştirme ve sayfa çıkarma, metin ve resim ekleme, yazdırma ve doğrulamalı kaydetme (`tests/unit/pdf`). Vurgulama, metin kutusu notu ve kaydetme ekranda da denetlendi (kaydedilen dosya bağımsız olarak geri okundu); diğer araçlar yalnızca birim testleriyle. |
-| Yükleyici, CI, depo belgeleri | **Yükleyici ve ZIP üretiliyor** (`npm run dist:win`: 330 MiB yükleyici, 436 MiB ZIP); paketlenmiş uygulama üç ofis modülü için gizli pencereli açılış testinden geçti. Ad değişikliğinden önceki bir derleme (o zamanki adıyla Varak, dosya türleri olmadan) geliştirme bilgisayarında kurulup kullanıldı (kullanıcı başına, yönetici izni olmadan); Simpaper yükleyicisi henüz kurulmadı, temiz bir makinede de çalıştırılmadı ve genel bir sürüm yok. CI iş akışları, topluluk dosyaları ve belgeler hazır; CI iş akışı `main` dalına yapılan her gönderimde ve her çekme isteğinde GitHub Actions'ta çalışır (sonuçlar deponun Actions sekmesinde). |
+| Yükleyici, CI, depo belgeleri | **Yükleyici ve ZIP üretiliyor** (`npm run dist:win`: 330 MiB yükleyici, 436 MiB ZIP); paketlenmiş uygulama üç ofis modülü için gizli pencereli açılış testinden geçti. Simpaper yükleyicisi geliştirme bilgisayarına kuruldu (kullanıcı başına, yönetici izni olmadan) ve bir betikle denetlendi: Windows Simpaper'ın simgelerini gösteriyor, çift tıklama ve çoklu seçim dosyaları açıyor, güncelleme dosya türlerini koruyor, kaldırma geride bir şey bırakmıyor ([ayrıntılar](docs/PACKAGING.md#real-installation), İngilizce). Temiz bir makinede henüz çalıştırılmadı ve genel bir sürüm yok. CI iş akışları, topluluk dosyaları ve belgeler hazır; CI iş akışı `main` dalına yapılan her gönderimde ve her çekme isteğinde GitHub Actions'ta çalışır (sonuçlar deponun Actions sekmesinde). |
 
 Hiçbir şey Microsoft Office'te doğrulanmadı; bkz. [docs/TESTING.md](docs/TESTING.md).
 
@@ -91,9 +93,6 @@ Paketlenmiş uygulamanın gerçek ekran görüntüleri (Windows 11, %100 ölçek
 kurallara göre `scripts/gui/screenshots.mjs` ile alındı, taslak görsel ya da rötuş yok. Tüm görüntüler ve ayrıntıları
 [docs/screenshots/](docs/screenshots/README.md) klasöründe.
 
-Görüntüler ad değişikliğinden önce alındığı için başlık çubuğunda (ve bazı örnek metinlerde ve yollarda) hâlâ eski
-çalışma adı "Varak" görünüyor; yeniden alınacaklar ([ADR 0009](docs/adr/0009-product-name-simpaper.md)).
-
 ![Simpaper'ın belge modülünde Türkçe metinli bir DOCX](docs/screenshots/writer-home-tr.png)
 
 | Hesap Tablosu | Sunu |
@@ -107,7 +106,7 @@ Aynı ekranların İngilizce arayüzlü hâlleri [İngilizce README](README.md#s
 ## Kurulum
 
 Henüz yayımlanmış bir sürüm yok. v0.1 yayımlandığında GitHub'daki
-[sürümler (Releases)](https://github.com/ncreativestudios/Simpaper/releases) sayfasında şunlar olacak:
+[sürümler (Releases)](https://github.com/enestanerr/Simpaper/releases) sayfasında şunlar olacak:
 
 - **`Simpaper-Setup-<sürüm>-x64.exe`**: yönetici hakları gerektirmeyen, yalnızca geçerli kullanıcı için kurulum yapan
   bir yükleyici;
@@ -132,9 +131,12 @@ Yükleyici, Simpaper'ın açabildiği dosya türlerini Windows'a kaydeder
   sunulur ("Birlikte aç" menüsünde ve Varsayılan uygulamalar sayfasında), varsayılan yapılmaz. ZIP sürümü hiçbir
   dosya türünü kaydetmez.
 
-Kayıt işlemi, birim testleriyle ve yükleyicinin kurma, güncelleme ve kaldırma adımlarını yalnızca deneme için
-kullanılan bir kayıt defteri anahtarında çalıştıran bir betikle denetleniyor; gerçek bir kurulum (Dosya
-Gezgini'ndeki simgeler, çift tıklama, Windows'un önerisi) henüz denenmedi.
+Kayıt işlemi birim testleriyle, yükleyicinin kurma, güncelleme ve kaldırma adımlarını yalnızca deneme için kullanılan
+bir kayıt defteri anahtarında çalıştıran bir betikle ve geliştirme bilgisayarındaki gerçek bir kurulumla denetlendi:
+Windows Simpaper'ın simgelerini gösterdi, çift tıklama dosyaları açtı, güncelleme kaydı korudu ve kaldırma her türü
+eski hâline getirdi ([ayrıntılar](docs/PACKAGING.md#real-installation), İngilizce). Bir türü başka bir uygulama da
+kaydetmişse (orada `.pptx` için bir Microsoft Store uygulaması) Windows, böyle bir dosyayı ilk açışınızda hangi
+uygulamayla açılacağını bir kez sorar; Simpaper'ı seçip **Her zaman**'a basın.
 
 ## Kaynaktan derleme
 
@@ -143,7 +145,7 @@ Gereksinimler: Windows 10/11 x64, [Node.js](https://nodejs.org/) 22.13 veya üst
 alanı (yükleyici derlenmeyecekse yaklaşık 3,5 GB).
 
 ```powershell
-git clone https://github.com/ncreativestudios/Simpaper.git
+git clone https://github.com/enestanerr/Simpaper.git
 cd Simpaper
 npm ci                                  # bağımlılıkları kur
 npm run engine:fetch                    # LibreOffice 26.8.0.3'ü indir, doğrula ve vendor/ altına aç

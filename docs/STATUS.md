@@ -1,7 +1,8 @@
 # Status and hand-off
 
-_Last updated: 2026-09-30 (rename to Simpaper, Windows file types and icons, first push to GitHub; before that
-session 2: review fixes, GUI runs, screenshots, focus and hang fixes, pre-publication audit)._ This file is the entry
+_Last updated: 2026-09-30 (rename to Simpaper, Windows file types and icons, first push to GitHub, real installation
+check on this PC, theme and keyboard fixes found on screen, screenshots captured again; before that session 2: review
+fixes, GUI runs, screenshots, focus and hang fixes, pre-publication audit)._ This file is the entry
 point for the next working session: read it first, then [ROADMAP.md](ROADMAP.md) (checked boxes = proven by
 automated tests) and the area notes in [dev/](dev/).
 
@@ -9,16 +10,19 @@ automated tests) and the area notes in [dev/](dev/).
 
 Milestone **M1** (four modules with a real open → edit → save flow) is implemented. Everything that can be proven
 without a visible desktop has automated tests. Several GUI runs (real mouse and keyboard on the packaged app) ran in
-session 2: the default **child** hosting mode passes; the **owned** mode is kept for development only. The owner
-installed a 0.1.0 build on this PC, still under the former name Varak, and used it (per user, no administrator
-rights); the Simpaper installer has not been installed yet. What still needs a person at the screen is listed under
+session 2: the default **child** hosting mode passes; the **owned** mode is kept for development only. The Simpaper
+installer was installed on this PC and checked by a script (file types, icons, double-click, update, uninstall; see
+below); the current build stays installed for the owner (per user, no administrator rights). The owner had used a
+build under the former name Varak before and has removed it. What still needs a person at the screen is listed under
 "Not verified yet".
 
 On 2026-09-30 the product was renamed from the working name "Varak" to **Simpaper**
 ([ADR 0009](adr/0009-product-name-simpaper.md)), and the installer now registers Windows file types with Simpaper's
 own icons ([ADR 0010](adr/0010-file-associations.md)). The repository is public at
-https://github.com/ncreativestudios/Simpaper (branch `main`; the local remote `origin` points there since the first
-push). The maintainer's open tasks on GitHub are listed under "Maintainer TODOs" in [dev/repo.md](dev/repo.md).
+https://github.com/enestanerr/Simpaper (branch `main`; the local remote `origin` points there). The first push had
+gone to a repository created under the wrong account (`ncreativestudios/Simpaper`), which the owner deletes; the
+application id changed with the account before anything was installed ([ADR 0009](adr/0009-product-name-simpaper.md)).
+The maintainer's open tasks on GitHub are listed under "Maintainer TODOs" in [dev/repo.md](dev/repo.md).
 
 ### Implemented (code + tests)
 
@@ -37,12 +41,13 @@ push). The maintainer's open tasks on GitHub are listed under "Maintainer TODOs"
 
 | Suite | Command | Result |
 |---|---|---|
-| Unit (main, renderer, PDF, platform, tools) | `npm test` | 67 files, 784 tests passed |
+| Unit (main, renderer, PDF, platform, tools) | `npm test` | 68 files, 794 tests passed |
 | Engine integration (real LibreOffice, headless/hidden) | `npm run test:engine` | 14 files, 115 passed, 5 skipped (3 opt-in long loops, 2 by design), 294 s |
 | Unit tests that need the engine image | `npx vitest run --project unit tests/unit/renderer/commands.test.ts src/main/engine/launch.test.ts` | 2 files, 19 tests passed |
 | Bridge (Python) | `vendor/libreoffice/program/python.exe -m unittest discover -s engine/bridge/tests -t engine/bridge` | 109 tests OK |
 | Smoke boot (real app, hidden window) | `node scripts/smoke-boot.mjs`; packaged: `release/win-unpacked/Simpaper.exe` with `SIMPAPER_SMOKE=1` | development build (calc) and packaged build (writer, calc, impress) PASSED, including `app:fileTypes` |
 | Installer file types | `node scripts/installer/check-associations.mjs` | PASSED: 28 extensions, 27 ProgIDs; exact registry tree after install, update, switch to "all users" and uninstall (scratch key) |
+| Real installation (changes the PC; owner's permission) | `node scripts/installer/verify-install.mjs --keep` | PASSED; results below and in [PACKAGING.md](PACKAGING.md#real-installation) |
 | Packaged engine | `npm run engine:prepare -- --verify` | PASSED (Turkish PDF and DOCX conversion, bundled fonts embedded) |
 | Type check / lint | `npm run typecheck`, `npx tsc -p tests/unit/{renderer,pdf}/tsconfig.renderer-tests.json --noEmit`, `npm run lint` | clean |
 | CI on GitHub | `.github/workflows/ci.yml` on every push to `main` | first run (commit 89ea113): `tests/unit/tools/pdf.test.ts` failed, because the runner keeps the repository on D: and the corpus font on C: (a cross-drive path joined to the repository root; fixed in 1c2a5a7). Second run: both jobs passed (`Lint, type check, unit tests, build` 99 s; `Engine tests (headless LibreOffice)` 511 s, with the engine downloaded and verified from scratch) |
@@ -51,7 +56,7 @@ push). The maintainer's open tasks on GitHub are listed under "Maintainer TODOs"
 
 - **Rename** ([ADR 0009](adr/0009-product-name-simpaper.md)): 190 files, the bridge package (`simpaper_bridge`), the
   environment variables (`SIMPAPER_*`), the data folders, the executable and installer names, the application id
-  `io.github.ncreativestudios.simpaper` and the repository links. Kept on purpose: the CSS prefixes `vr-`/`vpdf`,
+  `io.github.enestanerr.simpaper` and the repository links. Kept on purpose: the CSS prefixes `vr-`/`vpdf`,
   the historical ADR 0007 and research notes, and the recognition of `/VarakAP` PDF appearances and `.~varak-`
   save leftovers written by the old builds. A read-only name check found no software or registered trademark called
   Simpaper; it is no legal clearance.
@@ -66,6 +71,24 @@ push). The maintainer's open tasks on GitHub are listed under "Maintainer TODOs"
   statements.
 - **Build:** `electron-builder.yml` now sets `publish: null`: the first builds had shipped a
   `resources/app-update.yml` pointing at the git remote of the time.
+
+### Real installation, theme and keyboard fixes (2026-09-30)
+
+- **Real installation** (`scripts/installer/verify-install.mjs`, the owner's permission, idle PC): after a silent
+  per-user install 23 of the 24 office and PDF types opened with Simpaper (`.pdf` stays with Edge, the owner's
+  choice); Windows showed Simpaper's icons (identical to the ICO files); a double-click on a .docx and a multiple
+  selection of three files opened them; for `.pptx`, which a Store app registered too, Windows asked once which app
+  to use; plain text and CSV kept their apps; the uninstall left nothing and restored every type. A newer build
+  installed over it kept all 194 file-type values (update path). Details: [PACKAGING.md](PACKAGING.md#real-installation).
+- **Found on screen and fixed:** the accent-derived theme tokens never resolved (declared on `:root`, where no
+  module accent exists), so selected tabs, large ribbon icons, chips, menu check marks and dialog icons had no accent
+  colour, and dialogs and menus in `<body>` had no accent at all; Options drew some checkboxes above their labels;
+  menus opened with the mouse never got the keyboard focus (arrows and Esc did nothing), Tab did not close them, and
+  with a document open the keys went to the document; after a menu or prompt over the document the keyboard stayed in
+  Simpaper, because the focus request reached LibreOffice while its window was still frozen (hidden). Each fix has a
+  unit test that fails without it; `themecheck.mjs`, `menucheck.mjs` and the extended `focuscheck.mjs` confirm them
+  on screen (runs 17–22 in [testing/GUI_SPIKE.md](testing/GUI_SPIKE.md)).
+- **Screenshots** in `docs/screenshots/` captured again after the theme fix (run 20), all 13 reviewed.
 
 ### GUI spike (session 2, 2026-09-29, 100 % scaling)
 
@@ -124,7 +147,7 @@ Before the first push, five read-only auditors checked the repository, each find
   Removed from the history: the local Obsidian settings in `docs/.obsidian/` (now ignored). Commit author e-mail:
   the GitHub noreply address.
 - **Links:** all operational links pointed to the repository of the time (since the rename:
-  https://github.com/ncreativestudios/Simpaper); the About page and the external-URL allow-list follow
+  https://github.com/enestanerr/Simpaper); the About page and the external-URL allow-list follow
   `src/shared/brand.ts`.
 - **Licences:** the notices now include the Apache-2.0 parts of brotli and pdf-lib, the licence files of vendored
   code and MIT texts for packages without one; the installer no longer ships `elevate.exe`, the app no longer ships
@@ -160,11 +183,9 @@ shows it, look for a transient file lock on the working copy.
   (`ui.documentKeyTips`), the `closeStuck` prompt on screen (reachable only while the window still takes input).
   Plan: [testing/GUI_SPIKE.md](testing/GUI_SPIKE.md); manual checklist in Turkish: [TEST_REHBERI.md](TEST_REHBERI.md).
 - High-DPI (125/150 %) — both monitors of this PC run at 100 %.
-- The Simpaper installer on a real PC: the file types (Explorer's icons, double-click, Windows' prompt, Simpaper's
-  page under Settings › Apps › Default apps, Options › File types), the finish-page box and the "all users" mode;
-  checklist in Turkish: section 2 of [TEST_REHBERI.md](TEST_REHBERI.md). Also a clean Windows machine (only a
-  pre-rename build was installed, on this development PC).
-- The screenshots in `docs/screenshots/` predate the rename and show "Varak"; capturing them again is a GUI run.
+- The installer beyond the scripted check on this PC: Simpaper's page under Settings › Apps › Default apps, the
+  finish-page box, the "all users" mode, Windows 10, and a clean machine without other office apps; checklist in
+  Turkish: section 2 of [TEST_REHBERI.md](TEST_REHBERI.md).
 - Nothing is claimed as verified in Microsoft Office (not installed here).
 - The release workflow (`.github/workflows/release.yml`) has not run on GitHub yet (it starts on a `v*` tag and
   builds a draft release).
@@ -181,26 +202,27 @@ node scripts/smoke-boot.mjs # real app with a hidden window
 npm run dev                 # starts the app (opens windows!)
 npm run dist:win            # installer + ZIP in release/
 node scripts/installer/check-associations.mjs   # installer file types against a scratch registry key
+node scripts/installer/verify-install.mjs --keep # REAL install/uninstall on this PC (owner's permission, idle PC)
 npm run icons               # re-render app, module and file-type icons (resources/, build/)
-git log --oneline           # history; remote origin = https://github.com/ncreativestudios/Simpaper (public)
+git log --oneline           # history; remote origin = https://github.com/enestanerr/Simpaper (public)
 ```
 
-Machine notes: C: had about 2.3 GB free after the last build (a full working copy with a packaged build needs
+Machine notes: C: had about 2.1 GB free after the last build (a full working copy with a packaged build needs
 about 6 GB; `vendor/downloads` (0.39 GB) can be deleted once the engine is extracted). Editors built on Electron
-(VS Code) export `ELECTRON_RUN_AS_NODE=1`; the npm scripts remove it. This PC still has the owner's Varak test
-installation (Settings › Apps › Varak; data in `%APPDATA%\Varak` and `%LOCALAPPDATA%\Varak`, plus about 346 MB in
-`%LOCALAPPDATA%\varak-updater`, which that installer left); Simpaper neither reads nor changes them. `.xlsx` files
-open with that Varak.exe (an "Open with › Always" choice): after removing Varak, choose Simpaper once. Automated
-runs always use `SIMPAPER_DATA_DIR` under `test-output/` and never touch any installation's data.
+(VS Code) export `ELECTRON_RUN_AS_NODE=1`; the npm scripts remove it. Simpaper 0.1.0 is installed for the owner
+(per user). The owner removed the Varak test installation; its data folders remain (`%APPDATA%\Varak`,
+`%LOCALAPPDATA%\Varak` and about 346 MB in `%LOCALAPPDATA%\varak-updater`, which that installer left) and can be
+deleted by the owner; Simpaper neither reads nor changes them. Automated runs always use `SIMPAPER_DATA_DIR` under
+`test-output/` and never touch any installation's data (`verify-install.mjs` backs up and restores the owner's
+settings and recent files).
 
 ## Next steps
 
 1. The Maintainer TODOs in [dev/repo.md](dev/repo.md) (Code of Conduct contact, private vulnerability reporting,
    Discussions, branch protection requiring the two CI jobs, which pass on GitHub).
-2. On this PC: remove the Varak test installation, install `release/Simpaper-Setup-0.1.0-x64.exe` and go through
-   section 2 of [TEST_REHBERI.md](TEST_REHBERI.md) (file types); record the result here.
-3. Capture the screenshots again (`node scripts/gui/screenshots.mjs --lang both`, idle PC, owner's permission).
-4. Verify DPI with a scaled monitor; investigate the owned-mode soffice hang only if child mode shows DPI problems.
-5. Report the Turkish-locale hang upstream (TDF Bugzilla) with the reproduction from dev/engine.md.
-6. Before a commercial launch: the trademark steps of [ADR 0009](adr/0009-product-name-simpaper.md). Continue with
+2. The manual checklist [TEST_REHBERI.md](TEST_REHBERI.md) by the owner (section 2 covers what the installation
+   script cannot see, such as Simpaper's page in Windows Settings); record the result here.
+3. Verify DPI with a scaled monitor; investigate the owned-mode soffice hang only if child mode shows DPI problems.
+4. Report the Turkish-locale hang upstream (TDF Bugzilla) with the reproduction from dev/engine.md.
+5. Before a commercial launch: the trademark steps of [ADR 0009](adr/0009-product-name-simpaper.md). Continue with
    M2 (ROADMAP.md).

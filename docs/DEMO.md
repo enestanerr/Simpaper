@@ -3,10 +3,6 @@
 The README shows **real** screenshots of the running application, never mock-ups or edited images. This page
 explains how to capture them and how to name the files in [`docs/screenshots/`](screenshots/).
 
-The images now in `docs/screenshots/` predate the rename from the working name "Varak" to Simpaper
-([ADR 0009](adr/0009-product-name-simpaper.md)): their title bars (and some sample texts and paths) still show
-"Varak". They are to be captured again with the [automated capture](#automated-capture) below.
-
 > Capturing screenshots opens the application's windows. Do it only on a machine and a desktop session where you
 > are allowed to, with no confidential documents or notifications on screen.
 

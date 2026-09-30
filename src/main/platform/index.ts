@@ -1,5 +1,6 @@
 /**
- * Platform layer entry point: native document views, process guard, hang detection and shell keys.
+ * Platform layer entry point: native document views, process guard, hang detection, shell keys and the read-only
+ * file-association query.
  * Windows gets the koffi-based implementation; other platforms (or a missing koffi binary) get the
  * fallback, where `viewHost.supported === false`.
  *
@@ -11,6 +12,7 @@ import { createLogger } from '../log';
 import { createFallbackPlatform } from './fallback';
 import { hwndFromBuffer } from './hwnd';
 import type { Platform } from './types';
+import { createAssociationQuery } from './win32/associations';
 import { win32, win32LoadError } from './win32/ffi';
 import { takeFocusFromViews } from './win32/focus';
 import { Win32HangDetector } from './win32/hang-detector';
@@ -42,5 +44,6 @@ export function createPlatform(): Platform {
       return host === null ? false : takeFocusFromViews(api.user32, host, process.pid, container ? [container] : []);
     },
     shellKeys: new Win32ShellKeys(api, (win, hwnd) => viewHost.ownsForeground(win, hwnd), log.child('keys')),
+    associations: createAssociationQuery(api),
   };
 }

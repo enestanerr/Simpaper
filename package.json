@@ -25,6 +25,7 @@
     "engine:prepare": "node scripts/engine/prepare-engine.mjs",
     "corpus:generate": "node scripts/corpus/generate.mjs",
     "notices": "node scripts/generate-notices.mjs",
+    "icons": "node scripts/brand/generate-icons.mjs",
     "dist:win": "npm run build && electron-builder --win --config electron-builder.yml",
     "dist:dir": "npm run build && electron-builder --win dir --config electron-builder.yml"
   },

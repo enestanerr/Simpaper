@@ -232,7 +232,21 @@
     "qat": "Hızlı Erişim Araç Çubuğu",
     "qatHint": "Başlık çubuğunda görünecek komutları seçin ve sıralayın.",
     "moveUp": "{{name}} komutunu yukarı taşı",
-    "moveDown": "{{name}} komutunu aşağı taşı"
+    "moveDown": "{{name}} komutunu aşağı taşı",
+    "fileTypes": "Dosya türleri",
+    "fileTypesHint": "Kurulum bu dosya türlerini Simpaper'ın simgeleriyle Windows'a kaydetti. Bir türü hangi uygulamanın açacağına Windows'ta yalnızca siz karar verirsiniz: başka bir uygulamayla açılan türleri Windows Ayarları'nda Simpaper'a geçirebilirsiniz.",
+    "fileTypesTextHint": "Kurulum düz metin, CSV ve TSV dosyalarının varsayılan uygulamalarını değiştirmez: Simpaper bu türler için yalnızca seçenek olarak sunulur (“Birlikte aç” menüsünde ve Varsayılan uygulamalar'daki sayfasında).",
+    "fileTypesNotRegistered": "Bu Simpaper kopyası dosya türlerini Windows'a kaydetmedi (geliştirme sürümü ya da ZIP arşivi). Kurulum programıyla yüklenen Simpaper; belgeleri, hesap tablolarını, sunuları ve PDF dosyalarını kendi simgeleriyle kaydeder.",
+    "fileTypesOtherCopy": "Kayıtlı dosya türleri bu kopyayı değil, bu bilgisayardaki başka bir Simpaper kurulumunu başlatıyor.",
+    "fileTypes_writer": "Belgeler",
+    "fileTypes_calc": "Hesap tabloları",
+    "fileTypes_impress": "Sunular",
+    "fileTypes_pdf": "PDF dosyaları",
+    "fileTypesAll": "Simpaper ile açılıyor",
+    "fileTypesSome": "{{count}} / {{total}} tür Simpaper ile açılıyor",
+    "fileTypesNone": "Başka bir uygulamayla açılıyor",
+    "fileTypesChoose": "Varsayılan uygulamaları seç…",
+    "fileTypesOpenFailed": "Windows Ayarları açılamadı."
   },
   "about": {
     "version": "Sürüm {{version}}",

@@ -73,6 +73,12 @@ jobs:
       - name: Build the installer and the ZIP (unsigned)
         run: npm run dist:win -- --publish never
 
+      # Compiles build/installer.nsh with the makensis the build just downloaded and runs its install, update and
+      # uninstall parts against a scratch registry key (docs/adr/0010-file-associations.md); the runner's real file
+      # associations are not touched.
+      - name: Check the file types the installer registers
+        run: node scripts/installer/check-associations.mjs
+
       - name: Write checksums and release notes
         shell: pwsh
         run: |

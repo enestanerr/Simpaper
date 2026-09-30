@@ -232,7 +232,21 @@
     "qat": "Quick Access Toolbar",
     "qatHint": "Choose and order the commands shown in the title bar.",
     "moveUp": "Move {{name}} up",
-    "moveDown": "Move {{name}} down"
+    "moveDown": "Move {{name}} down",
+    "fileTypes": "File types",
+    "fileTypesHint": "Setup registered these file types with Windows, with Simpaper's icons. In Windows, only you decide which app opens a type: switch the types that open with another app to Simpaper in Windows Settings.",
+    "fileTypesTextHint": "Setup leaves the default apps of plain text, CSV and TSV files as they are: Simpaper is only offered for them, under “Open with” and on its Default apps page.",
+    "fileTypesNotRegistered": "This copy of Simpaper has not registered any file types with Windows (a development run or the ZIP archive). Simpaper installed with its setup program registers documents, spreadsheets, presentations and PDF files with its own icons.",
+    "fileTypesOtherCopy": "The registered file types start another Simpaper installation on this computer, not this copy.",
+    "fileTypes_writer": "Documents",
+    "fileTypes_calc": "Spreadsheets",
+    "fileTypes_impress": "Presentations",
+    "fileTypes_pdf": "PDF files",
+    "fileTypesAll": "Opens with Simpaper",
+    "fileTypesSome": "Simpaper opens {{count}} of {{total}} types",
+    "fileTypesNone": "Opens with another app",
+    "fileTypesChoose": "Choose default apps…",
+    "fileTypesOpenFailed": "Windows Settings could not be opened."
   },
   "about": {
     "version": "Version {{version}}",

@@ -36,6 +36,8 @@ const app: AppController = {
   windowAction: () => ({ maximized: true, fullScreen: false, focused: true }),
   windowState: () => ({ maximized: false, fullScreen: false, focused: true }),
   openExternal: async () => false,
+  fileTypes: async () => ({ supported: false, registration: null, thisCopy: false, groups: [] }),
+  openDefaultApps: async () => false,
 };
 
 const pdf: PdfService = {
@@ -326,6 +328,32 @@ describe('pdf and recovery channels', () => {
   it('lists recovery entries', async () => {
     expect(await call('recovery:list')).toEqual([]);
     await expect(call('recovery:discard', { id: 'abc.def' })).rejects.toThrow('errors.recovery.notFound');
+  });
+});
+
+describe('file types over IPC', () => {
+  it('app:fileTypes and app:openDefaultApps take no payload: the Settings page they open is fixed', async () => {
+    const calls: string[] = [];
+    const status = { supported: true, registration: 'user' as const, thisCopy: true, groups: [{ kind: 'pdf' as const, extensions: ['pdf'], withSimpaper: [] }] };
+    const r = routerWith({
+      app: {
+        ...app,
+        fileTypes: async () => {
+          calls.push('fileTypes');
+          return status;
+        },
+        openDefaultApps: async () => {
+          calls.push('openDefaultApps');
+          return true;
+        },
+      },
+    });
+    expect(await r.dispatch('app:fileTypes', trusted, undefined)).toEqual(status);
+    expect(await r.dispatch('app:openDefaultApps', trusted, undefined)).toBe(true);
+    await expect(r.dispatch('app:openDefaultApps', trusted, { url: 'ms-settings:privacy' })).rejects.toThrow('errors.ipc.invalidRequest');
+    await expect(r.dispatch('app:fileTypes', trusted, 'docx')).rejects.toThrow('errors.ipc.invalidRequest');
+    await expect(r.dispatch('app:openDefaultApps', stranger, undefined)).rejects.toThrow();
+    expect(calls).toEqual(['fileTypes', 'openDefaultApps']);
   });
 });
 

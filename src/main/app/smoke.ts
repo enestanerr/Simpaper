@@ -2,10 +2,10 @@
  * Smoke boot (SIMPAPER_SMOKE=1, see testMode.ts and scripts/smoke-boot.mjs): the real app starts with a main
  * window that is never shown, loads the renderer, and a script drives it through the real preload bridge
  * (`window.simpaperIpc`, i.e. contextBridge → ipcMain → sender check → validators → services):
- * app:info, app:settings:get, app:window:state, documents:list, documents:create (engine instance with a hidden
- * view), engine:query doc.info, documents:close. Renderer console errors, renderer/preload failures and
- * main-process error log records are collected. The run ends the app through the normal quit flow with exit
- * code 0 (everything passed) or 1, after writing a JSON report.
+ * app:info, app:settings:get, app:window:state, app:fileTypes (Windows' association API through koffi),
+ * documents:list, documents:create (engine instance with a hidden view), engine:query doc.info, documents:close.
+ * Renderer console errors, renderer/preload failures and main-process error log records are collected. The run
+ * ends the app through the normal quit flow with exit code 0 (everything passed) or 1, after writing a JSON report.
  *
  * Nothing here runs unless SIMPAPER_SMOKE is set.
  */
@@ -140,6 +140,12 @@ export function startSmoke(deps: SmokeDeps): Promise<SmokeReport> {
     await step('app:window:state', () => invoke('app:window:state'), (v) => {
       const state = v as { maximized?: unknown; focused?: unknown; active?: unknown };
       return typeof state.maximized === 'boolean' && state.focused === false && state.active === false ? null : `unexpected window state ${JSON.stringify(v)}`;
+    });
+    // Read only: which file types open with Simpaper (a smoke run is never registered, so no group counts itself).
+    await step('app:fileTypes', () => invoke('app:fileTypes'), (v) => {
+      const s = v as { supported?: unknown; groups?: unknown };
+      const expected = process.platform === 'win32';
+      return s.supported === expected && Array.isArray(s.groups) && s.groups.length === 4 ? null : `unexpected file types ${JSON.stringify(v)}`;
     });
     await step('documents:list (initial)', () => invoke('documents:list'), (v) => (Array.isArray(v) ? null : 'not an array'));
     const doc = (await step(`documents:create (${options.kind}, hidden view)`, () => invoke('documents:create', { kind: options.kind }), (v) => {

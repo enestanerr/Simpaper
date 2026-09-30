@@ -1,6 +1,6 @@
 /** The service surface the IPC handlers call (narrow interfaces so tests can use fakes). */
 import type { BrowserWindow } from 'electron';
-import type { AppInfo, Settings, WindowState } from '@shared/api/app';
+import type { AppInfo, FileTypesStatus, Settings, WindowState } from '@shared/api/app';
 import type {
   CloseOutcome,
   DocumentDescriptor,
@@ -29,6 +29,10 @@ export interface AppController {
   windowAction(action: WindowAction): WindowState;
   windowState(): WindowState;
   openExternal(url: string): Promise<boolean>;
+  /** Default-app state of the registered file types (read from Windows). */
+  fileTypes(): Promise<FileTypesStatus>;
+  /** Opens Settings › Apps › Default apps on Simpaper's page; false when Simpaper is not registered there. */
+  openDefaultApps(): Promise<boolean>;
 }
 
 export interface DocumentsApi {

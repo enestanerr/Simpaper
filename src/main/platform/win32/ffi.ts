@@ -106,6 +106,13 @@ export interface Win32Api {
   shcore: {
     GetDpiForMonitor: KoffiFunc<(monitor: Ptr, type: number, dpiX: number[], dpiY: number[]) => number>;
   } | null;
+  /** File associations (read only). */
+  shlwapi: {
+    AssocQueryStringW: KoffiFunc<(flags: number, str: number, assoc: string, extra: string | null, out: Uint16Array, chars: number[]) => number>;
+  };
+  advapi32: {
+    RegGetValueW: KoffiFunc<(hkey: Ptr, subKey: string, value: string, flags: number, type: Ptr, data: Ptr, bytes: number[]) => number>;
+  };
   kernel32: {
     GetLastError: KoffiFunc<() => number>;
     GetModuleHandleW: KoffiFunc<(name: string | null) => bigint | null>;
@@ -161,6 +168,8 @@ function bind(koffi: KoffiModule): Win32Api {
   const user32Lib = koffi.load('user32.dll');
   const gdi32Lib = koffi.load('gdi32.dll');
   const kernel32Lib = koffi.load('kernel32.dll');
+  const shlwapiLib = koffi.load('shlwapi.dll');
+  const advapi32Lib = koffi.load('advapi32.dll');
   const fn = <T extends (...args: never[]) => unknown>(lib: ReturnType<KoffiModule['load']>, name: string, ret: string | TypeObject, args: (string | TypeObject | ReturnType<KoffiModule['out']>)[]) =>
     lib.func('__stdcall', name, ret, args) as unknown as KoffiFunc<T>;
 
@@ -270,6 +279,12 @@ function bind(koffi: KoffiModule): Win32Api {
       GetDIBits: fn(gdi32Lib, 'GetDIBits', 'int', [P, P, 'uint32', 'uint32', P, P, 'uint32']),
     },
     shcore,
+    shlwapi: {
+      AssocQueryStringW: fn(shlwapiLib, 'AssocQueryStringW', 'int32', ['uint32', 'int', 'str16', 'str16', P, koffi.inout(koffi.pointer('uint32'))]),
+    },
+    advapi32: {
+      RegGetValueW: fn(advapi32Lib, 'RegGetValueW', 'int32', [P, 'str16', 'str16', 'uint32', P, P, koffi.inout(koffi.pointer('uint32'))]),
+    },
     kernel32: {
       GetLastError: fn(kernel32Lib, 'GetLastError', 'uint32', []),
       GetModuleHandleW: fn(kernel32Lib, 'GetModuleHandleW', P, ['str16']),

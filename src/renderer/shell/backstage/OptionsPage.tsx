@@ -1,11 +1,13 @@
-/** Options: language, theme, saving, CSV defaults, interface and Quick Access Toolbar. */
-import { useId, useState, type ReactNode } from 'react';
+/** Options: language, theme, saving, CSV defaults, interface, Quick Access Toolbar and (Windows) file types. */
+import { useEffect, useId, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { IconArrowDown, IconArrowUp } from '@tabler/icons-react';
-import type { Settings, ThemePreference, UiLanguage } from '@shared/api/app';
+import { IconArrowDown, IconArrowUp, IconExternalLink } from '@tabler/icons-react';
+import type { FileTypesStatus, Settings, ThemePreference, UiLanguage } from '@shared/api/app';
 import type { DocumentDescriptor } from '@shared/api/documents';
+import { hasBridge, invoke } from '../../services/ipc';
 import { updateSettings } from '../../services/settings';
 import { useApp } from '../../state/appStore';
+import { ModuleIcon } from '../brand';
 import { moveQatItem, normalizeQat, QAT_COMMANDS, toggleQatItem } from '../qat';
 
 type Separator = Settings['csv']['importSeparator'];
@@ -62,6 +64,81 @@ function NumberSetting({ label, hint, value, min, max, onCommit }: { label: stri
         </span>
       )}
     </div>
+  );
+}
+
+/**
+ * Which of the file types the installer registered open with Simpaper (read from Windows), and a button to Settings ›
+ * Apps › Default apps, where the user switches them: Windows lets no app change a default by itself.
+ */
+function FileTypesSection() {
+  const { t } = useTranslation();
+  const [status, setStatus] = useState<FileTypesStatus | null>(null);
+  const [openFailed, setOpenFailed] = useState(false);
+
+  useEffect(() => {
+    if (!hasBridge()) return;
+    let live = true;
+    const refresh = () => {
+      invoke('app:fileTypes', undefined)
+        .then((next) => {
+          if (live) setStatus(next);
+        })
+        .catch(() => undefined);
+    };
+    refresh();
+    // Coming back from Windows Settings shows the new state.
+    window.addEventListener('focus', refresh);
+    return () => {
+      live = false;
+      window.removeEventListener('focus', refresh);
+    };
+  }, []);
+
+  if (!status?.supported) return null;
+  const openDefaultApps = () => {
+    invoke('app:openDefaultApps', undefined)
+      .then((ok) => setOpenFailed(!ok))
+      .catch(() => setOpenFailed(true));
+  };
+  return (
+    <Section title={t('shell.options.fileTypes')}>
+      {status.registration === null ? (
+        <p className="vr-option__hint vr-filetypes__note">{t('shell.options.fileTypesNotRegistered')}</p>
+      ) : (
+        <>
+          <p className="vr-option__hint vr-filetypes__note">{t('shell.options.fileTypesHint')}</p>
+          <ul className="vr-filetypes">
+            {status.groups.map((g) => {
+              const count = g.withSimpaper.length;
+              const total = g.extensions.length;
+              const state = count === total ? 'All' : count === 0 ? 'None' : 'Some';
+              return (
+                <li key={g.kind} className="vr-filetypes__item">
+                  <ModuleIcon kind={g.kind} size={20} />
+                  <span className="vr-filetypes__name">{t(`shell.options.fileTypes_${g.kind}`)}</span>
+                  <span className="vr-filetypes__exts">{g.extensions.map((e) => `.${e}`).join(' ')}</span>
+                  <span className={state === 'None' ? 'vr-chip vr-chip--muted' : 'vr-chip'}>{t(`shell.options.fileTypes${state}`, { count, total })}</span>
+                </li>
+              );
+            })}
+          </ul>
+          {!status.thisCopy && <p className="vr-option__hint vr-filetypes__note">{t('shell.options.fileTypesOtherCopy')}</p>}
+          <p className="vr-option__hint vr-filetypes__note">{t('shell.options.fileTypesTextHint')}</p>
+          <div className="vr-field">
+            <button type="button" className="vr-btn" onClick={openDefaultApps}>
+              {t('shell.options.fileTypesChoose')}
+              <IconExternalLink size={13} stroke={1.75} aria-hidden="true" />
+            </button>
+          </div>
+          {openFailed && (
+            <p className="vr-option__hint vr-filetypes__note" role="alert">
+              {t('shell.options.fileTypesOpenFailed')}
+            </p>
+          )}
+        </>
+      )}
+    </Section>
   );
 }
 
@@ -231,6 +308,8 @@ export function OptionsPage(_props: { doc: DocumentDescriptor | null }) {
           })}
         </ul>
       </Section>
+
+      <FileTypesSection />
     </div>
   );
 }

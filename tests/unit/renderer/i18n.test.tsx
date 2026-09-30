@@ -9,7 +9,7 @@ import { join } from 'node:path';
 import { CSV_LCID, FORMATS } from '@shared/formats';
 import type { EngineQuery } from '@shared/api/engine';
 import type { CompatSeverity } from '@shared/api/documents';
-import { OFFICE_KINDS } from '@shared/modules';
+import { MODULE_KINDS, OFFICE_KINDS } from '@shared/modules';
 import { hasTranslation, i18n, initI18n, NAMESPACES, setLanguage, translateExternal } from '../../../src/renderer/i18n';
 import { calcModule } from '../../../src/renderer/modules/calc';
 import { impressModule } from '../../../src/renderer/modules/impress';
@@ -36,6 +36,8 @@ function dynamicKeys(): string[] {
     ...severities.map((s) => `shell.compat.severity.${s}`),
     ...OFFICE_KINDS.map((k) => `shell.start.blank.${k}`),
     ...['system', 'light', 'dark'].map((t) => `shell.options.theme_${t}`),
+    ...MODULE_KINDS.map((k) => `shell.options.fileTypes_${k}`),
+    ...['All', 'Some', 'None'].map((s) => `shell.options.fileTypes${s}`),
     ...Object.keys(CSV_LCID).map((l) => `shell.prompts.csv.locale_${l.replace('-', '_')}`),
     ...['saving', 'loading', 'dialog'].map((r) => `shell.status.busy_${r}`),
     ...FORMATS.map((f) => f.labelKey),

@@ -69,6 +69,22 @@ export interface ShellKeys {
   stop(): void;
 }
 
+/** The program Windows starts for a file type or ProgID; null parts when there is none or it is no classic program. */
+export interface AssociationHandler {
+  /** Full path of the program (null for app packages and for Windows' "choose an app" prompt). */
+  executable: string | null;
+  /** ProgID in effect, honouring the user's choice (UserChoice). */
+  progId: string | null;
+}
+
+/** Read-only view of Windows' file associations (Options › File types). Never writes to the registry. */
+export interface AssociationQuery {
+  /** Handler of an extension (".docx") or a ProgID ("Simpaper.docx"); worker thread, never throws. */
+  handler(assoc: string): Promise<AssociationHandler>;
+  /** Where Software\RegisteredApplications lists `name`: current user, all users, or nowhere. Never throws. */
+  registeredApp(name: string): Promise<'user' | 'machine' | null>;
+}
+
 /** Everything the platform layer provides; created once by `createPlatform()` (src/main/platform/index.ts). */
 export interface Platform {
   viewHost: ViewHost;
@@ -88,4 +104,6 @@ export interface Platform {
   focusHost(win: BrowserWindow): Promise<boolean>;
   /** Present on Windows only. */
   shellKeys?: ShellKeys;
+  /** Present on Windows only. */
+  associations?: AssociationQuery;
 }

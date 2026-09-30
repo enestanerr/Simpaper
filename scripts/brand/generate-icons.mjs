@@ -1,25 +1,29 @@
 #!/usr/bin/env node
 /**
- * Renders the brand SVGs (resources/brand) to PNG icons and writes the Windows app icon.
+ * Renders the brand SVGs (resources/brand) to PNG icons and writes the Windows app and file-type icons.
  *
  * Outputs:
  *   build/icon.ico            app icon for electron-builder (PNG-compressed entries, 16-256 px)
  *   build/icon.png            512 px app icon
  *   resources/icons/*.png     app and module icons for the UI (simpaper-<size>.png, <module>-<size>.png)
+ *   resources/fileicons/*.ico icons of the registered file types (filetype-icons.mjs; installed by
+ *                             build/installer.nsh): document, spreadsheet, presentation, pdf
  *
  * Sizes up to 32 px use the simplified mark (logo-small.svg). Every written file is read back and
  * its dimensions are checked.
  *
- * Usage: node scripts/brand/generate-icons.mjs
+ * Usage: npm run icons (node scripts/brand/generate-icons.mjs)
  */
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createCanvas, Image } from '@napi-rs/canvas';
+import { FILE_ICON_SIZES, FILE_ICON_SOURCE, FILE_TYPES, fileIconSvg } from './filetype-icons.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const brandDir = path.join(repoRoot, 'resources', 'brand');
 const iconsDir = path.join(repoRoot, 'resources', 'icons');
+const fileIconsDir = path.join(repoRoot, 'resources', 'fileicons');
 const buildDir = path.join(repoRoot, 'build');
 
 const APP_SIZES = [16, 20, 24, 32, 40, 48, 64, 96, 128, 256, 512];
@@ -123,6 +127,16 @@ function main() {
   const sizes = entries.map((e) => e.size).join(', ');
   if (sizes !== ICO_SIZES.join(', ')) throw new Error(`build/icon.ico entries ${sizes}`);
   written.push(`build/icon.ico (${entries.length} PNG entries: ${sizes}; ${ico.length} bytes)`);
+
+  fs.mkdirSync(fileIconsDir, { recursive: true });
+  for (const type of Object.keys(FILE_TYPES)) {
+    const typeIco = buildIco(FILE_ICON_SIZES.map((size) => renderSvg(fileIconSvg(type, FILE_ICON_SOURCE[size]), size)));
+    const typeFile = path.join(fileIconsDir, `${type}.ico`);
+    fs.writeFileSync(typeFile, typeIco);
+    const typeSizes = readIco(fs.readFileSync(typeFile)).map((e) => e.size).join(', ');
+    if (typeSizes !== FILE_ICON_SIZES.join(', ')) throw new Error(`resources/fileicons/${type}.ico entries ${typeSizes}`);
+    written.push(`resources/fileicons/${type}.ico (${FILE_ICON_SIZES.length} PNG entries; ${typeIco.length} bytes)`);
+  }
 
   console.log(`Wrote ${written.length} files:`);
   for (const f of written) console.log(`  ${f}`);

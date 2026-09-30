@@ -1,4 +1,5 @@
 /** `app:*` — application info, settings and window controls. Owner: main/app + main/settings. */
+import type { ModuleKind } from '../modules';
 
 export type UiLanguage = 'tr' | 'en';
 export type ThemePreference = 'system' | 'light' | 'dark';
@@ -78,6 +79,33 @@ export interface WindowState {
   active?: boolean;
 }
 
+/** File types of one module that the installer registers as default candidates (src/shared/fileAssociations.ts). */
+export interface FileTypeGroup {
+  kind: ModuleKind;
+  /** Extensions without the dot, in FORMATS order. */
+  extensions: string[];
+  /** The extensions that open with this copy of Simpaper today. */
+  withSimpaper: string[];
+}
+
+/** Which registered file types open with Simpaper (Options › File types). Read from Windows; never changed by the app. */
+export interface FileTypesStatus {
+  /** False where Windows cannot be asked (not Windows, or the Win32 bindings failed to load). */
+  supported: boolean;
+  /**
+   * Where the installer registered Simpaper under Software\RegisteredApplications: `user` (installed for the
+   * current user), `machine` (for all users) or null (development runs and the ZIP copy register nothing).
+   */
+  registration: 'user' | 'machine' | null;
+  /** The registered file types start this copy of Simpaper.exe (false for another installation or the ZIP copy). */
+  thisCopy: boolean;
+  /**
+   * Default candidates per module. The plain-text types (TXT, CSV, TSV) are left out: they are offered in "Open with"
+   * and on Simpaper's Default apps page but never proposed as the default.
+   */
+  groups: FileTypeGroup[];
+}
+
 export interface AppChannels {
   'app:info': { req: void; res: AppInfo };
   'app:settings:get': { req: void; res: Settings };
@@ -86,6 +114,10 @@ export interface AppChannels {
   'app:window:state': { req: void; res: WindowState };
   /** Opens only allow-listed https URLs (project pages, licenses). */
   'app:openExternal': { req: { url: string }; res: boolean };
+  /** Which registered file types open with Simpaper today (read only; Windows keeps the user's choice). */
+  'app:fileTypes': { req: void; res: FileTypesStatus };
+  /** Opens Windows Settings › Apps › Default apps on Simpaper's page (fixed target); false when that is not possible. */
+  'app:openDefaultApps': { req: void; res: boolean };
 }
 
 export interface AppEvents {
@@ -103,5 +135,14 @@ export const WINDOW_CHROME = {
   dark: { background: '#1F1F1F', titleBar: '#202020', symbol: '#F3F3F3' },
 } as const;
 
-export const APP_CHANNELS = ['app:info', 'app:settings:get', 'app:settings:update', 'app:window', 'app:window:state', 'app:openExternal'] as const;
+export const APP_CHANNELS = [
+  'app:info',
+  'app:settings:get',
+  'app:settings:update',
+  'app:window',
+  'app:window:state',
+  'app:openExternal',
+  'app:fileTypes',
+  'app:openDefaultApps',
+] as const;
 export const APP_EVENTS = ['app:settingsChanged', 'app:windowState'] as const;

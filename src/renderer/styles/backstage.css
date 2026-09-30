@@ -249,6 +249,34 @@
   display: flex;
   gap: 2px;
 }
+.vr-filetypes {
+  list-style: none;
+  margin: 6px 0 8px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: 640px;
+}
+.vr-filetypes__item {
+  display: grid;
+  grid-template-columns: 20px minmax(110px, auto) 1fr auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 30px;
+}
+.vr-filetypes__name {
+  font-weight: 600;
+}
+.vr-filetypes__exts {
+  color: var(--fg-muted);
+  font-size: var(--fs-s);
+  overflow-wrap: anywhere;
+}
+.vr-options-page .vr-filetypes__note {
+  margin: 4px 0;
+  max-width: 640px;
+}
 .vr-icon-btn {
   width: 26px;
   height: 26px;

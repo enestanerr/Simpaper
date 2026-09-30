@@ -39,6 +39,7 @@ import { createAppController, createEngineProbe } from './appController';
 import { filesFromArgv, isSecondInstanceData, type SecondInstanceData } from './argv';
 import { createDialogs, type PdfDialogs } from './dialogs';
 import { engineFontFolders } from './engineDirs';
+import { createOpenQueue } from './openQueue';
 import { resolveAppPaths } from './paths';
 import { QuitController } from './quit';
 import { hardenSession, hardenWebContents } from './security';
@@ -246,23 +247,17 @@ export function bootstrap(factories: Factories): void {
     // Visible views every 2.5 s, 1 s per probe, hung after two failed probes (docs/dev/platform.md §2.6).
     const hangWatch = documents.watchHangs(platform.hangDetector);
 
-    const openQueue = async (files: string[]) => {
-      for (const f of files) {
-        try {
-          await documents.open(f);
-        } catch (err) {
-          const key = (err as { errorKey?: string }).errorKey ?? 'errors.open.failed';
-          if (key !== 'errors.open.cancelled') sendEvent('documents:event', { type: 'error', docId: null, errorKey: key, detail: f.split(/[\\/]/).pop() ?? f });
-        }
-      }
-    };
+    const openQueue = createOpenQueue({
+      open: (f) => documents.open(f),
+      failed: (f, errorKey) => sendEvent('documents:event', { type: 'error', docId: null, errorKey, detail: f.split(/[\\/]/).pop() ?? f }),
+    });
     let flushTimer: ReturnType<typeof setTimeout> | null = null;
     const flushPending = () => {
       if (flushTimer) clearTimeout(flushTimer);
       flushTimer = null;
       if (openFiles) return;
-      openFiles = (files) => void openQueue(files);
-      void openQueue(pendingFiles.splice(0));
+      openFiles = (files) => void openQueue.enqueue(files);
+      void openQueue.enqueue(pendingFiles.splice(0));
       // Startup notices go out once the renderer listens.
       void recovery.list().then((entries) => {
         if (entries.length) sendEvent('documents:event', { type: 'notice', docId: null, noticeKey: 'errors.recovery.available', detail: String(entries.length) });
@@ -279,6 +274,7 @@ export function bootstrap(factories: Factories): void {
       probeEngine: () => probe.probe(),
       log: log.child('app'),
       ...(isForeground ? { isForeground } : {}),
+      ...(platform.associations ? { associations: platform.associations } : {}),
     });
     let rendererUp = false;
     const router = createIpcRouter({

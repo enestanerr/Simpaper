@@ -41,5 +41,13 @@ export function appHandlers(s: IpcServices): Record<keyof AppChannels, Handler> 
       return s.app.windowState();
     },
     'app:openExternal': (p) => s.app.openExternal(externalReq(p, 'req').url),
+    'app:fileTypes': (p) => {
+      none(p, 'req');
+      return s.app.fileTypes();
+    },
+    'app:openDefaultApps': (p) => {
+      none(p, 'req');
+      return s.app.openDefaultApps();
+    },
   };
 }

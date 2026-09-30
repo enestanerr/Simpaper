@@ -7,7 +7,7 @@
  */
 import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { AppInfo, Settings } from '@shared/api/app';
+import type { AppInfo, FileTypesStatus, Settings } from '@shared/api/app';
 import type { CompatReport, DocumentDescriptor, Prompt, RecentFile } from '@shared/api/documents';
 import type { RecoveryEntry } from '@shared/api/recovery';
 import { initI18n, setLanguage } from '../../../src/renderer/i18n';
@@ -256,6 +256,79 @@ describe('File backstage', () => {
     fireEvent.click(screen.getByRole('checkbox', { name: /KeyTips while working in a document/ }));
     await act(flush);
     expect(ipc.callsTo('app:settings:update').at(-1)?.req).toEqual({ ui: expect.objectContaining({ documentKeyTips: true }) });
+  });
+
+  async function openOptions() {
+    closeBackstage();
+    open(descriptor('w1', 'writer'));
+    await renderShell();
+    fireEvent.click(screen.getByRole('button', { name: 'Dosya' }));
+    const backstage = screen.getByRole('dialog', { name: 'Dosya' });
+    fireEvent.click(within(backstage).getByRole('button', { name: 'Seçenekler' }));
+    await act(flush);
+    return backstage;
+  }
+
+  it('Options › File types shows which registered types open with Simpaper and opens Windows Settings', async () => {
+    const status: FileTypesStatus = {
+      supported: true,
+      registration: 'user',
+      thisCopy: true,
+      groups: [
+        { kind: 'writer', extensions: ['docx', 'doc'], withSimpaper: ['docx', 'doc'] },
+        { kind: 'calc', extensions: ['xlsx', 'xls'], withSimpaper: ['xls'] },
+        { kind: 'impress', extensions: ['pptx'], withSimpaper: [] },
+        { kind: 'pdf', extensions: ['pdf'], withSimpaper: [] },
+      ],
+    };
+    ipc.handle('app:fileTypes', () => structuredClone(status));
+    ipc.handle('app:openDefaultApps', () => true);
+    const backstage = await openOptions();
+    const section = within(backstage).getByRole('region', { name: 'Dosya türleri' });
+    expect(within(section).getAllByRole('listitem').map((li) => li.textContent)).toEqual([
+      'Belgeler.docx .docSimpaper ile açılıyor',
+      'Hesap tabloları.xlsx .xls1 / 2 tür Simpaper ile açılıyor',
+      'Sunular.pptxBaşka bir uygulamayla açılıyor',
+      'PDF dosyaları.pdfBaşka bir uygulamayla açılıyor',
+    ]);
+    expect(within(section).queryByText(/başka bir Simpaper kurulumunu/)).toBeNull();
+
+    fireEvent.click(within(section).getByRole('button', { name: 'Varsayılan uygulamaları seç…' }));
+    await act(flush);
+    expect(ipc.callsTo('app:openDefaultApps').map((c) => c.req)).toEqual([undefined]);
+    expect(within(section).queryByRole('alert')).toBeNull();
+
+    // Back from Windows Settings: the state is read again.
+    status.groups[3]!.withSimpaper = ['pdf'];
+    act(() => {
+      window.dispatchEvent(new Event('focus'));
+    });
+    await act(flush);
+    expect(within(section).getAllByRole('listitem')[3]!.textContent).toBe('PDF dosyaları.pdfSimpaper ile açılıyor');
+  });
+
+  it('Options › File types: a failed Settings launch, another installation, an unregistered copy, no Windows', async () => {
+    const status: FileTypesStatus = { supported: true, registration: 'machine', thisCopy: false, groups: [{ kind: 'pdf', extensions: ['pdf'], withSimpaper: [] }] };
+    ipc.handle('app:fileTypes', () => structuredClone(status));
+    ipc.handle('app:openDefaultApps', () => false);
+    let backstage = await openOptions();
+    let section = within(backstage).getByRole('region', { name: 'Dosya türleri' });
+    expect(within(section).getByText(/başka bir Simpaper kurulumunu başlatıyor/)).toBeTruthy();
+    fireEvent.click(within(section).getByRole('button', { name: 'Varsayılan uygulamaları seç…' }));
+    await act(flush);
+    expect(within(section).getByRole('alert').textContent).toBe('Windows Ayarları açılamadı.');
+    cleanup();
+
+    ipc.handle('app:fileTypes', () => ({ ...status, registration: null }));
+    backstage = await openOptions();
+    section = within(backstage).getByRole('region', { name: 'Dosya türleri' });
+    expect(within(section).getByText(/dosya türlerini Windows'a kaydetmedi/)).toBeTruthy();
+    expect(within(section).queryByRole('button')).toBeNull();
+    cleanup();
+
+    ipc.handle('app:fileTypes', () => ({ ...status, supported: false }));
+    backstage = await openOptions();
+    expect(within(backstage).queryByRole('region', { name: 'Dosya türleri' })).toBeNull();
   });
 });
 

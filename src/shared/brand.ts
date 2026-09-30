@@ -1,6 +1,7 @@
 /**
  * Single source of truth for the product identity (docs/adr/0009-product-name-simpaper.md).
- * electron-builder.yml mirrors appId, productName and vendor.
+ * electron-builder.yml (appId, productName, shortcutName) and build/installer.nsh (registered-app name) mirror
+ * these values; tests/unit/main/fileAssociations.test.ts checks that they match.
  */
 export const BRAND = {
   productName: 'Simpaper',
@@ -9,6 +10,11 @@ export const BRAND = {
   vendor: 'Simpaper contributors',
   /** Folder name used under %APPDATA% / %LOCALAPPDATA%. */
   dataFolder: 'Simpaper',
+  /**
+   * Value name under Software\RegisteredApplications written by the installer; Settings › Apps › Default apps
+   * opens Simpaper's page with `ms-settings:defaultapps?registeredAppUser=<name>`. Never change it.
+   */
+  registeredAppName: 'Simpaper',
   repositoryUrl: 'https://github.com/ncreativestudios/Simpaper',
   issuesUrl: 'https://github.com/ncreativestudios/Simpaper/issues',
   /** Engine attribution shown in About and docs (TDF trademark policy: text form only). */

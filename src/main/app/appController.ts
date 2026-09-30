@@ -1,11 +1,13 @@
-/** `app:*` services: application info, settings, window controls and allow-listed external links. */
+/** `app:*` services: application info, settings, window controls, allow-listed external links and file types. */
 import { app, shell, type BrowserWindow } from 'electron';
-import type { AppInfo, Settings, WindowState } from '@shared/api/app';
+import type { AppInfo, FileTypesStatus, Settings, WindowState } from '@shared/api/app';
 import { BRAND } from '@shared/brand';
 import type { EngineManager, EngineProbe } from '../engine/types';
 import type { AppController, WindowAction } from '../ipc/services';
 import type { Logger } from '../log';
+import type { AssociationQuery } from '../platform/types';
 import type { SettingsStore } from '../settings/store';
+import { defaultAppsUri, fileTypesStatus } from './fileTypes';
 import { isAllowedExternalUrl } from './security';
 import { windowState } from './window';
 
@@ -16,6 +18,10 @@ export interface AppControllerDeps {
   log: Logger;
   /** Foreground check of the native document windows (ViewHost.isForeground) for `WindowState.active`. */
   isForeground?: (win: BrowserWindow) => boolean;
+  /** Platform.associations (Windows only): the default-app state for Options › File types. */
+  associations?: AssociationQuery;
+  /** This copy's executable (default: process.execPath). */
+  execPath?: string;
 }
 
 export function createAppController(deps: AppControllerDeps): AppController {
@@ -87,6 +93,21 @@ export function createAppController(deps: AppControllerDeps): AppController {
       }
       await shell.openExternal(url);
       return true;
+    },
+    fileTypes(): Promise<FileTypesStatus> {
+      return fileTypesStatus(deps.associations, deps.execPath ?? process.execPath);
+    },
+    async openDefaultApps(): Promise<boolean> {
+      // Only Simpaper's own page: without the installer's registration Windows has nothing to show there.
+      const registration = deps.associations ? await deps.associations.registeredApp(BRAND.registeredAppName) : null;
+      if (!registration) return false;
+      try {
+        await shell.openExternal(defaultAppsUri(registration));
+        return true;
+      } catch (err) {
+        deps.log.warn('could not open Default apps in Settings', { error: err instanceof Error ? err.message : String(err) });
+        return false;
+      }
     },
   };
 }

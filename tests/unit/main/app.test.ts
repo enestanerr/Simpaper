@@ -139,6 +139,14 @@ describe('command line and paths', () => {
     expect(isSecondInstanceData({ argv: 'a' })).toBe(false);
   });
 
+  it.runIf(process.platform === 'win32')('takes the document path Explorer passes for a registered file type ("%1", quoted)', () => {
+    const exe = 'C:\\Users\\Çağrı İşçi\\AppData\\Local\\Programs\\Simpaper\\Simpaper.exe';
+    const file = 'C:\\Users\\Çağrı İşçi\\Belgeler\\Bütçe 2026 (son).XLSX';
+    expect(filesFromArgv([exe, file], 'C:\\WINDOWS\\system32', true)).toEqual([file]);
+    // A program path split at its spaces (an unquoted command line) never becomes a document.
+    expect(filesFromArgv(['C:\\Users\\Çağrı', 'İşçi\\AppData\\Local\\Programs\\Simpaper\\Simpaper.exe', 'D:\\Rapor.docx'], 'C:\\', true)).toEqual(['D:\\Rapor.docx']);
+  });
+
   it('keeps roaming settings and machine-local data apart', () => {
     const p = resolveAppPaths({ appData: 'C:\\Users\\x\\AppData\\Roaming', localAppData: 'C:\\Users\\x\\AppData\\Local', folderName: 'Simpaper', platform: 'win32' });
     expect(p.settingsFile).toBe(join('C:\\Users\\x\\AppData\\Roaming', 'Simpaper', 'settings.json'));
@@ -161,6 +169,8 @@ describe('security and window chrome', () => {
     expect(isAllowedExternalUrl('https://user:pw@github.com/ncreativestudios/Simpaper')).toBe(false);
     expect(isAllowedExternalUrl('file:///C:/Windows/System32/calc.exe')).toBe(false);
     expect(isAllowedExternalUrl('javascript:alert(1)')).toBe(false);
+    // Settings pages only through app:openDefaultApps, whose target is fixed in the main process.
+    expect(isAllowedExternalUrl('ms-settings:defaultapps?registeredAppUser=Simpaper')).toBe(false);
   });
 
   it('builds dialog filters with the requested format first and no import-only formats', () => {

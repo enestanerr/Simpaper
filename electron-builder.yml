@@ -13,6 +13,10 @@ directories:
   output: release
   buildResources: build
 
+# No update feed yet (auto-update is planned for M3, docs/adr/0008-packaging.md). Without this line electron-builder
+# derives a GitHub feed from the git remote and ships it as resources/app-update.yml.
+publish: null
+
 # Only the compiled app is packaged; production dependencies are added by electron-builder.
 files:
   - out/**/*
@@ -59,6 +63,7 @@ electronLanguages:
 #   engine/share/fonts/truetype/               engine fonts (also used by the PDF service for inserted text)
 #   bridge/simpaper_bridge/__init__.py         UNO bridge package (PYTHONPATH = resources/bridge)
 #   profile/registrymodifications.xcu.template engine profile template (+ accelerators.json)
+#   fileicons/<type>.ico                       icons of the registered file types (build/installer.nsh)
 # pdf.js (worker, CMaps, standard fonts, WASM) is bundled into out/renderer by Vite and needs no entry here.
 extraResources:
   # Unmodified LibreOffice, pruned to the shipped UI languages (scripts/engine/prepare-engine.mjs).
@@ -83,6 +88,11 @@ extraResources:
     to: profile
     filter:
       - "**/*"
+  # File-type icons (npm run icons); Explorer loads them from here for the file types the installer registers.
+  - from: resources/fileicons
+    to: fileicons
+    filter:
+      - "*.ico"
 
 # Simpaper's license and the third-party notices next to Simpaper.exe (docs/adr/0006-license.md: every release ships
 # them). electron-builder adds Electron's LICENSE.electron.txt and LICENSES.chromium.html itself; the engine's
@@ -109,6 +119,10 @@ win:
       arch:
         - x64
 
+# build/installer.nsh (included automatically) registers the file types with their icons, the "Open with" entries and
+# Simpaper's page under Settings > Apps > Default apps, and removes them on uninstall (docs/adr/0010-file-associations.md).
+# electron-builder's own fileAssociations option is not used: it writes an unquoted program path, replaces other apps'
+# defaults and never registers for Default apps.
 nsis:
   oneClick: false
   perMachine: false

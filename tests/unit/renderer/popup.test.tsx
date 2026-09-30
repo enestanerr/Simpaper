@@ -6,7 +6,7 @@
  * group popup (which would unmount the menu before the click lands); a press elsewhere still closes both.
  */
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { initI18n, setLanguage } from '../../../src/renderer/i18n';
 import { clipboardControls } from '../../../src/renderer/modules/common/controls';
 import { GroupView } from '../../../src/renderer/ribbon/GroupView';
@@ -126,5 +126,45 @@ describe('popups opened from inside a popup', () => {
     expect(isInsidePopup(null, outer, null)).toBe(false);
     outer.remove();
     stranger.remove();
+  });
+});
+
+describe('focus on open (GUI check 2026-09-30: Esc and the arrows did nothing in a menu opened with the mouse)', () => {
+  it('moves into the popup, although the render that opens it commits before the positioned one', async () => {
+    // Like Chromium, which gives no focus to an element under visibility: hidden (jsdom would).
+    const focus = HTMLElement.prototype.focus;
+    const spy = vi.spyOn(HTMLElement.prototype, 'focus').mockImplementation(function (this: HTMLElement, options?: FocusOptions) {
+      if (!this.closest('[style*="visibility: hidden"]')) focus.call(this, options);
+    });
+    try {
+      const { groupPopup, menu } = await openPasteMenuInCollapsedGroup();
+      expect(menu.contains(document.activeElement)).toBe(true);
+      await act(async () => {
+        fireEvent.keyDown(document.activeElement!, { key: 'Escape' });
+        await flush();
+      });
+      expect(screen.queryByRole('menu', { name: 'Paste' })).toBeNull();
+      // Back on the split button (the menu anchors at its wrapper, which cannot take the focus).
+      const split = screen.getByRole('button', { name: 'Paste options' }).closest('.rb-split');
+      expect(split?.contains(document.activeElement)).toBe(true);
+      expect(groupPopup.contains(document.activeElement)).toBe(true);
+    } finally {
+      spy.mockRestore();
+    }
+  });
+});
+
+describe('Tab in a menu', () => {
+  it('closes it and puts the focus back on its button, from where the browser moves on', async () => {
+    const { groupPopup, menu } = await openPasteMenuInCollapsedGroup();
+    const item = menu.querySelector<HTMLElement>('[role^="menuitem"]')!;
+    item.focus();
+    await act(async () => {
+      fireEvent.keyDown(item, { key: 'Tab' });
+      await flush();
+    });
+    expect(screen.queryByRole('menu', { name: 'Paste' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Paste options' }).closest('.rb-split')?.contains(document.activeElement)).toBe(true);
+    expect(groupPopup.isConnected).toBe(true); // only the menu closes
   });
 });

@@ -1,11 +1,13 @@
 /**
  * Anchored popup rendered in a portal. While open it holds the airspace overlay if it overlaps the
- * native document view, closes on outside press / Esc / window blur / resize, and restores focus.
+ * native document view and, when it takes the focus, the keyboard; it closes on outside press / Esc / window blur /
+ * resize and restores focus.
  * A press inside a popup opened from within this one (a menu of a split button in a collapsed ribbon
  * group) is not an outside press, although every popup is a sibling in document.body.
  */
-import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
+import { holdKeyboard } from '../services/keyboardFocus';
 import { acquireOverlay, overlayPending, whenOverlayReady } from '../services/overlay';
 
 export type PopupCloseReason = 'escape' | 'outside' | 'blur' | 'select' | 'tab';
@@ -57,6 +59,21 @@ export function computePopupPosition(
 
 const FOCUSABLE = 'button:not([disabled]), [href], input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"]), [role^="menuitem"], [role="option"]';
 
+/**
+ * Whether a key event's target is in a menu of this popup itself: key events bubble through the React tree, so the
+ * popup a nested menu was opened from sees them too.
+ */
+function isInOwnMenu(target: EventTarget, popup: HTMLElement): boolean {
+  const menu = target instanceof Element ? target.closest('[role="menu"]') : null;
+  return !!menu && popup.contains(menu);
+}
+
+/** The control the focus returns to when no opener was recorded: a split button anchors at its wrapper. */
+function focusTargetIn(anchor: HTMLElement): HTMLElement | null {
+  if (anchor.matches(FOCUSABLE)) return anchor;
+  return anchor.querySelector<HTMLElement>('[aria-haspopup]') ?? anchor.querySelector<HTMLElement>(FOCUSABLE);
+}
+
 /** Open popup element → its anchor: nested popups are found through their anchor chain. */
 const popupAnchors = new WeakMap<HTMLElement, HTMLElement | null>();
 
@@ -91,12 +108,32 @@ export function Popup({
   role,
   ariaLabel,
 }: PopupProps) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [style, setStyle] = useState<CSSProperties>({ visibility: 'hidden', left: 0, top: 0 });
+  const ref = useRef<HTMLDivElement | null>(null);
+  // Transparent, not hidden, until positioned: the focus moves in (effect below) before the positioned render
+  // commits, and Chromium gives no focus to an element under visibility: hidden.
+  const [style, setStyle] = useState<CSSProperties>({ opacity: 0, pointerEvents: 'none', left: 0, top: 0 });
   const onCloseRef = useRef(onClose);
+  const restoreRef = useRef({ restoreFocus, anchor });
+  /** The control inside the anchor that had the focus when the popup opened. */
+  const openerRef = useRef<HTMLElement | null>(null);
   useLayoutEffect(() => {
     onCloseRef.current = onClose;
+    restoreRef.current = { restoreFocus, anchor };
   });
+  // The focus goes back while the popup is still in the DOM: React detaches refs before it removes the nodes, and
+  // once they are removed the focus is already on <body>.
+  const attach = useCallback((node: HTMLDivElement | null) => {
+    ref.current = node;
+    if (!node) return;
+    return () => {
+      ref.current = null;
+      const { restoreFocus: restore, anchor: back } = restoreRef.current;
+      if (!restore || !node.contains(document.activeElement)) return;
+      const opener = openerRef.current;
+      const target = opener?.isConnected ? opener : back?.isConnected ? focusTargetIn(back) : null;
+      target?.focus({ preventScroll: true });
+    };
+  }, []);
 
   // Position after layout, then hold the airspace overlay for exactly this rect. When the popup overlaps the
   // native document view, the view is frozen first: until the freeze-frame is in place the popup is laid out
@@ -128,6 +165,11 @@ export function Popup({
     if (!open) return;
     const el = ref.current;
     if (el) popupAnchors.set(el, anchor);
+    const active = document.activeElement;
+    openerRef.current = active instanceof HTMLElement && anchor?.contains(active) ? active : null;
+    // A popup that takes the focus takes the keyboard from the document while it is open, as Office's menus do: a
+    // click on the ribbon leaves it in LibreOffice's window (keyboardFocus.ts).
+    const releaseKeyboard = autoFocus ? holdKeyboard() : undefined;
     if (autoFocus && el) {
       const first = el.querySelector<HTMLElement>('[data-autofocus]') ?? el.querySelector<HTMLElement>(FOCUSABLE);
       (first ?? el).focus({ preventScroll: true });
@@ -146,14 +188,14 @@ export function Popup({
       document.removeEventListener('pointerdown', onPointerDown, true);
       window.removeEventListener('blur', onBlur);
       window.removeEventListener('resize', onResize);
-      if (restoreFocus && anchor && el?.contains(document.activeElement)) anchor.focus({ preventScroll: true });
+      releaseKeyboard?.();
     };
-  }, [open, anchor, autoFocus, restoreFocus]);
+  }, [open, anchor, autoFocus]);
 
   if (!open) return null;
   return createPortal(
     <div
-      ref={ref}
+      ref={attach}
       id={id}
       role={role}
       aria-label={ariaLabel}
@@ -165,7 +207,8 @@ export function Popup({
           e.stopPropagation();
           e.preventDefault();
           onCloseRef.current('escape');
-        } else if (e.key === 'Tab' && role === 'menu') {
+        } else if (e.key === 'Tab' && (role === 'menu' || isInOwnMenu(e.target, e.currentTarget))) {
+          // Closes before the browser moves the focus: it moves on from the menu's button (APG menu button).
           onCloseRef.current('tab');
         }
       }}

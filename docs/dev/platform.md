@@ -195,9 +195,13 @@ LibreOffice's child window and Chromium's window share one input queue (cross-th
   `Platform.focusHost` → `win32/focus.ts`: `GetFocus` on the UI thread; if it is a LibreOffice child *inside* the
   host that answers `WM_NULL` within 250 ms on a worker, `SetFocus(host)`; LibreOffice dialogs, windows of this
   process and hung windows are left alone). Asked for when a press on Simpaper's UI moves the focus into a text box
-  or outside ribbon/title bar/tab strip/status bar/ribbon menus, while a dialog or the File view is open (the
-  document gets the focus back when they close) and when a PDF becomes active (`services/keyboardFocus.ts`).
-  Ribbon tab switches and commands keep the keyboard in the document, as in Office (checked on screen).
+  or outside ribbon/title bar/tab strip/status bar, while a dialog, the File view or a menu is open (the document
+  gets the focus back when they close) and when a PDF becomes active (`services/keyboardFocus.ts`). Ribbon tab
+  switches and commands keep the keyboard in the document, as in Office (checked on screen). Our view container
+  gets the focus when the LibreOffice child that had it is hidden or destroyed; `takeFocusFromViews` then counts it
+  as taken from the document. The document's focus request (`view.focus`) waits until the view is shown again
+  (`ViewHost.whenShown`, at most 1.5 s): measured on screen 2026-09-30, a request sent while a menu's freeze-frame
+  still hid the view, or just before the File view gave the area back, left the keyboard in Simpaper.
 - While soffice is suspended, the Simpaper window gets **no mouse or keyboard input** although its UI thread keeps
   running (IPC, timers, repaint, the "not responding" bar): clicks on "Restart engine", the File tab or the title
   bar were processed only when soffice ran again. `AttachThreadInput(…, FALSE)` from another process returned TRUE

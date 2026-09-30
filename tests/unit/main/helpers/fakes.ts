@@ -261,6 +261,12 @@ export class FakeViewHost implements ViewHost {
   unfreeze(docId: string): void {
     this.log.push(`unfreeze:${docId}`);
   }
+  /** A test sets it to hold whenShown (a freeze-frame that has not ended yet). */
+  shownGate: Promise<void> | null = null;
+  whenShown(docId: string): Promise<void> {
+    this.log.push(`whenShown:${docId}`);
+    return this.shownGate ?? Promise.resolve();
+  }
   detach(docId: string): void {
     this.log.push(`detach:${docId}`);
   }

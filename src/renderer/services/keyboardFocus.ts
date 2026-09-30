@@ -5,9 +5,10 @@
  * meant for a text box of the ribbon, the File backstage or a prompt would reach the document. The shell claims
  * the keyboard (`view:focusShell`) when a press on its own UI moves the focus into a text box, or into anything
  * outside the parts that leave the keyboard in the document as Office does (ribbon, title bar, tab strip, status
- * bar, ribbon menus); while modal UI (dialogs, the backstage) is open; and when a PDF becomes the active document.
- * The document gets it back when the last modal UI closes; ribbon commands hand it back themselves (dispatchUno
- * with `focus`). Programmatic focus changes alone never claim it: that would take the keyboard while the user types.
+ * bar); while modal UI (dialogs, the backstage) or a popup that takes the focus (menus, galleries, collapsed ribbon
+ * groups) is open; and when a PDF becomes the active document. The document gets it back when the last of them
+ * closes; ribbon commands hand it back themselves (dispatchUno with `focus`). Programmatic focus changes alone never
+ * claim it: that would take the keyboard while the user types.
  */
 import { isOfficeKind } from '@shared/modules';
 import { getActiveDocument } from '../state/appStore';
@@ -18,7 +19,7 @@ import { hasBridge, invoke } from './ipc';
 const PRESS_WINDOW_MS = 1000;
 /**
  * Parts of the window that leave the keyboard in the document, as in Office (switching ribbon tabs, using a
- * button, gallery or menu, the tab strip, the zoom slider). Their text boxes still take it.
+ * button, the tab strip, the zoom slider). Their text boxes still take it; popups hold it while open (Popup.tsx).
  */
 const PASSIVE = '.rb-ribbon, .vr-titlebar, .vr-doctabs, .vr-status, .vr-popup';
 

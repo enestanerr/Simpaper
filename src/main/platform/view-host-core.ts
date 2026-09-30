@@ -116,6 +116,8 @@ export interface ViewHostCoreOptions<W> {
   captureTimeoutMs?: number;
   /** How long freeze() waits for the hide to be issued (default 1000 ms). */
   hideWaitMs?: number;
+  /** How long whenShown() waits at most for the view to be shown (default 1500 ms). */
+  showWaitMs?: number;
   /** Trailing z-order re-assert of child containers after resize bursts (default 150 ms). */
   zOrderSettleMs?: number;
 }
@@ -157,6 +159,8 @@ interface ViewRecord<W> {
   tail: Promise<void>;
   drainQueued: boolean;
   timer: ReturnType<typeof setTimeout> | null;
+  /** whenShown callers waiting for the view to be shown. */
+  shownWaiters: (() => void)[];
 }
 
 const MAX_PENDING = 64;
@@ -205,6 +209,7 @@ export class ViewHostCore<W extends object> {
   private readonly retryDelayMs: number;
   private readonly captureTimeoutMs: number;
   private readonly hideWaitMs: number;
+  private readonly showWaitMs: number;
   private readonly zOrderSettleMs: number;
   private disposed = false;
 
@@ -214,6 +219,7 @@ export class ViewHostCore<W extends object> {
     this.retryDelayMs = options.retryDelayMs ?? 500;
     this.captureTimeoutMs = options.captureTimeoutMs ?? 1500;
     this.hideWaitMs = options.hideWaitMs ?? 1000;
+    this.showWaitMs = options.showWaitMs ?? 1500;
     this.zOrderSettleMs = options.zOrderSettleMs ?? 150;
   }
 
@@ -284,6 +290,7 @@ export class ViewHostCore<W extends object> {
       tail: Promise.resolve(),
       drainQueued: false,
       timer: null,
+      shownWaiters: [],
     };
     host.views.set(docId, view);
     this.views.set(docId, view);
@@ -377,6 +384,39 @@ export class ViewHostCore<W extends object> {
     }
   }
 
+  /**
+   * Resolves once the view is shown, not frozen, and the placements queued so far have run; at the latest after
+   * `showWaitMs`, and at once for a detached view. LibreOffice gives the keyboard only to a window that is shown:
+   * on screen (2026-09-30) a focus request was lost when it came while a popup's freeze-frame still hid the view,
+   * or just before the File view gave the document area back.
+   */
+  whenShown(docId: string): Promise<void> {
+    const view = this.views.get(docId);
+    if (!view || view.dead) return Promise.resolve();
+    return new Promise<void>((resolve) => {
+      const done = (): void => {
+        clearTimeout(timer);
+        const i = view.shownWaiters.indexOf(done);
+        if (i >= 0) view.shownWaiters.splice(i, 1);
+        resolve();
+      };
+      const timer = setTimeout(done, this.showWaitMs);
+      view.shownWaiters.push(done);
+      // Shown already: after the placements queued so far (they may hide it for a freeze-frame).
+      void view.tail.then(() => {
+        if (this.isShown(view)) done();
+      });
+    });
+  }
+
+  private isShown(view: ViewRecord<W>): boolean {
+    return !view.dead && view.freezeDepth === 0 && view.applied?.shown === true;
+  }
+
+  private releaseShownWaiters(view: ViewRecord<W>): void {
+    for (const done of [...view.shownWaiters]) done();
+  }
+
   detach(docId: string): void {
     this.pending.delete(docId);
     const view = this.views.get(docId);
@@ -387,6 +427,7 @@ export class ViewHostCore<W extends object> {
     view.dead = true;
     if (view.timer) clearTimeout(view.timer);
     view.timer = null;
+    this.releaseShownWaiters(view);
     const host = view.host;
     if (host.activeChild === view) host.activeChild = null;
     if (view.mode === 'child' && view.inContainer) this.syncContainer(host, false);
@@ -652,6 +693,7 @@ export class ViewHostCore<W extends object> {
       return;
     }
     if (inContainer && appearing) this.syncContainer(view.host, false);
+    if (this.isShown(view)) this.releaseShownWaiters(view);
   }
 
   private convert(view: ViewRecord<W>, attempt: number): void {
@@ -690,6 +732,7 @@ export class ViewHostCore<W extends object> {
   private markDead(view: ViewRecord<W>): void {
     if (view.dead) return;
     view.dead = true;
+    this.releaseShownWaiters(view);
     this.log.warn('Native view window is gone', { docId: view.docId });
     if (view.mode === 'child' && view.inContainer) this.syncContainer(view.host, false);
   }

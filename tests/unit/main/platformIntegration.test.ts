@@ -85,6 +85,19 @@ describe('DocumentService — views', () => {
     // Unknown documents are ignored.
     hh.service.focusView('dgone');
   });
+
+  it('view:focus asks the engine only once the view is shown again (a popup over the document just closed)', async () => {
+    const hh = await setup();
+    const doc = await hh.service.create('writer');
+    let show: () => void = () => undefined;
+    hh.view.shownGate = new Promise<void>((resolve) => (show = resolve));
+    hh.service.focusView(doc.docId);
+    expect(hh.view.log).toContain(`whenShown:${doc.docId}`);
+    await new Promise((r) => setTimeout(r, 10));
+    expect(hh.engine.instance(doc.docId).callsOf('view.focus')).toEqual([]);
+    show();
+    await waitFor(() => hh.engine.instance(doc.docId).callsOf('view.focus').length === 1);
+  });
 });
 
 describe('DocumentService — hang watchdog', () => {

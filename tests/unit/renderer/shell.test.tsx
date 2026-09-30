@@ -574,6 +574,26 @@ describe('keyboard between Simpaper and the document (GUI check 2026-09-29: a le
     }
   });
 
+  it('a ribbon menu holds the keyboard while it is open (GUI check 2026-09-30: Esc and the arrows reached the document)', async () => {
+    ipc.handle('view:focusShell', () => true);
+    open(descriptor('w1', 'writer'));
+    await renderShell();
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Altı çizili seçenekleri' }));
+      await flush();
+    });
+    const menu = screen.getByRole('menu', { name: 'Altı çizili' });
+    expect(menu.contains(document.activeElement)).toBe(true);
+    expect(ipc.callsTo('view:focusShell')).toHaveLength(1);
+    expect(ipc.callsTo('view:focus')).toEqual([]);
+    await act(async () => {
+      fireEvent.keyDown(document.activeElement!, { key: 'Escape' });
+      await flush();
+    });
+    expect(screen.queryByRole('menu', { name: 'Altı çizili' })).toBeNull();
+    expect(ipc.callsTo('view:focus').map((c) => c.req)).toEqual([{ docId: 'w1' }]);
+  });
+
   it('prompts and the backstage hold the keyboard; the document gets it back when the last one closes', async () => {
     ipc.handle('view:focusShell', () => true);
     open(descriptor('w1', 'writer'));

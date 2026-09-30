@@ -103,7 +103,7 @@ class FakeOps implements NativeViewOps {
   }
 }
 
-function setup(opts: { scale?: number; zoom?: number; retryDelayMs?: number; captureTimeoutMs?: number } = {}) {
+function setup(opts: { scale?: number; zoom?: number; retryDelayMs?: number; captureTimeoutMs?: number; showWaitMs?: number } = {}) {
   const ops = new FakeOps();
   const win = new FakeWindow();
   win.scale = opts.scale ?? 1;
@@ -118,6 +118,7 @@ function setup(opts: { scale?: number; zoom?: number; retryDelayMs?: number; cap
     hideWaitMs: 50,
     zOrderSettleMs: 5,
     ...(opts.captureTimeoutMs !== undefined ? { captureTimeoutMs: opts.captureTimeoutMs } : {}),
+    ...(opts.showWaitMs !== undefined ? { showWaitMs: opts.showWaitMs } : {}),
   });
   return { ops, win, core, log };
 }
@@ -514,8 +515,8 @@ describe('ViewHostCore — owned mode', () => {
 });
 
 describe('ViewHostCore — child mode', () => {
-  function childSetup() {
-    const s = setup({ scale: 1.25 });
+  function childSetup(opts: { showWaitMs?: number } = {}) {
+    const s = setup({ scale: 1.25, ...opts });
     const params = s.core.viewParamsFor(s.win, 'child', DOC);
     const container = BigInt(params.parentHwnd!);
     s.ops.parents.set(VIEW, container);
@@ -592,6 +593,56 @@ describe('ViewHostCore — child mode', () => {
     core.unfreeze('d1');
     await settle();
     expect(ops.containerPlacements.at(-1)?.visible).toBe(true);
+  });
+
+  it('whenShown waits for the last unfreeze and the placement that shows the view again', async () => {
+    const { core, ops, win } = childSetup();
+    core.attach('d1', win, formatHwnd(VIEW), 'child');
+    core.setBounds('d1', DOC);
+    await settle();
+    await core.whenShown('d1'); // not frozen: nothing to wait for
+    await core.freeze('d1');
+    await core.freeze('d1'); // a nested popup
+    let shown = false;
+    void core.whenShown('d1').then(() => {
+      shown = true;
+      ops.log.push('shown');
+    });
+    core.unfreeze('d1');
+    await settle();
+    expect(shown).toBe(false);
+    core.unfreeze('d1');
+    await settle();
+    expect(shown).toBe(true);
+    expect(ops.log.lastIndexOf(`place ${VIEW} show`)).toBeLessThan(ops.log.indexOf('shown'));
+    // A view that goes away releases its waiters; unknown documents never wait.
+    await core.freeze('d1');
+    const waiting = core.whenShown('d1');
+    core.detach('d1');
+    await waiting;
+    await core.whenShown('dx');
+  });
+
+  it('whenShown also waits for a hidden view to be shown again (the File view closing), at most showWaitMs', async () => {
+    const { core, ops, win } = childSetup({ showWaitMs: 40 });
+    core.attach('d1', win, formatHwnd(VIEW), 'child');
+    core.setBounds('d1', DOC);
+    core.setVisible('d1', false);
+    await settle();
+    let shown = false;
+    void core.whenShown('d1').then(() => (shown = true));
+    await settle();
+    expect(shown).toBe(false);
+    core.setVisible('d1', true);
+    await settle();
+    expect(shown).toBe(true);
+    expect(ops.last(VIEW)?.visible).toBe(true);
+    // A view that stays hidden (a document in the background) does not keep the caller waiting.
+    core.setVisible('d1', false);
+    await settle();
+    const started = Date.now();
+    await core.whenShown('d1');
+    expect(Date.now() - started).toBeGreaterThanOrEqual(30);
   });
 
   it('closing the host hides the child without touching the already destroyed container', async () => {

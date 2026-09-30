@@ -369,7 +369,15 @@ export class DocumentService implements DocumentRegistry {
     }
     const instance = record.instance;
     if (!instance || !record.hwnd || record.hung || record.closing || record.descriptor.state !== 'ready') return;
-    void instance.call('view.focus', { docId }, { timeoutMs: 5_000 }).catch((err) => this.log.debug('view.focus failed', { docId, error: err }));
+    // After a popup or prompt over the document the view is still frozen (hidden) for a moment: LibreOffice would
+    // not give the keyboard to it.
+    const shown = this.deps.viewHost.whenShown?.(docId) ?? Promise.resolve();
+    void shown
+      .then(() => {
+        if (record.instance !== instance || record.hung || record.closing) return;
+        return instance.call('view.focus', { docId }, { timeoutMs: 5_000 });
+      })
+      .catch((err: unknown) => this.log.debug('view.focus failed', { docId, error: err }));
   }
 
   /**

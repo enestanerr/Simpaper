@@ -293,7 +293,7 @@ describe('components', () => {
     const popup = screen.getByRole('dialog', { name: 'menu' });
     expect(popup.style.opacity).toBe('');
     expect(popup.style.visibility).toBe('visible');
-    expect(ipc.calls).toEqual([]);
+    expect(ipc.calls.map((c) => c.channel)).toEqual(['view:focusShell']); // it takes the keyboard; nothing freezes
   });
 
   it('dialogs hold the freeze-frame for their whole lifetime', async () => {

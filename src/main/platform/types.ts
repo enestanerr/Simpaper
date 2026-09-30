@@ -20,6 +20,11 @@ export interface ViewHost {
   /** Snapshot (PNG data URL) + hide, so HTML can be shown over the document area. */
   freeze(docId: string): Promise<string | null>;
   unfreeze(docId: string): void;
+  /**
+   * Resolves once the view is shown again after freeze-frames and its queued placements have run (at once when
+   * there is nothing to wait for). LibreOffice gives the keyboard only to a window that is shown.
+   */
+  whenShown?(docId: string): Promise<void>;
   detach(docId: string): void;
   /** Re-applies positions after the host window moved/resized/changed DPI (owned mode follows the host). */
   syncAll(win: BrowserWindow): void;

@@ -64,9 +64,10 @@ describe('takeFocusFromViews (Win32 focus between Simpaper and LibreOffice windo
     expect(none.log).toEqual(['setFocus:100']);
   });
 
-  it('takes it from our own view container (it gets the focus when the LibreOffice window that had it is destroyed)', async () => {
+  it('takes it from our own view container, which gets it when the LibreOffice window that had it is hidden or destroyed', async () => {
     const { user32, log } = fakeUser32({ focus: 150n, owner: { '150': OWN_PID }, children: [150n] });
-    expect(await takeFocusFromViews(user32, HOST, OWN_PID, [150n])).toBe(false);
+    // The document had the keyboard: it gets it back when the modal UI or popup closes.
+    expect(await takeFocusFromViews(user32, HOST, OWN_PID, [150n])).toBe(true);
     expect(log).toEqual(['setFocus:100']);
   });
 

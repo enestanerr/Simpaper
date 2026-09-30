@@ -333,8 +333,15 @@ Later in session 2 (found by the usage review and the GUI runs), each with a tes
 - Keyboard between the shell and LibreOffice (`services/keyboardFocus.ts`, GUI check `focuscheck.mjs`): Windows keeps
   the keyboard focus in LibreOffice's window when the web content is clicked. `installKeyboardClaims` (Shell) asks for
   it (`view:focusShell`) when a press moves the focus into a text box, or outside `.rb-ribbon`, `.vr-titlebar`,
-  `.vr-doctabs`, `.vr-status`, `.vr-popup`; `holdKeyboard()` in `Dialog` (gives it back to the document if it took it)
-  and `holdKeyboard('always')` in the backstage; `activateDocument` claims it for a PDF. Programmatic focus alone
-  never claims it. Tests: `shell.test.tsx` › "keyboard between Simpaper and the document".
+  `.vr-doctabs`, `.vr-status`, `.vr-popup`; `holdKeyboard()` in `Dialog` and in every `Popup` that takes the
+  focus (menus, galleries, collapsed groups; they give it back to the document if they took it) and
+  `holdKeyboard('always')` in the backstage; `activateDocument` claims it for a PDF. Programmatic focus alone never
+  claims it. The main process sends LibreOffice's focus request once the view is shown again (`ViewHost.whenShown`):
+  sent while a freeze-frame still hid it, it was lost. Tests: `shell.test.tsx` › "keyboard between Simpaper and the
+  document", `popup.test.tsx`, `platformIntegration.test.ts`, `view-host-core.test.ts`.
+- Popups are transparent (`opacity: 0`), never `visibility: hidden`, until positioned: their focus moves in before
+  the positioned render, and Chromium does not focus a hidden element (menus opened with the mouse kept no focus
+  until 2026-09-30). The focus returns to the control that opened a popup (a split button anchors at its wrapper)
+  from a ref cleanup, which runs before React removes the nodes; Tab in a menu closes it first.
 - One "not responding" bar per document (`hang:<docId>`), dismissed when the document leaves `busy`. Test:
   `shell.test.tsx` › "keeps one "not responding" bar per document".

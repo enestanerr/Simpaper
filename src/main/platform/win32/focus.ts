@@ -17,18 +17,23 @@ export type FocusApi = Pick<Win32Api['user32'], 'GetFocus' | 'SetFocus' | 'GetWi
 
 /**
  * Moves the keyboard focus to `host` (on the host's UI thread, whose input queue LibreOffice's children share).
- * Resolves true when the focus was taken from a LibreOffice window inside `host`. The focus stays where it is when
- * it is in a window of this process already, in a window outside `host` (a LibreOffice dialog), or in a window that
- * does not answer: giving up the focus sends that window WM_KILLFOCUS and would block this thread. `containers`
- * (our own view containers) never keep it: Windows hands them the focus when the LibreOffice child that had it is
- * destroyed, and keys sent there are lost.
+ * Resolves true when the keyboard was the document's: taken from a LibreOffice window inside `host`, or from one
+ * of `containers` (our own view containers, which Windows hands the focus when the LibreOffice child that had it is
+ * hidden or destroyed; keys sent there are lost, so they never keep it). The focus stays where it is when it is in a
+ * window of this process already, in a window outside `host` (a LibreOffice dialog), or in a window that does not
+ * answer: giving up the focus sends that window WM_KILLFOCUS and would block this thread.
  */
 export async function takeFocusFromViews(user32: FocusApi, host: Hwnd, ownPid: number, containers: readonly Hwnd[] = []): Promise<boolean> {
   const focus = canonicalHwnd(user32.GetFocus());
-  if (focus === null || containers.some((c) => sameHwnd(c, focus))) {
-    // Nobody has it, or a container of ours: keys would be lost (or reach the host as system keys).
+  if (focus === null) {
+    // Nobody has it: keys would be lost.
     user32.SetFocus(host);
     return false;
+  }
+  if (containers.some((c) => sameHwnd(c, focus))) {
+    // Keys would reach the host as system keys; the keyboard was the document's, so it goes back there later.
+    user32.SetFocus(host);
+    return true;
   }
   if (sameHwnd(focus, host)) return false;
   const pid = [0];

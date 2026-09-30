@@ -68,9 +68,8 @@ Not full Office compatibility — the first installable version.
 - [x] Autosave + crash recovery: killing the engine process during editing loses at most the autosave interval. _(tests/engine/documents-recovery)_
 
 **Project**
-- [ ] README (EN/TR) with real screenshots, compatibility matrix, known limitations, contribution files, CI.
-      _(All in place; the screenshots were captured again from the running app after the rename on 2026-09-30;
-      open: a green CI run on GitHub, where the workflows run since the first push.)_
+- [x] README (EN/TR) with real screenshots, compatibility matrix, known limitations, contribution files, CI.
+      _(The screenshots were captured again from the running app on 2026-09-30; the CI workflow passes on GitHub.)_
 
 ## M2 — Editing depth and fidelity (v0.2)
 

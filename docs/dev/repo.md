@@ -50,13 +50,13 @@ The repository https://github.com/enestanerr/Simpaper is public.
   issue chooser and the CoC link to `/security/advisories/new`, and the CoC names it as the reporting channel until
   its e-mail address is published.
 - Protect `main`, requiring the `CI` checks `Lint, type check, unit tests, build` and
-  `Engine tests (headless LibreOffice)`; both pass on GitHub since the second push ([STATUS.md](../STATUS.md), Test
-  results).
+  `Engine tests (headless LibreOffice)`; both pass on GitHub ([STATUS.md](../STATUS.md), Test results).
 - Replace the e-mail placeholder in `CODE_OF_CONDUCT.md` (Enforcement section).
-- Check the file types on a real installation ([ADR 0010](../adr/0010-file-associations.md), Consequences): icons
-  in Explorer, double-click, Windows' prompt, Simpaper's Default apps page and Options › File types. This needs an
-  install on a test PC with someone at the screen. A PC with the old Varak test installation keeps it next to
-  Simpaper (new application id): remove it through Settings › Apps.
+- Check what the installation script cannot see ([PACKAGING.md](../PACKAGING.md#real-installation)): that Windows'
+  "How do you want to open this file?" prompt offers Simpaper, and Simpaper's Default apps page in Settings (section 2
+  of [TEST_REHBERI.md](../TEST_REHBERI.md)). Icons, double-click, update and uninstall were checked on the
+  development PC by `scripts/installer/verify-install.mjs`. A PC with the old Varak test installation keeps it next
+  to Simpaper (new application id): remove it through Settings › Apps.
 
 - Before the first public release: mirror the engine source tarballs (PACKAGING.md, ADR 0008 §6), set up SignPath
   (PACKAGING.md, Signing plan), write the CHANGELOG section, run the release workflow on the tag.

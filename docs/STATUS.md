@@ -50,7 +50,7 @@ The maintainer's open tasks on GitHub are listed under "Maintainer TODOs" in [de
 | Real installation (changes the PC; owner's permission) | `node scripts/installer/verify-install.mjs --keep` | PASSED; results below and in [PACKAGING.md](PACKAGING.md#real-installation) |
 | Packaged engine | `npm run engine:prepare -- --verify` | PASSED (Turkish PDF and DOCX conversion, bundled fonts embedded) |
 | Type check / lint | `npm run typecheck`, `npx tsc -p tests/unit/{renderer,pdf}/tsconfig.renderer-tests.json --noEmit`, `npm run lint` | clean |
-| CI on GitHub | `.github/workflows/ci.yml` on every push to `main` | first run (commit 89ea113): `tests/unit/tools/pdf.test.ts` failed, because the runner keeps the repository on D: and the corpus font on C: (a cross-drive path joined to the repository root; fixed in 1c2a5a7). Second run: both jobs passed (`Lint, type check, unit tests, build` 99 s; `Engine tests (headless LibreOffice)` 511 s, with the engine downloaded and verified from scratch) |
+| CI on GitHub | `.github/workflows/ci.yml` on every push to `main` | enestanerr/Simpaper, first run (commit 47a3be2): both jobs passed (`Lint, type check, unit tests, build` 132 s; `Engine tests (headless LibreOffice)` 883 s, with the engine downloaded and verified from scratch). Before, on the mistaken ncreativestudios repository: the first run failed in `tests/unit/tools/pdf.test.ts` (the runner keeps the repository on D: and the corpus font on C:; fixed in 1c2a5a7), the second passed |
 
 ### Rename and Windows file types (2026-09-30)
 

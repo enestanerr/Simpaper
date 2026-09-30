@@ -27,8 +27,10 @@ contributor follows when reporting results. The compatibility claims that depend
 | Types | `npm run typecheck` | Strict TypeScript for the main/preload (`tsconfig.node.json`) and renderer (`tsconfig.web.json`) projects | — |
 | Unit | `npm test` (Vitest project `unit`) | `src/**/*.test.ts(x)` and `tests/unit/**`: services, IPC validation, safe save with fault injection, compatibility analyzer, recovery, settings, ribbon definitions (every control has a real action, i18n keys exist in Turkish and English, KeyTips are unique), PDF logic, platform helpers | — |
 | Engine | `npm run test:engine` (Vitest project `engine`) | `tests/engine/**`: real LibreOffice instances, headless, one at a time: lifecycle, open → edit → save → close → reopen round trips, results checked by the engine **and** by independent parsers | `vendor/libreoffice` (`npm run engine:fetch`) or `VARAK_ENGINE_DIR` pointing to a LibreOffice `program` folder |
+| Bridge (Python) | `vendor/libreoffice/program/python.exe -m unittest discover -s engine/bridge/tests -t engine/bridge` | `engine/bridge/tests`: framing, protocol, values, listeners, documents, owned windows, connection loss with a real URP peer (CI: job `engine-tests`) | `vendor/libreoffice` |
+| Smoke boot | `node scripts/smoke-boot.mjs [--kind calc\|writer\|impress]` | The real app starts with a hidden window and creates, queries and closes a document through the preload bridge | `vendor/libreoffice` |
 | Packaged engine smoke test | `npm run engine:prepare -- --verify` or `node scripts/engine/verify-engine.mjs` | The prepared engine folder converts a Turkish test document to PDF and DOCX headlessly; the text is read back and the bundled fonts are embedded | `vendor/libreoffice` |
-| GUI | manual plan in [docs/testing/GUI_SPIKE.md](testing/GUI_SPIKE.md) | Native document views on a real desktop: placement, focus and Turkish typing, shortcuts, popups, DPI | **Owner's permission**, a free desktop session |
+| GUI | plan and results in [docs/testing/GUI_SPIKE.md](testing/GUI_SPIKE.md); automated runs on the packaged app (`npm run dist:dir`): `node scripts/gui/gui-spike.mjs`, `node scripts/gui/screenshots.mjs`, `scripts/gui/checks/*.mjs` | Native document views on a real desktop: placement, focus and Turkish typing, shortcuts, popups, DPI | **Owner's permission**, a free desktop session |
 | All | `npm run test:all` | Unit and engine projects together | as above |
 
 Test output (profiles, converted files, diffs) goes to `test-output/`, which is git-ignored. CI uploads it as an
@@ -53,7 +55,8 @@ part dropped by a round trip.
 When the test suites of milestone v0.1 are complete, CI verifies on every push:
 
 - lint, type checks, unit tests and a production build (`.github/workflows/ci.yml`, job `build`);
-- headless engine tests with a cached, verified engine (job `engine-tests`);
+- headless engine tests, the unit tests that need the engine image and the Python bridge tests, with a cached,
+  verified engine (job `engine-tests`);
 - that the safe-save pipeline leaves the original file intact under injected failures;
 - round trips of DOCX, XLSX and PPTX from the test corpus: the change made by the test is present after reopening,
   the original content (headers/footers, tables, images, formulas and cached results, slide count, texts and
@@ -61,8 +64,8 @@ When the test suites of milestone v0.1 are complete, CI verifies on every push:
 - PDF operations (annotations, form filling, page operations) re-opened with pdf.js.
 
 The exact list of passing tests is whatever the latest CI run reports; [COMPATIBILITY.md](COMPATIBILITY.md) names a
-test only after it has passed. CI has not run yet (the repository has not been published), so until then this means
-a local run of the same commands, stated with its date.
+test only after it has passed. CI runs on GitHub Actions since the first push; a result quoted without a CI run is a
+local run of the same commands, stated with its date.
 
 ## What is not verified
 

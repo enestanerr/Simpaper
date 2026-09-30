@@ -3,7 +3,7 @@
 _Last updated: 2026-09-29._ Varak is in early development (milestone v0.1 in progress, see
 [STATUS.md](STATUS.md)). This list is honest on purpose: it names what does not work, what has not been verified
 and what is lost in certain file formats. Format-by-format details are in [COMPATIBILITY.md](COMPATIBILITY.md).
-If you hit a limitation that is not listed here, please [open an issue](https://github.com/varak-office/varak/issues).
+If you hit a limitation that is not listed here, please [open an issue](https://github.com/enestanerr/varak/issues).
 
 ## General
 
@@ -51,9 +51,10 @@ If you hit a limitation that is not listed here, please [open an issue](https://
   since the last autosave.
 - **A hung engine can't save, and it blocks the Varak window.** LibreOffice's window lives inside the Varak window,
   and Windows gives both one input queue: while the engine hangs, the Varak window does not react to the mouse or
-  keyboard (it still redraws and shows a "not responding" bar). After 8 seconds Varak offers "Restart engine" /
-  "Wait" in a separate message box, which names what a restart loses (the changes after the last autosave; "Wait"
-  is the default); it closes by itself if the engine recovers. Varak never ends an engine on its own. When the
+  keyboard (it still redraws and shows a "not responding" bar). About 8 seconds after that bar appears (roughly
+  13 seconds after the engine stopped responding), Varak offers "Restart engine" / "Wait" in a separate message box,
+  which names what a restart loses (the changes after the last autosave; "Wait" is the default); it closes by itself
+  if the engine recovers. Varak never ends an engine on its own. When the
   window still takes input, closing the document or quitting asks first in the same way and keeps the autosave
   under File → Recover.
 - **No grammar checking and no Python macros.** On Windows with Turkish regional settings, LibreOffice's built-in

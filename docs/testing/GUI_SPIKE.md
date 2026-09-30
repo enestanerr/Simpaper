@@ -15,7 +15,7 @@ hosting) and roadmap M2 (high DPI).
 | Logs | `VARAK_DEBUG=1`: the view host logs `Owned view ready {windowDpi, hostDpi}`, attach/detach and failures |
 | Mode switch | `settings.json` → `"engine": { "viewMode": "child" }` (default) or `"owned"` (development only); read at start-up, so restart Varak |
 | Guard mode | default `adopt`; `VARAK_PROCESS_GUARD=self` for test J3 only |
-| Test files | `tests/corpus` (Writer DOCX with images/tables, Calc XLSX with 3 sheets, Impress PPTX with 10 slides) |
+| Test files | `tests/corpus` (Writer DOCX with images/tables, Calc XLSX with 3 sheets, Impress PPTX with 3 slides — `pptx-basic`; `npm run corpus:generate -- --large` adds a 200-slide deck) |
 | Tools | Windows Settings → Display (scale), a second monitor, Process Explorer (suspend/kill), NVDA or Narrator, Snipping Tool |
 | Record | one row per test and mode: pass/fail, notes, screenshot name, measured numbers |
 
@@ -59,7 +59,7 @@ than one frame.
 
 | # | Steps | Pass criteria |
 |---|---|---|
-| C1 | In the document: Ctrl+S, Ctrl+Shift+S, Ctrl+O, Ctrl+N, Ctrl+P, Ctrl+W, Ctrl+Q. | Each reaches Varak (engine `intercept` event → Varak UI); no LibreOffice dialog opens. |
+| C1 | In the document: Ctrl+S, Ctrl+Shift+S, Ctrl+O, Ctrl+N, Ctrl+W, Ctrl+Q; then Ctrl+P. | The first six reach Varak (engine `intercept` event → Varak UI) and no LibreOffice dialog opens; Ctrl+P opens LibreOffice's print dialog (`.uno:Print` is not intercepted, see engine/profile/ACCELERATORS.md), modal over the document. |
 | C2 | Ctrl+B/I/U, Ctrl+Z/Y, Ctrl+C/V, Ctrl+A, Ctrl+F. | Handled by LibreOffice; ribbon state updates within 100 ms. |
 | C3 | F6, Shift+F6, Ctrl+F1, Ctrl+Tab. | Engine `key` events arrive; Varak moves focus as designed. |
 

@@ -46,9 +46,12 @@ Aşağıdakiler ilk sürümün hedefleridir; her birinin ne kadarının hazır o
 
 Varak ilk kurulabilir sürümüne doğru geliştiriliyor. 2026-09-29 itibarıyla dürüst bir özet: "Birim testlerinden
 geçti" ifadesi, uygulama çalıştırılmadan yürütülen otomatik testleri; "gerçek motorla test edildi" ifadesi, pencere
-göstermeden LibreOffice'i süren otomatik testleri kasteder. Aşağıdakilerin hiçbiri henüz çalışan uygulamada bir kişi
-tarafından denenmedi. Test sayıları: 643 birim testi, 107 motor entegrasyon testi, 65 köprü testi
-([docs/STATUS.md](docs/STATUS.md)).
+göstermeden LibreOffice'i süren otomatik testleri; "ekranda kullanıldı" ifadesi ise paketlenmiş uygulamada gerçek
+fare ve klavye girdisiyle yapılan otomatik GUI denemelerini kasteder. Bu denemeler dışında uygulama yalnızca sahibi
+tarafından geliştirme bilgisayarında kurulup denendi; kayıtlı bir elle test turu
+([docs/TEST_REHBERI.md](docs/TEST_REHBERI.md)) henüz yok. Test sayıları: 763 birim testi (63 dosya), 115 motor
+entegrasyon testi (14 dosya; ayrıca 5 test atlandı: isteğe bağlı üç uzun döngü ve tasarım gereği iki test), 109
+köprü testi ([docs/STATUS.md](docs/STATUS.md)).
 
 | Alan | Durum |
 |---|---|
@@ -61,7 +64,7 @@ tarafından denenmedi. Test sayıları: 643 birim testi, 107 motor entegrasyon t
 | Belge, Hesap Tablosu ve Sunu modülleri | **Uygulandı; temel akışlar ekranda kullanıldı:** Writer'da yazma ve kaydetme, Calc'te Türkçe söz dizimiyle formül, Impress'te slayt paneliyle yeni slayt. 202 Writer, 225 Calc ve 164 Impress komutunun her biri LibreOffice 26.8 komut kaydında denetlendi ve pencere açmadan çalışan motorda gönderilebildiği doğrulandı; Calc formül çubuğu ve seçim istatistikleri; slayt komutları ve slayt gösterisi |
 | Motorda dosya biçimi gidiş-dönüşleri | **Otomatik testlerden geçiyor** (`tests/engine`): Türkçe içerikli üretilmiş DOCX, XLSX ve PPTX dosyaları ile lisansı temiz örnek dosyalar, pencere açmadan çalışan LibreOffice ile açılıp kaydediliyor; sonuç, LibreOffice kullanmayan okuyucularla ve sayfa sayfa görsel karşılaştırmayla denetleniyor. ODF, CSV, TXT, RTF, eski Office ve şablon biçimlerine dönüştürmeler de test ediliyor. Bu testler motoru doğrudan kullanır, henüz Varak uygulaması üzerinden değil; bulguları [uyumluluk tablosunda](docs/COMPATIBILITY.md#test-status) listelenir. |
 | PDF modülü | **Uygulandı, birim testlerinden geçti; görüntüleyici ekranda kullanıldı** (Türkçe metinli bir metin PDF'i ve bir form PDF'i): küçük resimlerle görüntüleme, Türkçeye uygun arama (İ/ı), vurgulama, metin kutusu, çizim, resim ve yorumlar, form doldurma, sayfaları döndürme, silme, taşıma, ekleme ve çoğaltma, PDF birleştirme ve sayfa çıkarma, metin ve resim ekleme, yazdırma ve doğrulamalı kaydetme (`tests/unit/pdf`). Vurgulama, metin kutusu notu ve kaydetme ekranda da denetlendi (kaydedilen dosya bağımsız olarak geri okundu); diğer araçlar yalnızca birim testleriyle. |
-| Yükleyici, CI, depo belgeleri | **Yükleyici ve ZIP üretiliyor** (`npm run dist:win`: 331 MB yükleyici, 436 MB ZIP); paketlenmiş uygulama üç ofis modülü için gizli pencereli açılış testinden geçti. Yükleyici geliştirme bilgisayarında kurulup kullanıldı (kullanıcı başına, yönetici izni olmadan); henüz temiz bir makinede çalıştırılmadı ve genel bir sürüm yok. CI iş akışları, topluluk dosyaları ve belgeler hazır; CI henüz GitHub'da çalışmadı. |
+| Yükleyici, CI, depo belgeleri | **Yükleyici ve ZIP üretiliyor** (`npm run dist:win`: 331 MB yükleyici, 436 MB ZIP); paketlenmiş uygulama üç ofis modülü için gizli pencereli açılış testinden geçti. Yükleyici geliştirme bilgisayarında kurulup kullanıldı (kullanıcı başına, yönetici izni olmadan); henüz temiz bir makinede çalıştırılmadı ve genel bir sürüm yok. CI iş akışları, topluluk dosyaları ve belgeler hazır; CI iş akışı `main` dalına yapılan her gönderimde ve her çekme isteğinde GitHub Actions'ta çalışır (sonuçlar deponun Actions sekmesinde). |
 
 Hiçbir şey Microsoft Office'te doğrulanmadı; bkz. [docs/TESTING.md](docs/TESTING.md).
 
@@ -71,12 +74,13 @@ Hiçbir şey Microsoft Office'te doğrulanmadı; bkz. [docs/TESTING.md](docs/TES
   görüntüleme, açıklama ekleme, form doldurma ve sayfa işlemleri; PDF olarak dışa aktarma; güvenli kaydetme, kayıp
   uyarıları ve çökme kurtarma; Türkçe ve İngilizce arayüz, açık ve koyu tema, şeride klavyeyle erişim; kullanıcı
   başına yükleyici ve ZIP.
-- **v0.2 — derinlik ve doğruluk:** bul ve değiştir, baskı önizleme, stil galerisi, yorumlar ve değişiklik izleme
-  arayüzü; Calc'ta sıralama, filtreleme, bölmeleri dondurma, koşullu biçimlendirme ve grafikler;
-  Impress'te düzenler ve geçişler; daha fazla PDF açıklama türü; yüksek DPI doğrulaması; görsel regresyon testleri.
-- **v0.3 — biçim kapsamı ve sağlamlık:** tüm eski ve ODF biçimleri için doğrulanmış uyumluluk tablosu, CSV içe
-  aktarma iletişim kutusu, parola işlemleri, büyük dosyalarda performans, dosya ilişkilendirmeleri, otomatik
-  güncelleme ve imzalı sürümler.
+- **v0.2 — derinlik ve doğruluk:** baskı önizleme; v0.1 şeritlerinin LibreOffice komutları ve iletişim kutularıyla
+  zaten sunduğu işlevlerin (bul ve değiştir, stiller, yorumlar ve değişiklik izleme; Calc'ta sıralama, filtreleme,
+  bölmeleri dondurma, koşullu biçimlendirme ve grafikler; Impress'te düzenler ve geçişler) ekranda doğrulanması ve
+  derinleştirilmesi; daha fazla PDF açıklama türü; yüksek DPI doğrulaması; daha kapsamlı görsel regresyon testleri.
+- **v0.3 — biçim kapsamı ve sağlamlık:** tüm eski ve ODF biçimleri için doğrulanmış uyumluluk tablosu, belgelere
+  parola koyma ve parolayı kaldırma, büyük dosyalarda performans, dosya ilişkilendirmeleri, otomatik güncelleme ve
+  imzalı sürümler.
 - **Daha sonra:** özet tablolar ve gelişmiş grafikler, PDF'deki mevcut metni düzeltme, karartma (redaksiyon), taranmış
   PDF'ler için OCR, erişilebilirlik denetimi, Linux ve macOS için ön çalışma.
 
@@ -101,7 +105,7 @@ Aynı ekranların İngilizce arayüzlü hâlleri [İngilizce README](README.md#s
 ## Kurulum
 
 Henüz yayımlanmış bir sürüm yok. v0.1 yayımlandığında GitHub'daki
-[sürümler (Releases)](https://github.com/varak-office/varak/releases) sayfasında şunlar olacak:
+[sürümler (Releases)](https://github.com/enestanerr/varak/releases) sayfasında şunlar olacak:
 
 - **`Varak-Setup-<sürüm>-x64.exe`**: yönetici hakları gerektirmeyen, yalnızca geçerli kullanıcı için kurulum yapan bir
   yükleyici;
@@ -119,7 +123,7 @@ Gereksinimler: Windows 10/11 x64, [Node.js](https://nodejs.org/) 22.13 veya üst
 alanı (yükleyici derlenmeyecekse yaklaşık 3,5 GB).
 
 ```powershell
-git clone https://github.com/varak-office/varak.git
+git clone https://github.com/enestanerr/varak.git
 cd varak
 npm ci                                  # bağımlılıkları kur
 npm run engine:fetch                    # LibreOffice 26.8.0.3'ü indir, doğrula ve vendor/ altına aç

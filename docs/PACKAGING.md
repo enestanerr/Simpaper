@@ -103,8 +103,8 @@ Measured on 2026-09-29 with LibreOffice 26.8.0.3:
 | — of which left out | spelling dictionaries 393 MiB, other UI languages 349 MiB, MSI copy 19 MiB, help 11 MiB, extension help 4.5 MiB, AutoText 3 MiB, 32-bit runtime 1.5 MiB |
 | Electron 44.4.5 runtime (before locale pruning) | about 368 MB |
 | Unpacked application (`release/win-unpacked`, 0.1.0 build of 2026-09-29 evening) | **1,109 MiB, 6,823 files**, of which `resources/engine` 742 MiB (6,713 files) and `app.asar` 44 MiB |
-| Installer `Varak-Setup-0.1.0-x64.exe` | 346,580,644 bytes (330.5 MiB) |
-| ZIP `Varak-0.1.0-x64.zip` | 456,781,792 bytes (435.6 MiB) |
+| Installer `Varak-Setup-0.1.0-x64.exe` | 346,332,767 bytes (330.3 MiB; without `elevate.exe`) |
+| ZIP `Varak-0.1.0-x64.zip` | 456,570,179 bytes (435.4 MiB) |
 
 The uncompressed payload of about 1.1 GB is below NSIS's 2 GB limit. The installer was installed and used on the
 development PC (per user, no administrator rights); a clean machine is still to be tried.
@@ -179,7 +179,7 @@ Node 22:
 | Job | Steps |
 |---|---|
 | `build` | `npm ci` → `npm run lint` → `npm run typecheck` → `npm test` → `npm run build` |
-| `engine-tests` | `npm ci` → engine image from the cache (key: hash of `scripts/engine/engine.lock.json`) or `fetch-engine.ps1` on a cache miss → `npm run test:engine` (with `ELECTRON_RUN_AS_NODE` removed); `test-output/` is uploaded as an artifact when the job fails |
+| `engine-tests` | `npm ci` → engine image from the cache (key: hash of `scripts/engine/engine.lock.json`) or `fetch-engine.ps1` on a cache miss → `npm run test:engine` (with `ELECTRON_RUN_AS_NODE` removed) → the unit tests that need the engine image (`tests/unit/renderer/commands.test.ts`, `src/main/engine/launch.test.ts`) and the Python bridge tests; `test-output/` is uploaded as an artifact when the job fails |
 
 The cache holds only the extracted engine image (`vendor/libreoffice`, about 1.5 GB); the MSI is deleted after
 extraction (`-RemoveMsiAfterExtract`). A new lock file means a new cache key, so an engine update is always fetched

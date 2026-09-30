@@ -29,6 +29,7 @@ desktop.ini
 !.vscode/extensions.json
 !.vscode/settings.json
 .idea/
+.obsidian/
 
 # Office lock files
 ~$*

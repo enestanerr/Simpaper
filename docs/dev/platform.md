@@ -1,8 +1,9 @@
 # Platform layer (Windows): developer notes
 
 Code: `src/main/platform/**`. Tests: `tests/unit/platform/**`. GUI test plan: [`docs/testing/GUI_SPIKE.md`](../testing/GUI_SPIKE.md).
-Status (2026-09-29): implemented and verified headless. The behaviour of real LibreOffice windows on
-screen (visibility, focus, DPI at 125/150 %) is **not** verified yet: it needs the GUI spike.
+Status (2026-09-29): implemented and verified headless; child hosting passed the GUI runs at 100 % (placement,
+visibility, keyboard focus, hung-engine rescue: §6, §10). DPI at 125/150 % and mixed-DPI monitors are **not**
+verified yet.
 
 ## 1. What it provides
 
@@ -259,8 +260,8 @@ real keyboard); the state machine is.
 ## 9. Tests
 
 ```powershell
-npx vitest run --project unit tests/unit/platform          # 106 tests incl. real processes, headless
-node tests/unit/platform/electron/run-headless-check.ts    # Electron 44 without windows, ~5 s
+npx vitest run --project unit tests/unit/platform          # 12 test files incl. real processes, headless
+node tests/unit/platform/electron/run-headless-check.ts    # Node ≥ 22.18 (type stripping); Electron 44 without windows, ~5 s
 ```
 
 - Pure: HWND conversions, geometry/DPI (100–200 %, mixed monitors), style bits, process tree (PID reuse,
@@ -276,7 +277,7 @@ node tests/unit/platform/electron/run-headless-check.ts    # Electron 44 without
 
 - GUI spike 2026-09-29 (`scripts/gui/gui-spike.mjs`, 100 %): **child** passed (placement, typing, ribbon,
   Ctrl+S, backstage, Calc/Impress/PDF, window moves, themes); **owned** hung the UI thread about 3 s after
-  the first document appeared (fix above, not yet re-run on screen). Still not observed: DPI > 100 %,
+  the first document appeared (fix above; re-run on screen in the next point). Still not observed: DPI > 100 %,
   mixed-DPI monitors, shell-key hooks, freeze fidelity in owned mode.
 - **Owned mode, second run (with the engine owning the frame first):** Varak stayed responsive, but soffice
   stopped responding about 4 s after the first click into the document (hang detector: "engine window not

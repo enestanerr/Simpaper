@@ -23,7 +23,43 @@ const OUTPUT = path.join(repoRoot, 'THIRD_PARTY_NOTICES.md');
 const LICENSE_FILE = /^(licen[cs]e|copying|notice)([-._ ].*)?$/i;
 /** Installed as optional dependencies but excluded from the package by electron-builder.yml (never shipped). */
 const NOT_SHIPPED = ['@napi-rs/canvas'];
-const SKIP_DIRS = new Set(['node_modules', 'test', 'tests', '__tests__', 'example', 'examples', 'docs', 'doc', 'src', '.github']);
+/** Notices for code inside shipped packages that the package's own license file does not state (re-check on upgrades). */
+const SUPPLEMENTS = {
+  '@cantoo/pdf-lib': [
+    '`core/crypto.js` and `core/streams/*.js` are ports of Mozilla pdf.js ("Copyright 2012 Mozilla Foundation"),',
+    '`core/streams/FlateStream.js` also of XPDF ("Copyright 1996-2003 Glyph & Cog, LLC"), both under the Apache License,',
+    'Version 2.0 (license text in the pdfjs-dist section).',
+  ],
+  brotli: [
+    'The decoder in `dec/` (used by @cantoo/fontkit for WOFF2 fonts) is a port of Google Brotli; its files state',
+    '"Copyright 2013 Google Inc. All Rights Reserved. Licensed under the Apache License, Version 2.0" (license text in the',
+    'pdfjs-dist section).',
+  ],
+};
+/** Copyright holder of a package that ships no license file (package.json "author"). */
+function authorOf(pkg) {
+  const a = pkg.author;
+  const name = typeof a === 'string' ? a.replace(/\s*[<(].*$/, '') : a?.name;
+  return name || `the ${pkg.name} authors`;
+}
+const MIT_PERMISSION = `Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.`;
+const SKIP_DIRS = new Set(['node_modules', 'test', 'tests', '__tests__', 'example', 'examples', 'docs', 'doc', '.github']);
 
 function readJson(file) {
   return JSON.parse(fs.readFileSync(file, 'utf8'));
@@ -78,16 +114,17 @@ function collectPackages() {
     for (const dep of Object.keys(pkg.dependencies ?? {})) queue.push({ name: dep, from: dir, optional: false });
     for (const dep of Object.keys(pkg.optionalDependencies ?? {})) queue.push({ name: dep, from: dir, optional: true });
   }
-  return [...found.values()].sort((a, b) => a.pkg.name.localeCompare(b.pkg.name) || a.pkg.version.localeCompare(b.pkg.version));
+  // A fixed collation: the machine's default (tr-TR here, en-US on CI) would reorder the output.
+  return [...found.values()].sort((a, b) => a.pkg.name.localeCompare(b.pkg.name, 'en-US') || a.pkg.version.localeCompare(b.pkg.version, 'en-US'));
 }
 
-/** License and notice files in the package root and in first-level folders (e.g. pdfjs-dist/wasm). */
+/** License and notice files anywhere in the package (vendored code included), outside node_modules, tests and docs. */
 function licenseFiles(dir) {
   const result = [];
   const scan = (d, rel, depth) => {
-    for (const entry of fs.readdirSync(d, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
-      if (entry.isFile() && LICENSE_FILE.test(entry.name)) result.push(rel ? `${rel}/${entry.name}` : entry.name);
-      else if (entry.isDirectory() && depth < 1 && !SKIP_DIRS.has(entry.name)) scan(path.join(d, entry.name), entry.name, depth + 1);
+    for (const entry of fs.readdirSync(d, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name, 'en-US'))) {
+      if (entry.isFile() && LICENSE_FILE.test(entry.name) && !/\.(svg|png)$/i.test(entry.name)) result.push(rel ? `${rel}/${entry.name}` : entry.name);
+      else if (entry.isDirectory() && depth < 4 && !SKIP_DIRS.has(entry.name)) scan(path.join(d, entry.name), rel ? `${rel}/${entry.name}` : entry.name, depth + 1);
     }
   };
   scan(dir, '', 0);
@@ -180,7 +217,7 @@ async function engineFonts(dir) {
     f.files++;
     families.set(family, f);
   }
-  return [...families.values()].sort((a, b) => a.family.localeCompare(b.family));
+  return [...families.values()].sort((a, b) => a.family.localeCompare(b.family, 'en-US'));
 }
 
 async function main() {
@@ -292,8 +329,10 @@ async function main() {
   for (const { dir, pkg } of packages) {
     const files = licenseFiles(dir);
     push(`### ${pkg.name} ${pkg.version}`, '', `License: ${licenseOf(pkg)}${repositoryOf(pkg) ? ` - ${repositoryOf(pkg)}` : ''}`, '');
+    if (SUPPLEMENTS[pkg.name]) push(...SUPPLEMENTS[pkg.name], '');
     if (!files.length) {
       push(`_The package does not include a license file; its package.json declares "${licenseOf(pkg)}"._`, '');
+      if (licenseOf(pkg) === 'MIT') push(codeBlock(`MIT License\n\nCopyright (c) ${authorOf(pkg)}\n\n${MIT_PERMISSION}`), '');
       continue;
     }
     const seen = new Set();

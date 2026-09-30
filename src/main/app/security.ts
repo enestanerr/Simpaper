@@ -11,7 +11,6 @@ import type { Logger } from '../log';
 export const EXTERNAL_URL_PREFIXES: readonly string[] = [
   `${BRAND.repositoryUrl}`,
   `${BRAND.issuesUrl}`,
-  'https://github.com/varak-office/',
   'https://www.mozilla.org/en-US/MPL/2.0/',
   'https://www.mozilla.org/MPL/2.0/',
   'https://www.libreoffice.org/',

@@ -5,7 +5,7 @@ Documents the tests open, edit, convert and verify. Two kinds, with different li
 | Folder | Content | Licence | In git? |
 |---|---|---|---|
 | `generated/` | Deterministic fixtures written by `scripts/corpus/generate.mjs` (+ `derived/` files converted by LibreOffice) and `manifest.json` with the expected facts | CC0-1.0 (self-authored) | no — regenerated on demand |
-| `third_party/<source>/` | Unmodified copies of files from other open-source projects, with the upstream `LICENSE`/`NOTICE` and an `ATTRIBUTION.md` | licence of the source (currently Apache-2.0 only) | yes |
+| `third_party/<source>/` | Unmodified copies of files from other open-source projects, with the upstream `LICENSE`/`NOTICE` and an `ATTRIBUTION.md` | licence of the source (Apache-2.0; delins.docx also quotes Wikipedia text, CC BY-SA 3.0) | yes |
 
 What each file exercises and which tests use it: [tests/README.md](../README.md#the-corpus). Findings from
 round trips of these files: [docs/dev/testing-corpus.md](../../docs/dev/testing-corpus.md#findings).
@@ -48,7 +48,7 @@ Current sources:
 
 - [`apache-poi/`](third_party/apache-poi/ATTRIBUTION.md) — 14 Office-made documents from the Apache POI test data
   (macros, SmartArt, charts and chartEx, pivot tables, tracked changes, encrypted DOCX/XLSX, legacy DOC/XLS/PPT,
-  speaker notes), Apache-2.0.
+  speaker notes), Apache-2.0 (delins.docx also quotes Wikipedia, CC BY-SA 3.0).
 - [`apache-pdfbox/`](third_party/apache-pdfbox/ATTRIBUTION.md) — an AcroForm made with Adobe Acrobat (26 widgets of
   all field types), Apache-2.0.
 

@@ -1,5 +1,5 @@
 /**
- * Unicode appearance streams for what pdf.js 6.3 saves without one (vendor/research-raw/pdf.md):
+ * Unicode appearance streams for what pdf.js 6.3 saves without one (docs/research/pdf.md):
  *  - FreeText annotations whose text Helvetica/WinAnsi cannot encode (Turkish ğ ş ı İ …) get no /AP, so they
  *    are invisible in PDFium-based viewers (Chrome, Edge);
  *  - form fields whose value the field font cannot encode get no /AP and /NeedAppearances true.

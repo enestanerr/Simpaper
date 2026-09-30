@@ -32,17 +32,23 @@ Session 2 (2026-09-29), resuming after the interrupted first pass.
   packaged `app.asar` path (Electron 44.4.5 in node mode, `GetCurrentProcessId` call), fuses as configured,
   LICENSE.txt + THIRD_PARTY_NOTICES.md next to Varak.exe. The build used the stale `out/` of 00:27 (layout check
   only; the app was not started).
-- In dev mode `bootstrap.ts` looks for engine fonts in `<programDir>/../share/fonts/truetype`; in
-  `vendor/libreoffice` (admin image) they are in `Fonts/`, so the PDF service falls back to pdfjs-dist's Liberation
-  Sans there. Packaged builds are fine (prepare-engine moves them). Main-core's decision; not changed here.
+- Engine fonts in dev mode: the PDF service also searches the admin image's `Fonts/` folder
+  (`src/main/app/engineDirs.ts`); only the compatibility font check still reads `share/fonts/truetype` alone
+  (main-core.md, Known limitations). Packaged builds have the fonts in `share/fonts/truetype` (prepare-engine moves
+  them).
 
 ### Maintainer TODOs (need the GitHub repository or a person)
 
 - Replace the e-mail placeholder in `CODE_OF_CONDUCT.md` (Enforcement section).
-- Repository settings: enable **Private vulnerability reporting** (SECURITY.md, issue chooser and CoC link to
-  `/security/advisories/new`) and **Discussions** (issue chooser, feature form); protect `main` and require the
-  `CI` checks `Lint, type check, unit tests, build` and `Engine tests (headless LibreOffice)`.
-- First CI run: expect the known lint/type errors of other areas until they are fixed (see STATUS).
+- Repository https://github.com/enestanerr/varak (private): enable **Discussions** (issue chooser, feature form and
+  CONTRIBUTING link to `/discussions`; Settings → General → Features).
+- When the repository is made public (after the trademark search and the GitHub organisation of ADR 0007; a later
+  transfer to the organisation keeps the old links working through GitHub's redirects): enable **Private
+  vulnerability reporting** (SECURITY.md, issue chooser and CoC link to `/security/advisories/new`; GitHub offers it
+  only for public repositories) and protect `main`, requiring the `CI` checks `Lint, type check, unit tests, build`
+  and `Engine tests (headless LibreOffice)` (branch protection of a private repository needs a paid plan).
+- First CI run (started by the first push): lint, type check, unit and engine tests were clean locally on 2026-09-29
+  ([STATUS.md](../STATUS.md), Test results); check the result under Actions and record it in STATUS.md.
 - Before the first public release: mirror the engine source tarballs (PACKAGING.md, ADR 0008 §6), set up SignPath
   (PACKAGING.md, Signing plan), write the CHANGELOG section, run the release workflow on the tag.
 

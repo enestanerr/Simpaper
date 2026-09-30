@@ -94,12 +94,14 @@ implemented behind `ViewHost` (`src/main/platform/`):
   of the Varak window. The container has its own redirection surface and Chromium runs with
   `--disable-features=RemoveRedirectionBitmap`, so the GDI-painted view is visible although Chromium ≥ 139
   creates top-level windows with `WS_EX_NOREDIRECTIONBITMAP`. Passed the first GUI spike.
-- **owned** (experimental): a borderless top-level LibreOffice window owned by the Varak window and kept
-  exactly over the document area; own redirection surface and DPI mode. It hung the UI thread in the first
-  GUI spike; the engine now owns the frame before loading into it, which is not yet verified on screen
-  ([ADR 0003](adr/0003-document-surface.md), amendment).
+- **owned** (development only): a borderless top-level LibreOffice window owned by the Varak window and kept
+  exactly over the document area; own redirection surface and DPI mode. It hung Varak's UI thread in the first
+  GUI spike; with the engine owning the frame before loading into it, Varak stayed responsive in the second run,
+  but soffice stopped responding after the first click into the document ([ADR 0003](adr/0003-document-surface.md),
+  amendment).
 
-The mode is read once at start-up (Options → takes effect after a restart).
+The mode is read once at start-up from `settings.json` (`engine.viewMode`; Options does not offer it), so a change
+takes effect after a restart.
 
 Because HTML can never paint over a native window ("airspace"), popups that overlap the document area
 use a freeze-frame: the native view is captured (PrintWindow), shown as an image and hidden while the
@@ -124,7 +126,9 @@ Turkish text renders correctly. Open issues are tracked in `docs/STATUS.md`.
 - Renderer: `contextIsolation`, `sandbox`, strict CSP, no Node integration, allow-listed IPC channels.
 - Engine pipes use random per-instance names; no TCP listeners.
 - No telemetry. Logs never contain document content.
-- PDFs are parsed by pdf.js in the sandboxed renderer (`isEvalSupported: false`).
+- PDFs are parsed by pdf.js 6.3.289 in the sandboxed renderer; PDF scripting is not loaded (no scripting manager,
+  QuickJS not bundled) and XFA is off (`enableXfa: false`); pdf.js 6.3 no longer has an `isEvalSupported` option
+  ([dev/pdf.md](dev/pdf.md)).
 
 ## 7. Cross-platform outlook
 

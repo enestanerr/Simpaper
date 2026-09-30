@@ -3,7 +3,7 @@
 Composition root, main window, IPC router, document lifecycle, safe save, compatibility analysis,
 crash recovery, settings and recent files. Everything here runs in Electron's main process.
 
-## Review fixes (review of 2026-09-29, vendor/research-raw/review-2026-09-29.md)
+## Review fixes (review of 2026-09-29; notes kept outside the repository)
 
 Checkpoint list of this area's findings (ticked when code + regression test are in):
 
@@ -382,24 +382,20 @@ blocked, `fs.promises.stat` answered after 28 ms with the setting in the first i
   not load, so the font check may report fonts as missing that the packaged engine has.
 - Save As of PDFs, merging and printing are the PDF service's (`src/main/pdf`).
 - `settings.engine.viewMode = 'child'` needs a restart (Chromium switch).
-- Not verified on screen (needs the GUI spike, docs/testing/GUI_SPIKE.md): owned/child views with a visible window,
-  `view.focus`, the active-look polling, the shell-key hook, the hang watchdog against a really hung view.
+- Not verified on screen (docs/testing/GUI_SPIKE.md): the active-look polling and the shell-key hook. Child views with
+  a visible window, the keyboard hand-over (`view.focus`, `view:focusShell`), the hang watchdog against a really hung
+  view and the rescue box passed GUI runs 2–13; owned views hung soffice (run 4).
 - The hang watchdog runs on Electron's main thread (the probes themselves run on koffi worker threads); platform.md
   §2.6 notes that a watchdog that must fire even while Chromium's UI thread is blocked by a hung, input-attached
   soffice would need a utility process.
-- The shell does not use `WindowState.active`, `documents:restartEngine` or `settings.ui.documentKeyTips` yet
-  (renderer work).
-- Engine bridge (reported to its owner): `impress.setShapeText` changes the text but leaves LibreOffice's
-  modified flag false, so no `modified` event follows (UI edits and dispatched commands do set it; the renderer does
-  not use this RPC). The PPTX engine test therefore edits with `.uno:DuplicatePage` first.
 - Electron prints "Error occurred in handler for '<channel>'" to stderr for every rejected `ipcMain.handle`
   (e.g. `engine:query` for a document that was just closed); the renderer receives the i18n key as usual.
 - VBA passthrough (#11) has unit tests only: the corpus has no DOCM with a VBA project and LibreOffice cannot
   create one, so there is no engine test of "DOCM → snapshot → restore → save loses vbaProject.bin".
 - Password-protected documents get the structural verification only (#21); a deep check would need an engine RPC
   that loads a file and writes nothing (engine layer).
-- The PDF flush protocol (#10) needs the renderer's side (`pdf:markModified`, answering `flushRequest`); without it
-  every PDF save/close/quit waits for the 10 s timeout.
+- The PDF flush protocol (#10) depends on the renderer's answer (implemented: shell-ui.md §5, pdf.md); a renderer
+  that does not answer makes a PDF save/close/quit wait for the 10 s timeout.
 
 ## Verified (review fixes, 2026-09-29, this machine)
 

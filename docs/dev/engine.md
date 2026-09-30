@@ -7,7 +7,8 @@ profiles, start-up overrides). Tests: `tests/engine/**` (real headless LibreOffi
 `tests/engine/diagnostics/` (stack dumper, minidump reader).
 
 Status (2026-09-29): implemented and verified against LibreOffice 26.8.0.3 on Windows 11 (Turkish region),
-headless and with hidden views. Visible views (painting, focus, typing) need the GUI spike.
+headless and with hidden views. Visible child views (painting, focus, typing) passed the GUI runs of 2026-09-29
+(docs/testing/GUI_SPIKE.md); owned views hung soffice there (run 4).
 
 ## Progress (checkpoint for resuming)
 
@@ -23,7 +24,7 @@ headless and with hidden views. Visible views (painting, focus, typing) need the
 - [x] `engine/profile/ACCELERATORS.md`, shortcut and profile read-back test.
 - [x] This document.
 
-Review 2026-09-29 (`vendor/research-raw/review-2026-09-29.md`), engine part — all done:
+Review 2026-09-29 (notes kept outside the repository, see STATUS.md), engine part — all done:
 
 - [x] #1 dialog tracking keyed by the pyuno wrappers (UNO identity), cleared on shutdown (§3) —
       `engine/bridge/tests/test_documents.py` (4 of its 6 dialog tests fail with the old `id()` keys).
@@ -46,8 +47,8 @@ Lead follow-ups 2026-09-29 (after the first GUI spike):
       Tests: `engine/bridge/tests/test_owned.py` (style vectors shared with `tests/unit/platform/styles.test.ts`,
       real hidden windows, guard paths, job order; 4 flow tests fail against the old single-job flow),
       `tests/unit/platform/win32-view-ops.test.ts` (makeOwned makes no hide/restyle/owner call on an engine-owned
-      frame; fails without the early return), `tests/engine/views.test.ts` (real soffice). Not yet observed on
-      screen: see docs/dev/platform.md §10.
+      frame; fails without the early return), `tests/engine/views.test.ts` (real soffice). On screen (GUI run 4)
+      Varak stayed responsive, but soffice stopped responding after the first click: docs/dev/platform.md §10.
 - [x] Lone UTF-16 surrogates are replaced with U+FFFD right after decoding a request
       (`framing.scrub_surrogates`, §14): `test_framing.py` and `lifecycle.test.ts` 'replaces lone UTF-16
       surrogates…' (fails without the scrub: the connection drops). The lost-connection test now uses the
@@ -61,7 +62,7 @@ Lead follow-ups 2026-09-29 (after the first GUI spike):
       a bar that does not exist yet. Test: `views.test.ts` 'impress: the slide pane stays available…' (test hook
       `debug.viewChrome`): no bar visible after load, after Select All and after Outline → Normal view; it failed
       while only `hideElement` was used (the status bar came back). Writer and Calc keep the invisible layout
-      manager. Not yet seen on screen.
+      manager. Confirmed on screen in GUI run 3 (slide pane visible).
 - [x] Writer page count without a layout run: `doc.info` and the load result read the page count from the
       document statistics (`ops.writer_page_count`, after `WordCount` has brought them up to date) instead of
       `controller.PageCount`, which formats the whole document with a progress bar (`SwViewShell::CalcLayout`);
@@ -447,7 +448,7 @@ product does not: one document and one view mode per instance).
 
 ```powershell
 npx vitest run --project unit src/main/engine                     # launch overrides, profiles, manager (21)
-vendor\libreoffice\program\python.exe -m unittest discover -s engine/bridge/tests -t engine/bridge   # bridge (93)
+vendor\libreoffice\program\python.exe -m unittest discover -s engine/bridge/tests -t engine/bridge   # bridge (109)
 npx vitest run --project engine tests/engine/startup.test.ts tests/engine/lifecycle.test.ts `
   tests/engine/roundtrip.test.ts tests/engine/calc.test.ts tests/engine/export.test.ts `
   tests/engine/store.test.ts tests/engine/views.test.ts tests/engine/profile.test.ts --silent=false   # real engine (~2 min)

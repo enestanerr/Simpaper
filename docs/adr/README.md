@@ -9,7 +9,7 @@ decisions, with sources, is in [docs/research](../research/README.md).
 | [0001](0001-engine.md) | Unmodified LibreOffice 26.8 as the office document engine, driven over UNO, one instance per document | Accepted |
 | [0002](0002-shell.md) | Electron, React and TypeScript for the application shell | Accepted |
 | [0003](0003-document-surface.md) | LibreOffice's editing window hosted in the Varak window: child embedding by default (amended after the GUI spike), owned overlay for development only | Accepted (amended) |
-| [0004](0004-pdf-stack.md) | pdf.js in the renderer, @cantoo/pdf-lib in the main process | Accepted for v0.1 |
+| [0004](0004-pdf-stack.md) | pdf.js in the renderer, @cantoo/pdf-lib in the main process | Accepted for v0.1 (amended) |
 | [0005](0005-data-integrity.md) | Working copies, safe save, loss-risk warnings, recovery, no macro execution | Accepted |
 | [0006](0006-license.md) | Mozilla Public License 2.0 | Accepted |
 | [0007](0007-product-name.md) | Product name "Varak" (formal trademark search still required) | Accepted (working name) |

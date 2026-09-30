@@ -1,6 +1,7 @@
 # ADR 0004: PDF stack — pdf.js in the renderer, @cantoo/pdf-lib in the main process
 
-- **Status:** Accepted for milestone M1 (v0.1); later tools are planned, not decided in detail
+- **Status:** Accepted for milestone M1 (v0.1), amended 2026-09-30 (implementation notes); later tools are planned,
+  not decided in detail
 - **Date:** 2026-09-28
 - **Related:** [ARCHITECTURE.md](../ARCHITECTURE.md), [ADR 0005](0005-data-integrity.md),
   research: [pdf](../research/pdf.md), contracts: `src/shared/api/pdf.ts`, `src/main/pdf/types.ts`
@@ -71,3 +72,12 @@ For v0.1:
   adapter, and upgrades require the PDF regression tests.
 - Security: PDFs are untrusted input; parsing happens in the sandboxed renderer with a pdf.js version newer
   than the fix for CVE-2024-4367.
+
+## Amendment (2026-09-30): implementation notes
+
+- pdf.js 6.3.289 no longer has the `isEvalSupported` option, so there is nothing to switch off; PDF scripting is not
+  loaded at all (no scripting manager, QuickJS not bundled) and XFA is off (`enableXfa: false`). CMaps, standard fonts
+  and WASM are served locally; no ICC profiles are shipped (`iccUrl` is unset). Details: [dev/pdf.md](../dev/pdf.md).
+- Varak's own Unicode appearance streams for Turkish FreeText and form values were implemented in M1
+  (`src/main/pdf/appearance.ts`), not in M2, so the Chrome/Edge consequence above no longer applies to files saved
+  by Varak.

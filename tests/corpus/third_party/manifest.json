@@ -240,7 +240,7 @@
       "features": [
         "tracked-changes"
       ],
-      "exercises": "Tracked changes written by Word (32 w:ins and 4 w:del elements).",
+      "exercises": "Tracked changes written by Word (32 w:ins and 4 w:del elements). Its text includes an excerpt of the English Wikipedia page \"Tika\" (https://en.wikipedia.org/wiki/Tika) by Wikipedia contributors, CC BY-SA 3.0 (https://creativecommons.org/licenses/by-sa/3.0/).",
       "expect": {
         "insElements": 32,
         "delElements": 4

@@ -3,8 +3,8 @@
 Code: `src/renderer/**` (except `src/renderer/modules/pdf/**`, owned by the PDF module — see [`pdf.md`](pdf.md)) and
 the `.uno:` allow-list `src/shared/commands.ts`. Tests: `tests/unit/renderer/**`.
 Status (2026-09-29): implemented and verified with unit tests (jsdom, fake IPC bridge), a throw-away production
-bundle build and headless engine probes. The running app has **not** been looked at on screen (no GUI runs on the
-development machine without the owner's consent); see "Known gaps".
+bundle build and headless engine probes. The app was used on screen in the GUI runs of 2026-09-29 (child hosting,
+100 %; [GUI_SPIKE.md](../testing/GUI_SPIKE.md), Results); see "Known gaps".
 
 ## 1. Structure
 
@@ -71,7 +71,6 @@ is not `ready` or the engine reports the command disabled; `shell` actions are e
    when it is generic or in that module's component. Prefer the command LibreOffice's own menus use for the module.
 2. **Allow it** in `src/shared/commands.ts` (`dispatch` list of the module, or `STATUS` for status-only items).
    Never add file/quit/macro/options/help commands (`INTERCEPTED_COMMANDS`): those flows belong to the shell.
-   Note: the main-process IPC validator currently rejects names containing `-` (see "Known gaps").
 3. **Check that it dispatches** in the module — registry presence is not enough (`.uno:InsertSlideField` is registered
    but has no dispatch in Impress): `vendor/libreoffice/program/python.exe tests/unit/renderer/engine-probe/probe_commands.py`
    reads the allow-list from `commands.ts`, checks `frame.queryDispatch` for every command in hidden new documents
@@ -202,14 +201,15 @@ Contextual tabs use `--ctx-table|picture|drawing|chart`; each module has an acce
 ## 12. Tests and verification
 
 ```powershell
-npx vitest run --project unit tests/unit/renderer                 # 12 files, 213 tests (2026-09-29, after the review fixes)
+npx vitest run --project unit tests/unit/renderer                 # 14 files (whole unit project on 2026-09-29: 63 files, 763 tests, docs/STATUS.md)
 npx tsc -p tests/unit/renderer/tsconfig.renderer-tests.json      # type-check the tests (.tsx stay out of tsconfig.node.json)
 npx tsc -p tsconfig.web.json --noEmit; npx eslint src/renderer src/shared
 npx vite build --config test-output/shell-ui/vite.bundle.config.mts [--mode minified]   # temporary config (git-ignored), own outDir
 vendor/libreoffice/program/python.exe tests/unit/renderer/engine-probe/probe_commands.py # headless engine probe (~25 s)
 ```
 
-Test files: `ribbons` (all four module ribbons incl. PDF), `commands` (allow-list rules, registry, IPC validator),
+Test files: `ribbons` (all four module ribbons incl. PDF), `statusbars` (Impress status bar), `dispatch-args` (every
+ribbon `.uno:` action passes the IPC checks), `commands` (allow-list rules, registry, IPC validator),
 `i18n`, `keytips` (rules, state machine, global keyboard), `layout`, `turkish`, `overlay` (freeze-frame service and
 components; the freeze following the shown document; dialogs across blur; the ribbon peek), `popup` (nested popups
 in collapsed groups), `lifecycle` (closing notice, open/create/restore results, pushing PDF edits before a close and
@@ -244,13 +244,8 @@ Verified results (2026-09-29):
 
 ## 13. Known gaps
 
-- **Not seen on screen**: layout, focus order, freeze-frame visuals, DPI > 100 %, the title bar look with a real
-  owned document window.
-- **IPC validator vs. shape commands** (main-core): `src/main/ipc/validate.ts` accepts `.uno:` names matching
-  `[A-Za-z0-9_.]` only, so the eight hyphenated shape commands (`.uno:BasicShapes.round-rectangle`,
-  `…isosceles-triangle`, `…right-triangle`, `.uno:ArrowShapes.right-arrow|left-right-arrow|up-arrow`,
-  `.uno:CalloutShapes.round-rectangular-callout|cloud-callout`) are rejected with `errors.ipc.invalidRequest`.
-  The fix is to allow `-` there; `commands.test.ts` has an `it.fails` that turns red once it is fixed.
+- **Not seen on screen**: DPI > 100 %, the full keyboard focus order, the title bar look with a real owned document
+  window (ribbon layout, KeyTips and the freeze-frame under a drop-down were seen in GUI runs 3 and 7).
 - Calc cell-attribute dispatches (`Bold`, `BackgroundColor`, `NumberFormatPercent`, `Color`) had no effect on
   **hidden headless** Calc documents in this session's probe (an earlier probe with another sequence saw them apply);
   to be verified with a real view by the engine tests.
@@ -275,10 +270,10 @@ Changes found necessary by the new checks: KeyTip conflicts (Writer Picture Form
 Calc Insert `Z`); collapsed-group KeyTips when a tab uses `Z`; adaptive layout choosing wider forms of a group; option
 hints that were part of accessible names (now `aria-describedby`); five allow-listed commands without a dispatch
 (replaced); `.uno:Crop`, `.uno:CompressGraphic`, `.uno:ChangePicture`, `.uno:SaveGraphic` added for Calc's Picture
-Format tab (dispatch verified). Open item for main-core: allow `-` in `.uno:` names in `src/main/ipc/validate.ts`
-(then drop `.fails` in `tests/unit/renderer/commands.test.ts`).
+Format tab (dispatch verified). Done by main-core since: `.uno:` names may contain `-` (`src/main/ipc/validate.ts`,
+`UNO_NAME`), and `commands.test.ts` checks every allowed command, including the hyphenated shape names.
 
-Review fixes (2026-09-29, `vendor/research-raw/review-2026-09-29.md`, renderer findings) — done, each with a
+Review fixes (2026-09-29, review notes kept outside the repository, renderer findings) — done, each with a
 regression test that was checked to fail against the previous code:
 
 - **#3** freeze-frame follows the shown document (`services/overlay.ts`: `retarget()` from a store subscription and

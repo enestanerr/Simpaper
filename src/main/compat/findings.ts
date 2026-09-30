@@ -1,7 +1,7 @@
 /**
  * Finding catalogue: severity of each detectable feature and whether saving to a given target format
  * puts it at risk. Classification follows the LibreOffice 26.8 feature-fidelity table
- * (vendor/research-raw/formats.md, table 2):
+ * (docs/research/formats.md, table 2):
  *  - `risk`    not supported or lost on save (slicers, Power Query, Morph, ink, 3D, chartex drawing ...)
  *  - `warning` kept but degraded/not editable, or preserved with known bugs
  *  - `info`    supported; listed so the user knows what the file contains

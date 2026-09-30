@@ -14,7 +14,7 @@ explains how to capture them and how to name the files in [`docs/screenshots/`](
    documents you created yourself for the demo. Never show real personal or business documents.
 3. Windows display scaling 100 %, window size **1600 × 1000** (logical pixels), light theme unless the shot is about
    the dark theme. Close other windows that could appear in the capture.
-4. Set the UI language for the shot (Settings → Language). Capture the main screens in **both Turkish and English**.
+4. Set the UI language for the shot (File → Options → Display language). Capture the main screens in **both Turkish and English**.
 5. Hide personal data: the Windows user name in paths, recent-file lists and the title bar.
 
 ## Automated capture
@@ -72,5 +72,6 @@ formula in an XLSX; adding a slide in a PPTX; highlighting text in a PDF.
 
 ## Updating the README
 
-Replace the "Screenshots" placeholder in [README.md](../README.md) and [README.tr.md](../README.tr.md) with the images
-(Turkish images in README.tr.md, English in README.md) and give each image a descriptive `alt` text.
+The Screenshots sections of [README.md](../README.md) (English images) and [README.tr.md](../README.tr.md) (Turkish
+images) embed the files in `docs/screenshots/`. When you replace a shot, keep its file name, update its row in
+[`docs/screenshots/README.md`](screenshots/README.md) and check that the `alt` text still describes the image.

@@ -1,6 +1,6 @@
 # Status and hand-off
 
-_Last updated: 2026-09-29 evening (session 2: review fixes, GUI runs, screenshots, focus and hang fixes, local commits)._ This file is
+_Last updated: 2026-09-30 (session 2: review fixes, GUI runs, screenshots, focus and hang fixes, pre-publication audit)._ This file is
 the entry point for the next working session: read it first, then [ROADMAP.md](ROADMAP.md) (checked boxes = proven
 by automated tests) and the area notes in [dev/](dev/).
 
@@ -12,8 +12,9 @@ session 2: the default **child** hosting mode passes; the **owned** mode is kept
 installed the 0.1.0 installer on this PC and used it (per user, no administrator rights). What still needs a person
 at the screen is listed under "Not verified yet".
 
-The project is a local Git repository (branch `main`, two commits at the end of session 2, **no remote, nothing
-pushed**). Publishing on GitHub is the owner's decision.
+The repository's home is https://github.com/enestanerr/varak (**private**, branch `main`; the local remote `origin`
+points there). Making it public is the owner's decision; what has to come first is listed under "Maintainer TODOs"
+in [dev/repo.md](dev/repo.md).
 
 ### Implemented (code + tests)
 
@@ -32,7 +33,7 @@ pushed**). Publishing on GitHub is the owner's decision.
 | Suite | Command | Result |
 |---|---|---|
 | Unit (main, renderer, PDF, platform, tools) | `npm test` | 63 files, 763 tests passed |
-| Engine integration (real LibreOffice, headless/hidden) | `npm run test:engine` | 14 files, 115 passed, 5 skipped (opt-in long loops), 290 s |
+| Engine integration (real LibreOffice, headless/hidden) | `npm run test:engine` | 14 files, 115 passed, 5 skipped (3 opt-in long loops, 2 by design), 290 s |
 | Bridge (Python) | `vendor/libreoffice/program/python.exe -m unittest discover -s engine/bridge/tests -t engine/bridge` | 109 tests OK |
 | Smoke boot (real app, hidden window) | `node scripts/smoke-boot.mjs --kind calc\|writer\|impress` | all three PASSED |
 | Type check / lint | `npm run typecheck`, `npx tsc -p tests/unit/{renderer,pdf}/tsconfig.renderer-tests.json --noEmit`, `npm run lint` | clean |
@@ -86,6 +87,29 @@ without asking — now the `closeStuck` prompt names the last autosave, Cancel i
 Toolbar and the File tab stayed usable while a LibreOffice dialog was open; the CSV "Other" separator was ignored by
 the import, and choosing another number format switched a legacy file's code page away from the preview's.
 
+### Pre-publication audit (2026-09-30)
+
+Before the first push, five read-only auditors checked the repository, each finding re-checked by a second agent:
+
+- **Secrets and personal data** (all tracked files, the whole history, every image and document's metadata): none.
+  Removed from the history: the local Obsidian settings in `docs/.obsidian/` (now ignored). Commit author e-mail:
+  the GitHub noreply address.
+- **Links:** all operational links point to https://github.com/enestanerr/varak (the `varak-office` organisation of
+  ADR 0007 does not exist yet); the About page and the external-URL allow-list follow `src/shared/brand.ts`.
+- **Licences:** the notices now include the Apache-2.0 parts of brotli and pdf-lib, the licence files of vendored
+  code and MIT texts for packages without one; the installer no longer ships `elevate.exe`, the app no longer ships
+  pdf.js' unused QuickJS sandbox; `delins.docx` is labelled with its Wikipedia excerpt (CC BY-SA 3.0).
+- **CI:** predicted to pass on `windows-latest` (the unit suite passed with TZ=UTC and en-US defaults on a fresh
+  clone). Fixed: the release workflow's notices check depended on the machine's collation; the unit tests no longer
+  load Electron (it would download its binary); the engine job now also runs the unit tests that need the engine
+  image and the Python bridge tests.
+- **Docs:** 15 statements corrected (test counts, "never tried on screen", plans for features v0.1 already has,
+  wait times, labels).
+
+One unexplained failure was seen once in seven full unit runs (`tests/unit/pdf/appearance.test.ts`, "pdf:update
+stores the fixed bytes in the working copy"); it did not come back alone or in four parallel stress runs. If CI
+shows it, look for a transient file lock on the working copy.
+
 ### Important findings of session 1
 
 - **Start-up hang on Turkish Windows (fixed).** LibreOffice's in-process Python (loaded for the Lightproof grammar
@@ -108,7 +132,8 @@ the import, and choosing another number format switched a legacy file's code pag
 - High-DPI (125/150 %) — both monitors of this PC run at 100 %.
 - The installer on a clean Windows machine (it was only installed on this development PC).
 - Nothing is claimed as verified in Microsoft Office (not installed here).
-- CI workflows have not run on GitHub yet.
+- CI on GitHub: the workflows run on every push to `main`; the first results are not recorded here yet
+  (repository → Actions).
 
 ## How to resume
 
@@ -121,7 +146,7 @@ npm run test:engine         # engine integration tests (headless, no windows)
 node scripts/smoke-boot.mjs # real app with a hidden window
 npm run dev                 # starts the app (opens windows!)
 npm run dist:win            # installer + ZIP in release/
-git log --oneline           # local history (no remote configured)
+git log --oneline           # history; remote origin = https://github.com/enestanerr/varak (private)
 ```
 
 Machine notes: C: had about 4.5 GB free at the end of session 2 (a full working copy with a packaged build needs
@@ -132,8 +157,10 @@ data folders (`%APPDATA%\Varak`, `%LOCALAPPDATA%\Varak`); automated runs always 
 
 ## Next steps
 
-1. Publish: create the GitHub repository and push the local history (needs the owner's decision and account; check
-   the commit author e-mail first, it becomes public).
+1. Check the first CI run on GitHub (jobs `Lint, type check, unit tests, build` and
+   `Engine tests (headless LibreOffice)`) and fix what fails. Before making the repository public: the trademark
+   search and the GitHub organisation of ADR 0007, then the Maintainer TODOs in [dev/repo.md](dev/repo.md) (Code of
+   Conduct contact, private vulnerability reporting, Discussions, branch protection).
 2. Verify DPI with a scaled monitor; investigate the owned-mode soffice hang only if child mode shows DPI problems.
 3. Report the Turkish-locale hang upstream (TDF Bugzilla) with the reproduction from dev/engine.md.
 4. Continue with M2 (ROADMAP.md).

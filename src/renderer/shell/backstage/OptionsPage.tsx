@@ -1,4 +1,4 @@
-/** Options: language, theme, saving, CSV defaults, document view mode, interface and Quick Access Toolbar. */
+/** Options: language, theme, saving, CSV defaults, interface and Quick Access Toolbar. */
 import { useId, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IconArrowDown, IconArrowUp } from '@tabler/icons-react';

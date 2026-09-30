@@ -112,7 +112,7 @@ export const SAMPLES = [
   {
     id: 'poi-tracked-changes-docx', source: 'apache-poi', file: 'delins.docx', path: 'test-data/document/delins.docx', bytes: 17_720,
     sha256: '7ecad102602586be7f1371f117fc567ea47f3ed0ca703b353e003002f1ff8d3f', producer: 'Microsoft Office Word 12.0',
-    features: ['tracked-changes'], exercises: 'Tracked changes written by Word (32 w:ins and 4 w:del elements).',
+    features: ['tracked-changes'], exercises: 'Tracked changes written by Word (32 w:ins and 4 w:del elements). Its text includes an excerpt of the English Wikipedia page "Tika" (https://en.wikipedia.org/wiki/Tika) by Wikipedia contributors, CC BY-SA 3.0 (https://creativecommons.org/licenses/by-sa/3.0/).',
     expect: { insElements: 32, delElements: 4 },
   },
   {

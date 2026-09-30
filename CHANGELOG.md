@@ -66,12 +66,17 @@ Nothing has been released yet. This section collects the work towards **v0.1.0**
   for its text boxes and modal views and gives it back afterwards; switching ribbon tabs still leaves the keyboard
   in the document, as in Office.
 - While a document's engine hung, the Varak window did not react to the mouse or keyboard (Windows shares its input
-  queue with LibreOffice's window), so "Restart engine" could not be clicked. After 8 seconds Varak now offers the
-  restart in a separate message box; a hung engine is ended before its view is removed (removing it first could
+  queue with LibreOffice's window), so "Restart engine" could not be clicked. About 8 seconds after the "not
+  responding" bar appears, Varak now offers the restart in a separate message box; a hung engine is ended before its
+  view is removed (removing it first could
   block the app); the "not responding" bar disappears once the document responds again or is restarted.
 - CSV import: a separator typed under "Other" was shown in the preview but the import used the default separator;
   and choosing other number formats for a legacy-encoded file (Windows-1254/1252) switched its code page, so the
   imported text differed from the preview.
+- Third-party notices: code bundled inside dependencies was missing (Apache-2.0 parts of brotli and pdf-lib, the
+  licence files of vendored code, MIT texts of packages without a licence file), and the sort order depended on the
+  build machine's language, so the release check would have failed on GitHub's runners. The installer no longer
+  contains `elevate.exe`, and the app no longer contains pdf.js' unused QuickJS sandbox.
 - The 24 defects of the first adversarial review, among them: edits made while a save was verified could be marked
   saved; unsynced PDF annotations and form edits could be lost on close or quit; the engine folder could be changed
   over IPC; explicit save targets were accepted from the renderer; restoring a crashed document could lose the old
@@ -86,4 +91,4 @@ Nothing has been released yet. This section collects the work towards **v0.1.0**
 - The renderer can no longer change the folder engines are started from, choose save targets without a dialog,
   or pass arguments to engine commands beyond an allow-list.
 
-[Unreleased]: https://github.com/varak-office/varak/commits/main
+[Unreleased]: https://github.com/enestanerr/varak/commits/main

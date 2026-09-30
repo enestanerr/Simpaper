@@ -3,8 +3,10 @@
 Milestones are delivered as working, installable versions. A milestone is done only when every
 acceptance criterion is demonstrated by an automated test or a documented, repeatable manual check.
 Current progress is tracked in [`STATUS.md`](STATUS.md). A checked box below means the criterion is proven by the
-automated tests named next to it; criteria that need a person at a visible desktop stay unchecked until the GUI
-test ([testing/GUI_SPIKE.md](testing/GUI_SPIKE.md)) has been run.
+automated tests named next to it. Criteria that need a visible desktop stay unchecked until every part of them has
+been shown on screen; the GUI runs so far ([testing/GUI_SPIKE.md](testing/GUI_SPIKE.md), Results) covered only parts
+of them (for example ribbon Bold, Ctrl+S, one Calc formula, a new slide, PDF highlight and free text, KeyTips
+appearing on Alt).
 
 ## M0 — Foundations ✅/🔄
 
@@ -58,10 +60,15 @@ Not full Office compatibility — the first installable version.
 
 **Project**
 - [ ] README (EN/TR) with real screenshots, compatibility matrix, known limitations, contribution files, CI.
-      _(All in place, screenshots taken from the running app; open: CI has not run on GitHub yet.)_
+      _(All in place, screenshots taken from the running app; open: a green CI run on GitHub, where the workflows
+      run since the first push.)_
 
 ## M2 — Editing depth and fidelity (v0.2)
 
+- The M1 ribbons already reach several items below through LibreOffice's own commands and dialogs (find & replace,
+  styles gallery, comments, track changes, headers/footers, table of contents, Calc sort/filter/freeze
+  panes/conditional formatting/data validation/charts/print areas, Impress layouts and transitions); M2 covers
+  their depth and their verification on a real desktop.
 - Contextual tabs verified on a real desktop (implemented in M1: table, picture, drawing, chart tabs driven by engine
   context events; KeyTips with Alt/F10).
 - Find & replace UI, print preview, styles gallery, comments and track changes, headers/footers, page numbers,
@@ -77,7 +84,8 @@ Not full Office compatibility — the first installable version.
 
 - Verified matrix for DOC/DOCM/DOTX/DOTM/RTF/TXT/ODT, XLS/XLSM/XLSB/XLTX/XLTM/CSV/TSV/ODS,
   PPT/PPTM/PPS/PPSX/PPSM/POTX/POTM/ODP (open, display, edit, save, convert, preserved/lost features).
-- CSV import dialog with preview; password-protected documents; macro-enabled format policy.
+- Setting and removing document passwords (opening password-protected documents and the CSV import dialog with
+  preview are already in M1, see CHANGELOG.md); macro-enabled format policy.
 - Large-file performance budget and cancellable long operations.
 - Hot-path UNO glue moved into the engine process (in-process Python component) if latency requires it.
 - Per-user file associations (HKCU), auto-update, signed releases (SignPath Foundation).

@@ -24,7 +24,7 @@ data or confidential documents on screen. Delete this section otherwise. -->
 ## Checklist
 
 - [ ] `npm run lint`, `npm run typecheck` and `npm test` pass locally
-- [ ] Engine-related changes: `npm run test:engine` passes (or I explain above why it could not run)
+- [ ] Engine-related changes: `npm run test:engine` passes, and for `engine/bridge` also the Python tests (`vendor/libreoffice/program/python.exe -m unittest discover -s engine/bridge/tests -t engine/bridge`), or I explain above why they could not run
 - [ ] New behaviour is covered by tests; a bug fix comes with a test that fails without the fix
 - [ ] User-facing text is added in **both** Turkish and English (`src/renderer/i18n/locales/{tr,en}`), and in the
       main-process strings where applicable

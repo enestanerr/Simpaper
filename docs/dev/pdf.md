@@ -1,7 +1,7 @@
 # PDF module (developer notes)
 
 The PDF module shows and edits PDFs with **pdf.js 6.3.289** (components build) in the sandboxed renderer and
-changes files with **@cantoo/pdf-lib 2.11.1** in the main process. Research and sources: `vendor/research-raw/pdf.md`.
+changes files with **@cantoo/pdf-lib 2.11.1** in the main process. Research and sources: [docs/research/pdf.md](../research/pdf.md).
 
 ```
 renderer (src/renderer/modules/pdf)                      main (src/main/pdf)
@@ -185,11 +185,12 @@ Tests that import renderer modules are `.test.tsx`: `tsconfig.node.json` is a co
 `npx tsc -p tests/unit/pdf/tsconfig.renderer-tests.json`.
 
 Bundling (worker URL, `import.meta.glob` resources, CSS) was validated with a throw-away Vite build of the module;
-the running UI has not been exercised yet (no GUI runs on the development machine without the owner's consent).
+in the running app the viewer (text and form PDFs), highlighting, free-text notes and saving were exercised on
+screen (GUI runs 2 and 7); forms, page operations, merge, extract and printing only by the unit tests.
 
 ## Progress
 
-Review fixes (2026-09-29, `vendor/research-raw/review-2026-09-29.md` #10, renderer part): `pdf:markModified` on the
+Review fixes (2026-09-29, review notes kept outside the repository, #10, renderer part): `pdf:markModified` on the
 first edit while the main process has the document clean (and again when a save leaves unsynced edits), the module
 `flush` hook, the pre-close flush and the `flushRequest` → `documents:flushDone` answer. Tests:
 `tests/unit/pdf/controller-sync.test.tsx`, `tests/unit/renderer/lifecycle.test.tsx` › "pending PDF edits". The main

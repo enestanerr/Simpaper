@@ -8,7 +8,7 @@ import { QuitController, type QuitDocuments } from '../../../src/main/app/quit';
 import { isAllowedExternalUrl } from '../../../src/main/app/security';
 import { forwardShellKey } from '../../../src/main/app/shellKeys';
 import { configureThreadPool, THREADPOOL_SIZE } from '../../../src/main/app/threadpool';
-import { saveFilters, openFilters } from '../../../src/main/app/dialogs';
+import { saveFilters, openFilters } from '../../../src/main/app/dialogFilters';
 import { engineRescueTexts } from '../../../src/main/app/strings';
 import { chromeColors } from '../../../src/main/app/theme';
 import { silentLog } from './helpers/fakes';
@@ -151,11 +151,14 @@ describe('command line and paths', () => {
 
 describe('security and window chrome', () => {
   it('allows only listed https URLs to open externally', () => {
-    expect(isAllowedExternalUrl('https://github.com/varak-office/varak/issues/12')).toBe(true);
+    expect(isAllowedExternalUrl('https://github.com/enestanerr/varak/issues/12')).toBe(true);
+    expect(isAllowedExternalUrl('https://github.com/enestanerr/varak/blob/main/THIRD_PARTY_NOTICES.md')).toBe(true);
     expect(isAllowedExternalUrl('https://www.mozilla.org/en-US/MPL/2.0/')).toBe(true);
-    expect(isAllowedExternalUrl('http://github.com/varak-office/varak')).toBe(false);
-    expect(isAllowedExternalUrl('https://github.com/varak-officex/evil')).toBe(false);
-    expect(isAllowedExternalUrl('https://user:pw@github.com/varak-office/varak')).toBe(false);
+    expect(isAllowedExternalUrl('http://github.com/enestanerr/varak')).toBe(false);
+    expect(isAllowedExternalUrl('https://github.com/enestanerr/varakx')).toBe(false);
+    expect(isAllowedExternalUrl('https://github.com/enestanerr/other-repo')).toBe(false);
+    expect(isAllowedExternalUrl('https://github.com/varak-office/varak')).toBe(false);
+    expect(isAllowedExternalUrl('https://user:pw@github.com/enestanerr/varak')).toBe(false);
     expect(isAllowedExternalUrl('file:///C:/Windows/System32/calc.exe')).toBe(false);
     expect(isAllowedExternalUrl('javascript:alert(1)')).toBe(false);
   });

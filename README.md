@@ -43,8 +43,11 @@ These are the goals of the first version; [What works today](#what-works-today) 
 
 Varak is being built toward its first installable version. Honest summary as of 2026-09-29. "Unit-tested"
 means automated tests without the running application; "tested with the real engine" means automated tests that
-drive LibreOffice without showing windows. Nothing below has been tried by a person in the running app yet.
-Test counts: 643 unit tests, 107 engine integration tests, 65 bridge tests ([docs/STATUS.md](docs/STATUS.md)).
+drive LibreOffice without showing windows; "used on screen" means automated GUI runs with real mouse and keyboard
+input on the packaged app. Beyond those runs, the app has only been installed and tried by its owner on the
+development PC; no manual test pass ([docs/TEST_REHBERI.md](docs/TEST_REHBERI.md)) is recorded yet.
+Test counts: 763 unit tests (63 files), 115 engine integration tests (14 files; 5 more are skipped: three opt-in
+long loops and two by design), 109 bridge tests ([docs/STATUS.md](docs/STATUS.md)).
 
 | Area | State |
 |---|---|
@@ -57,7 +60,7 @@ Test counts: 643 unit tests, 107 engine integration tests, 65 bridge tests ([doc
 | Documents, Spreadsheets and Presentations modules | **Implemented; the core flows were used on screen:** typing and saving in Writer, a formula in Turkish syntax in Calc, a new slide with the slide pane in Impress. 202 Writer, 225 Calc and 164 Impress commands, each checked against LibreOffice 26.8's command registry and confirmed to dispatch in a headless engine; Calc formula bar and selection statistics; slide commands and slide show |
 | File-format round trips in the engine | **Automated tests pass** (`tests/engine`): generated DOCX, XLSX and PPTX files with Turkish content and license-clean sample files are opened and saved by headless LibreOffice and checked with independent readers and a page-by-page visual comparison, plus conversions to ODF, CSV, TXT, RTF, legacy and template formats. These tests drive the engine directly, not yet through Varak's app; what they found is listed in the [compatibility matrix](docs/COMPATIBILITY.md#test-status). |
 | PDF module | **Implemented and unit-tested; the viewer was used on screen** (a text PDF and a form PDF with Turkish text): viewing with thumbnails, Turkish-aware search (İ/ı), highlight, free text, ink, images and comments, form filling, rotating, deleting, moving, inserting and duplicating pages, merging and extracting, adding text and images, printing, and saving with verification (`tests/unit/pdf`). Highlighting, free-text notes and saving were also checked on screen (the saved file read back independently); the other tools only by unit tests. |
-| Installer, CI, repository documents | **Installer and ZIP build** (`npm run dist:win`: 331 MB installer, 436 MB ZIP); the packaged app passed the hidden-window smoke test for all three office modules. The installer was installed and used on the development PC (per user, without administrator rights); it has not yet been run on a clean machine and there is no public release. CI workflows, community files and documentation are in place; CI has not run on GitHub yet. |
+| Installer, CI, repository documents | **Installer and ZIP build** (`npm run dist:win`: 331 MB installer, 436 MB ZIP); the packaged app passed the hidden-window smoke test for all three office modules. The installer was installed and used on the development PC (per user, without administrator rights); it has not yet been run on a clean machine and there is no public release. CI workflows, community files and documentation are in place; the CI workflow runs on GitHub Actions for every push to `main` and every pull request (results in the repository's Actions tab). |
 
 Nothing has been verified in Microsoft Office; see [docs/TESTING.md](docs/TESTING.md).
 
@@ -66,11 +69,12 @@ Nothing has been verified in Microsoft Office; see [docs/TESTING.md](docs/TESTIN
 - **v0.1 — first installable version:** open, edit and save DOCX, XLSX and PPTX with the ribbon; PDF viewing,
   annotation, form filling and page operations; export to PDF; safe save, loss warnings and crash recovery; Turkish
   and English UI, light and dark theme, keyboard access to the ribbon; per-user installer and ZIP.
-- **v0.2 — depth and fidelity:** find and replace, print preview, styles gallery, comments and track changes UI,
-  Calc sort/filter/freeze/conditional formatting/charts, Impress layouts and transitions, more PDF annotation types,
-  high-DPI verification, broader visual regression tests.
-- **v0.3 — format coverage and robustness:** verified matrix for all legacy and ODF formats, CSV import dialog,
-  password handling, large-file performance, file associations, auto-update and signed releases.
+- **v0.2 — depth and fidelity:** print preview; on-screen verification and deeper support for what the v0.1 ribbons
+  already reach through LibreOffice's commands and dialogs (find and replace, styles, comments and track changes,
+  Calc sort/filter/freeze/conditional formatting/charts, Impress layouts and transitions); more PDF annotation types;
+  high-DPI verification; broader visual regression tests.
+- **v0.3 — format coverage and robustness:** verified matrix for all legacy and ODF formats, setting and removing
+  document passwords, large-file performance, file associations, auto-update and signed releases.
 - **Later:** pivot tables and advanced charts, correcting existing PDF text, redaction, OCR for scanned PDFs,
   accessibility audit, and exploration of Linux and macOS.
 
@@ -94,7 +98,7 @@ The same screens with the Turkish interface are in the [Turkish README](README.t
 
 ## Install
 
-There is no release yet. When v0.1 is released, the [GitHub releases](https://github.com/varak-office/varak/releases)
+There is no release yet. When v0.1 is released, the [GitHub releases](https://github.com/enestanerr/varak/releases)
 page will offer:
 
 - **`Varak-Setup-<version>-x64.exe`** — a per-user installer that does not need administrator rights;
@@ -111,7 +115,7 @@ Prerequisites: Windows 10/11 x64, [Node.js](https://nodejs.org/) 22.13 or newer,
 installer).
 
 ```powershell
-git clone https://github.com/varak-office/varak.git
+git clone https://github.com/enestanerr/varak.git
 cd varak
 npm ci                                  # install dependencies
 npm run engine:fetch                    # download, verify and extract LibreOffice 26.8.0.3 into vendor/

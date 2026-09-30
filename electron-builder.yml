@@ -33,6 +33,9 @@ files:
   - "!**/node_modules/react-dom/**"
   # Optional dependency of pdfjs-dist for rendering in Node; the main process does not render PDFs.
   - "!**/node_modules/@napi-rs/**"
+  # pdf.js scripting sandbox (QuickJS compiled to WebAssembly; pdfjs-dist ships no license for it). Never used:
+  # Varak does not run PDF JavaScript, and the renderer bundles its own pdf.js resources.
+  - "!**/node_modules/pdfjs-dist/wasm/quickjs-eval.*"
 
 asar: true
 asarUnpack:
@@ -110,6 +113,9 @@ nsis:
   oneClick: false
   perMachine: false
   allowElevation: false
+  # No resources/elevate.exe (third-party helper, (C) 2007 Johannes Passing): it is only needed for per-machine
+  # installs with electron-updater, and Varak uses neither.
+  packElevateHelper: false
   allowToChangeInstallationDirectory: true
   createDesktopShortcut: true
   createStartMenuShortcut: true

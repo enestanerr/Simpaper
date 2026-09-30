@@ -24,10 +24,10 @@ rest of the project ([ADR 0006](docs/adr/0006-license.md)). There is no contribu
 
 ## Ways to contribute
 
-- **Report a bug** with the [bug report form](https://github.com/varak-office/varak/issues/new/choose). Never
+- **Report a bug** with the [bug report form](https://github.com/enestanerr/varak/issues/new/choose). Never
   attach confidential documents; create a small file that shows the problem instead.
 - **Suggest a feature** with the feature request form, or start a
-  [discussion](https://github.com/varak-office/varak/discussions) when the idea is not concrete yet. Check the
+  [discussion](https://github.com/enestanerr/varak/discussions) when the idea is not concrete yet. Check the
   [roadmap](docs/ROADMAP.md) first.
 - **Improve translations**: every user-facing text exists in Turkish and English (see [Translations](#translations)).
 - **Add test files**: small documents that exercise a feature, generated or under a permissive license (see
@@ -51,7 +51,7 @@ rest of the project ([ADR 0006](docs/adr/0006-license.md)). There is no contribu
 ### First build
 
 ```powershell
-git clone https://github.com/varak-office/varak.git
+git clone https://github.com/enestanerr/varak.git
 cd varak
 npm ci                  # exact dependency versions from package-lock.json
 npm run engine:fetch    # downloads LibreOffice 26.8.0.3, verifies SHA-256 and signature, extracts it to vendor/
@@ -110,7 +110,7 @@ notes in [docs/dev/](docs/dev/).
 | `src/renderer/` | React UI: `shell/` (title bar, backstage, tabs, status bar), `ribbon/` (ribbon framework), `modules/` (writer, calc, impress, pdf), `i18n/`, `theme/` |
 | `engine/bridge/` | `varak_bridge`, a Python package that runs on LibreOffice's bundled Python and talks UNO to the engine; NDJSON JSON-RPC over stdio |
 | `engine/profile/` | Template of the engine's user profile (macros disabled, updates off, shortcuts) |
-| `scripts/` | Engine fetch/prepare/verify, corpus generator, notices, icons |
+| `scripts/` | Engine fetch/prepare/verify, corpus generator, notices, icons, smoke boot (`smoke-boot.mjs`), GUI runs and on-screen checks (`gui/`, `gui/checks/`; they open windows, see [Testing rules](#testing-rules)) |
 | `tests/` | `unit/`, `engine/` (headless LibreOffice), `tools/` (independent OOXML/ODF/PDF readers), `corpus/` |
 
 Contracts live in `src/shared/*.ts`, `src/shared/api/*.ts`, `src/main/*/types.ts`, `src/renderer/ribbon/types.ts`
@@ -229,6 +229,8 @@ only commands on the allow-list in `src/shared/commands.ts`, so a new command ne
 - The [pull request template](.github/PULL_REQUEST_TEMPLATE.md) contains the checklist; in short:
   - [ ] `npm run lint`, `npm run typecheck`, `npm test` pass (and `npm run test:engine` for engine-related changes),
         with the summary lines pasted into the description;
+  - [ ] changes in `engine/bridge`: the Python tests pass
+        (`vendor/libreoffice/program/python.exe -m unittest discover -s engine/bridge/tests -t engine/bridge`);
   - [ ] tests for new behaviour; a failing test first for bug fixes;
   - [ ] every new user-facing text in Turkish **and** English;
   - [ ] no claims beyond what was tested; screenshots of the real app for UI changes;
